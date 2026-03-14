@@ -1,0 +1,772 @@
+/* ============================================
+   파이프 계산기 - calculator.js
+   8개 계산기: 오프셋, 엘보+탄젠트, 절단길이, 원주, 수축량, 단위변환, 각도/투영, 용접설정
+   ============================================ */
+
+const Calculator = {
+  data: null,
+
+  async init() {
+    try {
+      const res = await fetch('data/pipe-data.json');
+      this.data = await res.json();
+    } catch (e) {
+      console.error('파이프 데이터 로드 실패:', e);
+      return;
+    }
+
+    this._setupTabs();
+    this._populateSizeSelects();
+    this._buildFractionGrid();
+  },
+
+  // --- 탭 전환 ---
+  _setupTabs() {
+    document.getElementById('calcTabs').addEventListener('click', (e) => {
+      const tab = e.target.closest('.calc-tab');
+      if (!tab) return;
+
+      document.querySelectorAll('.calc-tab').forEach(t => t.classList.remove('calc-tab--active'));
+      document.querySelectorAll('.calc-panel').forEach(p => p.classList.remove('calc-panel--active'));
+
+      tab.classList.add('calc-tab--active');
+      document.getElementById('panel-' + tab.dataset.calc).classList.add('calc-panel--active');
+    });
+  },
+
+  // --- 사이즈 드롭다운 채우기 ---
+  _populateSizeSelects() {
+    const sizes = this.data.pipeSizes;
+    ['elbowSize', 'shrinkageSize', 'tangentSize', 'weldSize'].forEach(id => {
+      const sel = document.getElementById(id);
+      sizes.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.od_inch;
+        opt.textContent = `${s.nominal} (OD ${s.od_mm}mm)`;
+        sel.appendChild(opt);
+      });
+      sel.value = '2'; // 기본 2"
+    });
+  },
+
+  // --- 분수 inch 그리드 ---
+  _buildFractionGrid() {
+    const fractions = [
+      { label: '1/16"', value: 0.0625 },
+      { label: '1/8"', value: 0.125 },
+      { label: '3/16"', value: 0.1875 },
+      { label: '1/4"', value: 0.25 },
+      { label: '5/16"', value: 0.3125 },
+      { label: '3/8"', value: 0.375 },
+      { label: '7/16"', value: 0.4375 },
+      { label: '1/2"', value: 0.5 },
+      { label: '9/16"', value: 0.5625 },
+      { label: '5/8"', value: 0.625 },
+      { label: '11/16"', value: 0.6875 },
+      { label: '3/4"', value: 0.75 },
+      { label: '13/16"', value: 0.8125 },
+      { label: '7/8"', value: 0.875 },
+      { label: '15/16"', value: 0.9375 },
+      { label: '1"', value: 1.0 }
+    ];
+
+    const grid = document.getElementById('fractionGrid');
+    fractions.forEach(f => {
+      const btn = document.createElement('button');
+      btn.className = 'calc-fraction-btn';
+      btn.textContent = f.label;
+      btn.addEventListener('click', () => {
+        document.getElementById('convertInch').value = f.value;
+        this.convertFromInch();
+      });
+      grid.appendChild(btn);
+    });
+  },
+
+  // --- 결과 표시 헬퍼 ---
+  _showResult(id, html) {
+    document.getElementById(id).innerHTML = html;
+  },
+
+  _round(val, digits = 3) {
+    return Math.round(val * Math.pow(10, digits)) / Math.pow(10, digits);
+  },
+
+  _toMm(val, unit) {
+    return unit === 'mm' ? val : val * 25.4;
+  },
+
+  _formatBoth(valInch, valMm) {
+    return `${this._round(valInch)}" (${this._round(valMm, 2)}mm)`;
+  },
+
+  // ===== 1. 파이프 오프셋 =====
+  calcOffset() {
+    const angle = parseFloat(document.getElementById('offsetAngle').value);
+    const set = parseFloat(document.getElementById('offsetSet').value);
+    const unit = document.getElementById('offsetUnit').value;
+
+    if (!set || set <= 0) {
+      this._showResult('result-offset', '<p class="calc-result__error">Set 값을 입력하세요</p>');
+      return;
+    }
+
+    const rad = angle * Math.PI / 180;
+    const travel = set / Math.sin(rad);
+    const run = set / Math.tan(rad);
+
+    const setMm = this._toMm(set, unit);
+    const travelMm = this._toMm(travel, unit);
+    const runMm = this._toMm(run, unit);
+
+    this._showResult('result-offset', `
+      <div class="calc-result__grid">
+        <div class="calc-result__item">
+          <span class="calc-result__label">Travel</span>
+          <span class="calc-result__value">${this._round(travel)} ${unit}</span>
+          <span class="calc-result__sub">${unit === 'inch' ? this._round(travelMm, 2) + 'mm' : this._round(travel / 25.4) + '"'}</span>
+        </div>
+        <div class="calc-result__item">
+          <span class="calc-result__label">Run</span>
+          <span class="calc-result__value">${this._round(run)} ${unit}</span>
+          <span class="calc-result__sub">${unit === 'inch' ? this._round(runMm, 2) + 'mm' : this._round(run / 25.4) + '"'}</span>
+        </div>
+        <div class="calc-result__item">
+          <span class="calc-result__label">Set</span>
+          <span class="calc-result__value">${this._round(set)} ${unit}</span>
+          <span class="calc-result__sub">${unit === 'inch' ? this._round(setMm, 2) + 'mm' : this._round(set / 25.4) + '"'}</span>
+        </div>
+      </div>
+      <p class="calc-result__note">상수: ${angle}° → Travel = Set × ${this._round(1 / Math.sin(rad), 4)}</p>
+    `);
+  },
+
+  // ===== 2. 엘보 테이크아웃 =====
+  calcElbow() {
+    const size = document.getElementById('elbowSize').value;
+    const type = document.getElementById('elbowType').value;
+
+    const elbowData = this.data.elbowTakeout.types[type];
+    const takeout = elbowData.values[size];
+    const takeoutMm = takeout * 25.4;
+    const sizeInfo = this.data.pipeSizes.find(s => s.od_inch === parseFloat(size));
+
+    this._showResult('result-elbow', `
+      <div class="calc-result__grid">
+        <div class="calc-result__item calc-result__item--primary">
+          <span class="calc-result__label">테이크아웃</span>
+          <span class="calc-result__value">${takeout}" (${this._round(takeoutMm, 2)}mm)</span>
+        </div>
+      </div>
+      <p class="calc-result__note">${sizeInfo.nominal} ${elbowData.name} — 공식: ${elbowData.formula}</p>
+    `);
+  },
+
+  // ===== 2-2. 탄젠트 엘보 =====
+  calcTangentElbow() {
+    const od = parseFloat(document.getElementById('tangentSize').value);
+    const totalAngle = parseFloat(document.getElementById('tangentAngle').value);
+    const pieces = parseInt(document.getElementById('tangentPieces').value);
+    const sizeInfo = this.data.pipeSizes.find(s => s.od_inch === od);
+
+    const nWelds = pieces - 1;
+    const cutAngleDeg = totalAngle / (2 * nWelds);
+    const cutAngleRad = cutAngleDeg * Math.PI / 180;
+
+    // 파이프 표면 마킹: 짧은쪽~긴쪽 차이
+    const miterMark = od * Math.tan(cutAngleRad);
+    const miterMarkMm = miterMark * 25.4;
+
+    // 최소 직관부 (양쪽 끝)
+    const minTangent = Math.max(1.5, od);
+
+    // 고어(가운데 피스) 최소 길이
+    const nGore = Math.max(0, pieces - 2);
+    const goreMin = nGore > 0 ? Math.max(1.5, od) : 0;
+
+    // 필요 파이프 총 길이 (대략)
+    const endPiece = minTangent + miterMark / 2;
+    const totalPipe = 2 * endPiece + nGore * (goreMin + miterMark);
+
+    // 기성품 비교
+    const lr90 = 1.5 * od;
+    const sr90 = od;
+
+    let html = `
+      <div class="calc-result__grid">
+        <div class="calc-result__item calc-result__item--primary">
+          <span class="calc-result__label">절단 각도</span>
+          <span class="calc-result__value">${this._round(cutAngleDeg, 1)}°</span>
+          <span class="calc-result__sub">수직선에서 ${this._round(cutAngleDeg, 1)}° 기울여 절단</span>
+        </div>
+        <div class="calc-result__item">
+          <span class="calc-result__label">마킹 치수</span>
+          <span class="calc-result__value">${this._round(miterMark, 3)}"</span>
+          <span class="calc-result__sub">${this._round(miterMarkMm, 1)}mm</span>
+        </div>
+      </div>
+      <div class="calc-result__breakdown">
+        <p><strong>절단 마킹</strong>: 파이프 한쪽에서 반대쪽까지 ${this._round(miterMark, 3)}" (${this._round(miterMarkMm, 1)}mm) 차이로 사선 표시</p>
+        <p><strong>최소 직관부</strong>: 양쪽 끝 각 ${this._round(minTangent, 1)}" 이상 확보</p>`;
+    if (nGore > 0) {
+      html += `<p><strong>가운데 피스</strong>: ${nGore}개, 각 ${this._round(goreMin, 1)}" 이상</p>`;
+    }
+    html += `
+        <p><strong>필요 파이프</strong>: 약 ${this._round(totalPipe, 1)}" (${this._round(totalPipe * 25.4, 0)}mm) 최소</p>
+      </div>
+      <div class="calc-result__breakdown" style="margin-top:0.75rem; border-top:1px solid var(--border); padding-top:0.75rem;">
+        <p><strong>기성품 비교</strong></p>
+        <p>90° LR 테이크아웃: ${lr90}" | 90° SR: ${sr90}" | 45° LR: ${this._round(0.625 * od, 3)}"</p>
+      </div>
+      <p class="calc-result__note">${sizeInfo.nominal} ${pieces}-piece ${totalAngle}° 탄젠트 — 용접 ${nWelds}개소</p>`;
+
+    this._showResult('result-tangent', html);
+  },
+
+  // ===== 3. 절단 길이 =====
+  calcCutLength() {
+    const total = parseFloat(document.getElementById('cutTotal').value);
+    const fitting = parseFloat(document.getElementById('cutFitting').value) || 0;
+    const welds = parseInt(document.getElementById('cutWelds').value) || 0;
+    const shrinkPerJoint = parseFloat(document.getElementById('cutShrinkage').value) || 0;
+    const unit = document.getElementById('cutUnit').value;
+
+    if (!total || total <= 0) {
+      this._showResult('result-cutlength', '<p class="calc-result__error">전체 길이를 입력하세요</p>');
+      return;
+    }
+
+    // 수축량은 항상 mm로 입력됨 → 단위 맞추기
+    let shrinkTotal = shrinkPerJoint * welds;
+    let shrinkInUnit = unit === 'mm' ? shrinkTotal : shrinkTotal / 25.4;
+
+    const cutLength = total - fitting - shrinkInUnit;
+
+    this._showResult('result-cutlength', `
+      <div class="calc-result__grid">
+        <div class="calc-result__item calc-result__item--primary">
+          <span class="calc-result__label">절단 길이</span>
+          <span class="calc-result__value">${this._round(cutLength)} ${unit}</span>
+          <span class="calc-result__sub">${unit === 'inch' ? this._round(cutLength * 25.4, 2) + 'mm' : this._round(cutLength / 25.4) + '"'}</span>
+        </div>
+      </div>
+      <div class="calc-result__breakdown">
+        <p>전체: ${total} ${unit}</p>
+        <p>- 피팅: ${fitting} ${unit}</p>
+        <p>- 수축: ${this._round(shrinkInUnit)} ${unit} (${shrinkPerJoint}mm × ${welds}개소)</p>
+        <p><strong>= ${this._round(cutLength)} ${unit}</strong></p>
+      </div>
+    `);
+  },
+
+  // ===== 4. 파이프 원주 =====
+  calcCircumference() {
+    const od = parseFloat(document.getElementById('circOD').value);
+    const unit = document.getElementById('circUnit').value;
+
+    if (!od || od <= 0) {
+      this._showResult('result-circumference', '<p class="calc-result__error">외경(OD)을 입력하세요</p>');
+      return;
+    }
+
+    const circ = Math.PI * od;
+    const half = circ / 2;
+
+    this._showResult('result-circumference', `
+      <div class="calc-result__grid">
+        <div class="calc-result__item">
+          <span class="calc-result__label">원주</span>
+          <span class="calc-result__value">${this._round(circ)} ${unit}</span>
+          <span class="calc-result__sub">${unit === 'inch' ? this._round(circ * 25.4, 2) + 'mm' : this._round(circ / 25.4) + '"'}</span>
+        </div>
+        <div class="calc-result__item">
+          <span class="calc-result__label">반원주</span>
+          <span class="calc-result__value">${this._round(half)} ${unit}</span>
+          <span class="calc-result__sub">${unit === 'inch' ? this._round(half * 25.4, 2) + 'mm' : this._round(half / 25.4) + '"'}</span>
+        </div>
+      </div>
+    `);
+  },
+
+  // ===== 5. 용접 수축량 =====
+  calcShrinkage() {
+    const size = document.getElementById('shrinkageSize').value;
+    const welds = parseInt(document.getElementById('shrinkageWelds').value) || 1;
+
+    const perJoint = this.data.weldShrinkage.values[size];
+    const total = perJoint * welds;
+    const totalInch = total / 25.4;
+    const sizeInfo = this.data.pipeSizes.find(s => s.od_inch === parseFloat(size));
+
+    this._showResult('result-shrinkage', `
+      <div class="calc-result__grid">
+        <div class="calc-result__item calc-result__item--primary">
+          <span class="calc-result__label">총 수축량</span>
+          <span class="calc-result__value">${this._round(total, 2)}mm (${this._round(totalInch)}")</span>
+        </div>
+        <div class="calc-result__item">
+          <span class="calc-result__label">1개소당</span>
+          <span class="calc-result__value">${perJoint}mm</span>
+        </div>
+      </div>
+      <p class="calc-result__note">${sizeInfo.nominal} × ${welds}개소 — 고순도 SST TIG 기준</p>
+    `);
+  },
+
+  // ===== 6. 단위 변환 =====
+  convertFromInch() {
+    const inch = parseFloat(document.getElementById('convertInch').value);
+    if (isNaN(inch)) {
+      document.getElementById('convertMm').value = '';
+      this._showResult('result-convert', '');
+      return;
+    }
+    const mm = inch * 25.4;
+    document.getElementById('convertMm').value = this._round(mm, 3);
+    this._showConvertResult(inch, mm);
+  },
+
+  convertFromMm() {
+    const mm = parseFloat(document.getElementById('convertMm').value);
+    if (isNaN(mm)) {
+      document.getElementById('convertInch').value = '';
+      this._showResult('result-convert', '');
+      return;
+    }
+    const inch = mm / 25.4;
+    document.getElementById('convertInch').value = this._round(inch, 4);
+    this._showConvertResult(inch, mm);
+  },
+
+  // ===== 7. 각도 편차 + 투영 보정 (파이프 길이 기반) =====
+  calcTolerance() {
+    const length = parseFloat(document.getElementById('tolLength').value);
+    const angle = parseFloat(document.getElementById('tolAngle').value);
+    const deviation = parseFloat(document.getElementById('tolDeviation').value) || 0;
+    const unit = document.getElementById('tolUnit').value;
+
+    if (!length || length <= 0) {
+      this._showResult('result-tolerance', '<p class="calc-result__error">도면 치수(길이)를 입력하세요</p>');
+      return;
+    }
+
+    const rad = angle * Math.PI / 180;
+    const cosA = Math.abs(Math.cos(rad));
+    const sinA = Math.abs(Math.sin(rad));
+    const toInch = (v) => unit === 'inch' ? v : v / 25.4;
+    const judge = (v) => {
+      const vi = toInch(v);
+      if (vi <= 0.01) return '<span style="color:#16a34a">0.01" 이내 (타이트 OK)</span>';
+      if (vi <= 0.03) return '<span style="color:#2563eb">0.03" 이내 (일반 OK)</span>';
+      return '<span style="color:#dc2626">0.03" 초과 (공차 벗어남)</span>';
+    };
+    const r = (v) => this._round(v, 4);
+    const r2 = (v) => this._round(v, 2);
+
+    // ── 투영 보정 (항상 표시: 길이 + 각도만 있으면 됨) ──
+    const actualFromH = cosA > 0.001 ? length / cosA : null;
+    const actualFromV = sinA > 0.001 ? length / sinA : null;
+
+    let projectionHtml = `
+      <div class="calc-result__breakdown" style="margin-top:0.5rem;">
+        <p><strong>도면치수 → 실제 파이프 길이</strong></p>`;
+    if (actualFromH !== null) {
+      const diffH = Math.abs(actualFromH - length);
+      projectionHtml += `<p>도면 ${r(length)}${unit}이 수평 투영이면 → 실제 파이프 <strong>${r(actualFromH)}${unit}</strong> (차이 ${r(diffH)}${unit}) ${judge(diffH)}</p>`;
+    }
+    if (actualFromV !== null && angle !== 90) {
+      const diffV = Math.abs(actualFromV - length);
+      projectionHtml += `<p>도면 ${r(length)}${unit}이 수직 투영이면 → 실제 파이프 <strong>${r(actualFromV)}${unit}</strong> (차이 ${r(diffV)}${unit}) ${judge(diffV)}</p>`;
+    }
+    projectionHtml += `<p style="color:var(--text-muted); font-size:0.85rem;">* 차이가 공차 이내면 직선으로 잘라도 OK</p></div>`;
+
+    // ── 편차가 없으면 투영 보정만 표시 ──
+    if (deviation <= 0) {
+      this._showResult('result-tolerance', `
+        <div class="calc-result__grid">
+          <div class="calc-result__item calc-result__item--primary">
+            <span class="calc-result__label">기준 높이</span>
+            <span class="calc-result__value">${r(length * sinA)} ${unit}</span>
+          </div>
+          <div class="calc-result__item">
+            <span class="calc-result__label">기준 수평</span>
+            <span class="calc-result__value">${r(length * cosA)} ${unit}</span>
+          </div>
+        </div>
+        ${projectionHtml}
+        <p class="calc-result__note">각도 편차를 입력하면 오차 영향도 함께 계산됩니다</p>
+      `);
+      return;
+    }
+
+    // ── 편차 분석 (편차 입력 시) ──
+    const radMinus = (angle - deviation) * Math.PI / 180;
+    const radPlus = (angle + deviation) * Math.PI / 180;
+    const baseH = length * sinA;
+    const baseR = length * cosA;
+    const minusH = length * Math.sin(radMinus);
+    const minusR = length * Math.cos(radMinus);
+    const plusH = length * Math.sin(radPlus);
+    const plusR = length * Math.cos(radPlus);
+
+    const heightDiff = Math.max(Math.abs(plusH - baseH), Math.abs(minusH - baseH));
+    const horizDiff = Math.max(Math.abs(plusR - baseR), Math.abs(minusR - baseR));
+
+    // 역계산: 허용 최대 각도 편차
+    const lengthInch = toInch(length);
+    const maxDevH03 = cosA > 0.001 ? (0.03 / (lengthInch * cosA)) * 180 / Math.PI : 999;
+    const maxDevH01 = cosA > 0.001 ? (0.01 / (lengthInch * cosA)) * 180 / Math.PI : 999;
+    const maxDevR03 = sinA > 0.001 ? (0.03 / (lengthInch * sinA)) * 180 / Math.PI : 999;
+    const maxDevR01 = sinA > 0.001 ? (0.01 / (lengthInch * sinA)) * 180 / Math.PI : 999;
+
+    this._showResult('result-tolerance', `
+      <div class="calc-result__grid">
+        <div class="calc-result__item calc-result__item--primary">
+          <span class="calc-result__label">높이 변화량</span>
+          <span class="calc-result__value">${r(heightDiff)} ${unit}</span>
+          <span class="calc-result__sub">${judge(heightDiff)}</span>
+        </div>
+        <div class="calc-result__item">
+          <span class="calc-result__label">수평 변화량</span>
+          <span class="calc-result__value">${r(horizDiff)} ${unit}</span>
+          <span class="calc-result__sub">${judge(horizDiff)}</span>
+        </div>
+      </div>
+      <div class="calc-result__breakdown">
+        <p><strong>${r2(angle - deviation)}°</strong> : 높이 ${r(minusH)}, 수평 ${r(minusR)} ${unit}</p>
+        <p><strong>${r2(angle)}° (기준)</strong> : 높이 ${r(baseH)}, 수평 ${r(baseR)} ${unit}</p>
+        <p><strong>${r2(angle + deviation)}°</strong> : 높이 ${r(plusH)}, 수평 ${r(plusR)} ${unit}</p>
+      </div>
+      <div class="calc-result__breakdown" style="margin-top:0.75rem; border-top:1px solid var(--border); padding-top:0.75rem;">
+        <p><strong>허용 각도 편차 (${length}${unit})</strong></p>
+        <p>높이 기준: ±${r2(maxDevH03)}° (0.03"), ±${r2(maxDevH01)}° (0.01")</p>
+        <p>수평 기준: ±${r2(maxDevR03)}° (0.03"), ±${r2(maxDevR01)}° (0.01")</p>
+      </div>
+      ${projectionHtml}
+      <p class="calc-result__note">파이프 ${length}${unit} × ${angle}° — 길이가 길수록 허용 각도 편차가 줄어듦</p>
+    `);
+  },
+
+  // ===== 8. 용접 파라미터 (펄스 TIG) =====
+  // 알고리즘 근거: Pro-Fusion Orbital Welding, AWS B2.1, MDPI 2025 연구
+  // 핵심 공식: 벽 두께 → 전류(1A/mil) + 이동속도(4-10 IPM) + PPS(75% 오버랩) 연립
+  calcWeldParam() {
+    const od = parseFloat(document.getElementById('weldSize').value);
+    const wallRaw = parseFloat(document.getElementById('weldWall').value) || 0;
+    const wallUnit = document.getElementById('weldWallUnit').value;
+    const peak = parseFloat(document.getElementById('weldPeak').value);
+    const bgPercent = parseFloat(document.getElementById('weldBG').value);
+    const pps = parseFloat(document.getElementById('weldPPS').value) || 1;
+    const duty = parseFloat(document.getElementById('weldDuty').value) || 50;
+    const voltage = parseFloat(document.getElementById('weldVolt').value) || 8;
+    const rpmInput = document.getElementById('weldRPM').value.trim();
+    const rpm = rpmInput ? parseFloat(rpmInput) : 0;
+
+    if (!peak || isNaN(bgPercent)) {
+      this._showResult('result-weldparam', '<p class="calc-result__error">피크 전류와 BG %를 입력하세요</p>');
+      return;
+    }
+
+    const sizeInfo = this.data.pipeSizes.find(s => s.od_inch === od);
+    const odMm = od * 25.4;
+    const circumMm = Math.PI * odMm;
+    const r = (v) => this._round(v, 2);
+
+    // 벽 두께 → mm/inch 통일
+    const wallMm = wallUnit === 'inch' ? wallRaw * 25.4 : wallRaw;
+    const wallInch = wallUnit === 'inch' ? wallRaw : wallRaw / 25.4;
+    const wallMils = wallInch * 1000;
+    const wallDisplay = wallMm > 0 ? `${r(wallMm)}mm (${this._round(wallInch, 3)}")` : '';
+
+    // BG% → 실제 암페어
+    const bgAmps = peak * (bgPercent / 100);
+    const peakBgRatio = bgPercent > 0 ? (100 / bgPercent) : 999;
+
+    // 평균 전류
+    const iAvg = peak * (duty / 100) + bgAmps * (1 - duty / 100);
+
+    // 열입력 판정
+    const judgeHI = (hi) => {
+      if (hi <= 0.2) return ['극저 (용입 부족 주의)', '#2563eb'];
+      if (hi <= 0.35) return ['최적 (STS 권장)', '#16a34a'];
+      if (hi <= 0.5) return ['안전', '#16a34a'];
+      if (hi <= 1.0) return ['보통 (모니터링)', '#2563eb'];
+      if (hi <= 1.5) return ['주의 (변형 가능)', '#ea580c'];
+      return ['위험 (열변형 발생)', '#dc2626'];
+    };
+
+    // ── 업계 표준 기반 추천 엔진 (벽 두께가 모든 것을 결정) ──
+    // 출처: Pro-Fusion Orbital Welding, 1A/mil 규칙, 4-10 IPM 범위
+    let rec = null;
+    if (wallMm > 0) {
+      rec = {};
+      // 1. 목표 평균 전류: STS는 1A per mil (CS 대비 ~10% 감소)
+      rec.targetIAvg = wallMils * 1.0;
+
+      // 2. 이동 속도 (IPM): 벽 두께에 반비례 — 얇으면 빠름
+      //    0.030" → ~9.5 IPM, 0.065" → ~7.75, 0.083" → ~6.85, 0.120" → ~5, 0.154" → ~3.5
+      rec.optIPM = Math.max(3.5, Math.min(10, 11 - wallMils * 0.05));
+      rec.minIPM = rec.optIPM * 0.8;
+      rec.maxIPM = Math.min(10, rec.optIPM * 1.2);
+
+      // 3. RPM = 속도 / 원주
+      rec.optSpeed = rec.optIPM * 25.4; // mm/min
+      rec.optRPM = rec.optSpeed / circumMm;
+      rec.minRPM = (rec.minIPM * 25.4) / circumMm;
+      rec.maxRPM = (rec.maxIPM * 25.4) / circumMm;
+
+      // 4. 추천 펄스 설정 (Peak:BG = 3:1, Duty 벽 두께별)
+      rec.bgPct = 33; // 3:1 비율
+      rec.duty = wallMils <= 50 ? 30 : wallMils <= 80 ? 35 : wallMils <= 120 ? 40 : 45;
+      const avgFactor = rec.duty / 100 + (rec.bgPct / 100) * (1 - rec.duty / 100);
+      rec.peak = Math.round(rec.targetIAvg / avgFactor);
+      if (rec.peak > 250) rec.peak = 250;
+      if (rec.peak < 30) rec.peak = 30;
+      rec.bgAmps = rec.peak * rec.bgPct / 100;
+      rec.iAvg = rec.peak * (rec.duty / 100) + rec.bgAmps * (1 - rec.duty / 100);
+
+      // 5. 추천 PPS (75% 오버랩 기준: 용융지 ≈ 2.5×벽)
+      const spotDia = 2.5 * wallInch; // inch
+      const stepPerPulse = spotDia * 0.25; // 75% overlap
+      rec.pps = stepPerPulse > 0 ? Math.max(1, Math.round((rec.optIPM / 60) / stepPerPulse)) : 3;
+
+      // 6. 열입력 검증
+      rec.heatKJ = (voltage * rec.iAvg * 60) / rec.optSpeed / 1000;
+
+      // 7. 리플 간격 검증
+      rec.ripple = rec.pps > 0 ? (rec.optSpeed / 60) / rec.pps : 0;
+    }
+
+    // ── 결과 출력 ──
+    let html = `
+      <div class="calc-result__grid">
+        <div class="calc-result__item calc-result__item--primary">
+          <span class="calc-result__label">평균 전류</span>
+          <span class="calc-result__value">${r(iAvg)} A</span>
+          <span class="calc-result__sub">Peak ${peak}A × ${duty}% + BG ${r(bgAmps)}A(${bgPercent}%) × ${100-duty}%</span>
+        </div>
+        <div class="calc-result__item">
+          <span class="calc-result__label">BG 실제 전류</span>
+          <span class="calc-result__value">${r(bgAmps)} A</span>
+          <span class="calc-result__sub">Peak:BG = ${r(peakBgRatio)}:1</span>
+        </div>
+      </div>`;
+
+    // ── 현재 설정 분석 (RPM 입력 시) ──
+    if (rpm > 0) {
+      const speed = rpm * circumMm;
+      const speedIPM = speed / 25.4;
+      const heatJ = (voltage * iAvg * 60) / speed;
+      const heatKJ = heatJ / 1000;
+      const weldTimeSec = 60 / rpm;
+      const ripple = pps > 0 ? (speed / 60) / pps : 0;
+      const [hiLabel, hiColor] = judgeHI(heatKJ);
+
+      html += `
+      <div class="calc-result__breakdown" style="margin-top:0.75rem;">
+        <p><strong>현재 설정 분석</strong></p>
+        <p>이동 속도: <strong>${r(speed)} mm/min</strong> (${r(speedIPM)} IPM)</p>
+        <p>열입력: <strong style="color:${hiColor}">${this._round(heatKJ, 3)} kJ/mm — ${hiLabel}</strong></p>
+        <p>리플 간격: ${r(ripple)} mm/펄스</p>
+        <p>1회전: ${r(weldTimeSec)}초 | 원주: ${r(circumMm)}mm</p>`;
+      if (wallMm > 0) {
+        html += `<p>벽 두께 대비: ${r(heatJ / wallMm)} J/mm² (${wallDisplay})</p>`;
+      }
+      html += `</div>`;
+    }
+
+    // ── 업계 표준 추천 (벽 두께 기반 — 핵심 섹션) ──
+    if (rec) {
+      const [recHILabel, recHIColor] = judgeHI(rec.heatKJ);
+
+      html += `
+      <div class="calc-result__breakdown" style="margin-top:0.75rem; border-top:1px solid var(--border); padding-top:0.75rem; background:var(--color-bg-alt, #f0f9ff); padding:0.75rem; border-radius:8px;">
+        <p style="font-weight:bold; font-size:1.05rem;">업계 표준 추천 (${wallDisplay})</p>
+        <p style="color:var(--text-muted); font-size:0.85rem;">STS 1A/mil + 이동속도 4-10 IPM + Peak:BG 3:1 기준</p>
+        <table style="width:100%; font-size:0.9rem; margin-top:0.5rem; border-collapse:collapse;">
+          <tr style="border-bottom:1px solid var(--border);">
+            <th style="text-align:left; padding:0.25rem 0;"></th>
+            <th style="text-align:right;">내 설정</th>
+            <th style="text-align:right;">추천</th>
+            <th style="text-align:right;">판정</th>
+          </tr>
+          <tr>
+            <td style="padding:0.25rem 0;">Peak</td>
+            <td style="text-align:right;">${peak}A</td>
+            <td style="text-align:right;">${rec.peak}A</td>
+            <td style="text-align:right;">${Math.abs(peak - rec.peak) <= 15 ? '<span style="color:#16a34a">OK</span>' : peak > rec.peak ? '<span style="color:#ea580c">높음</span>' : '<span style="color:#2563eb">낮음</span>'}</td>
+          </tr>
+          <tr>
+            <td>BG</td>
+            <td style="text-align:right;">${bgPercent}%</td>
+            <td style="text-align:right;">${rec.bgPct}%</td>
+            <td style="text-align:right;">${Math.abs(bgPercent - rec.bgPct) <= 10 ? '<span style="color:#16a34a">OK</span>' : bgPercent > rec.bgPct + 10 ? '<span style="color:#ea580c">높음</span>' : '<span style="color:#16a34a">OK</span>'}</td>
+          </tr>
+          <tr>
+            <td>Duty</td>
+            <td style="text-align:right;">${duty}%</td>
+            <td style="text-align:right;">${rec.duty}%</td>
+            <td style="text-align:right;">${Math.abs(duty - rec.duty) <= 15 ? '<span style="color:#16a34a">OK</span>' : '<span style="color:#ea580c">조정</span>'}</td>
+          </tr>
+          <tr style="font-weight:bold;">
+            <td>평균 전류</td>
+            <td style="text-align:right;">${r(iAvg)}A</td>
+            <td style="text-align:right;">${r(rec.iAvg)}A</td>
+            <td style="text-align:right;">${Math.abs(iAvg - rec.targetIAvg) <= rec.targetIAvg * 0.15 ? '<span style="color:#16a34a">OK</span>' : iAvg > rec.targetIAvg * 1.15 ? '<span style="color:#ea580c">과다</span>' : '<span style="color:#2563eb">부족</span>'}</td>
+          </tr>
+          <tr>
+            <td>PPS</td>
+            <td style="text-align:right;">${pps} Hz</td>
+            <td style="text-align:right;">${rec.pps} Hz</td>
+            <td style="text-align:right;">${Math.abs(pps - rec.pps) <= 2 ? '<span style="color:#16a34a">OK</span>' : '<span style="color:#ea580c">조정</span>'}</td>
+          </tr>
+          <tr style="font-weight:bold; border-top:1px solid var(--border);">
+            <td style="padding-top:0.35rem;">RPM</td>
+            <td style="text-align:right; padding-top:0.35rem;">${rpm > 0 ? r(rpm) : '—'}</td>
+            <td style="text-align:right; padding-top:0.35rem;">${r(rec.optRPM)}</td>
+            <td style="text-align:right; padding-top:0.35rem;">${rpm > 0 ? (Math.abs(rpm - rec.optRPM) / rec.optRPM <= 0.15 ? '<span style="color:#16a34a">OK</span>' : rpm > rec.optRPM ? '<span style="color:#ea580c">빠름</span>' : '<span style="color:#2563eb">느림</span>') : '—'}</td>
+          </tr>
+          <tr>
+            <td>속도</td>
+            <td style="text-align:right;">${rpm > 0 ? r(rpm * circumMm) + ' mm/min' : '—'}</td>
+            <td style="text-align:right;">${r(rec.optSpeed)} mm/min</td>
+            <td style="text-align:right;">${r(rec.optIPM)} IPM</td>
+          </tr>
+          <tr>
+            <td>열입력</td>
+            <td style="text-align:right;">${rpm > 0 ? this._round((voltage * iAvg * 60) / (rpm * circumMm) / 1000, 3) + ' kJ' : '—'}</td>
+            <td style="text-align:right; color:${recHIColor};">${this._round(rec.heatKJ, 3)} kJ</td>
+            <td style="text-align:right;">${recHILabel}</td>
+          </tr>
+        </table>`;
+
+      // ── 종합 판정 ──
+      const iAvgOk = Math.abs(iAvg - rec.targetIAvg) <= rec.targetIAvg * 0.15;
+      const rpmOk = rpm > 0 ? Math.abs(rpm - rec.optRPM) / rec.optRPM <= 0.2 : false;
+      const allGood = iAvgOk && (rpm <= 0 || rpmOk);
+
+      if (allGood && rpm > 0) {
+        html += `<p style="color:#16a34a; margin-top:0.5rem; font-weight:bold;">✓ 현재 설정이 업계 표준과 일치합니다</p>`;
+      } else {
+        html += `<p style="margin-top:0.5rem; font-weight:bold;">조정 가이드:</p>`;
+        if (!iAvgOk) {
+          if (iAvg > rec.targetIAvg * 1.15) {
+            html += `<p>• 평균 전류 ${r(iAvg)}A → <strong>${r(rec.targetIAvg)}A</strong> (Peak↓ 또는 Duty↓)</p>`;
+          } else {
+            html += `<p>• 평균 전류 ${r(iAvg)}A → <strong>${r(rec.targetIAvg)}A</strong> (Peak↑ 또는 Duty↑)</p>`;
+          }
+        }
+        if (rpm > 0 && !rpmOk) {
+          html += `<p>• RPM ${r(rpm)} → <strong>${r(rec.optRPM)}</strong> (${r(rec.optIPM)} IPM)</p>`;
+        }
+        if (rpm <= 0) {
+          html += `<p>• 추천 RPM: <strong>${r(rec.optRPM)}</strong> (${r(rec.minRPM)}~${r(rec.maxRPM)} 범위)</p>`;
+        }
+        if (peakBgRatio < 2 || peakBgRatio > 5) {
+          html += `<p>• Peak:BG 비율 ${r(peakBgRatio)}:1 → <strong>3:1</strong> 권장 (2:1~5:1)</p>`;
+        }
+      }
+      html += `</div>`;
+
+      // ── RPM 범위 테이블 (벽 두께 기반) ──
+      const hiAtRpm = (rpmVal) => (voltage * iAvg * 60) / (rpmVal * circumMm) / 1000;
+      const ripAtRpm = (rpmVal) => pps > 0 ? (rpmVal * circumMm / 60) / pps : 0;
+      html += `
+      <div class="calc-result__breakdown" style="margin-top:0.75rem; border-top:1px solid var(--border); padding-top:0.75rem;">
+        <p><strong>RPM 범위</strong> (${sizeInfo.nominal}, ${wallDisplay})</p>
+        <table style="width:100%; font-size:0.9rem; margin-top:0.5rem; border-collapse:collapse;">
+          <tr style="border-bottom:1px solid var(--border);">
+            <th style="text-align:left; padding:0.25rem 0;"></th>
+            <th style="text-align:right;">RPM</th>
+            <th style="text-align:right;">IPM</th>
+            <th style="text-align:right;">열입력</th>
+            <th style="text-align:right;">리플</th>
+          </tr>
+          <tr style="color:#2563eb;">
+            <td style="padding:0.25rem 0;">느림 (보수적)</td>
+            <td style="text-align:right;">${r(rec.minRPM)}</td>
+            <td style="text-align:right;">${r(rec.minIPM)}</td>
+            <td style="text-align:right;">${this._round(hiAtRpm(rec.minRPM), 3)} kJ</td>
+            <td style="text-align:right;">${r(ripAtRpm(rec.minRPM))}mm</td>
+          </tr>
+          <tr style="color:#16a34a; font-weight:bold;">
+            <td style="padding:0.25rem 0;">최적</td>
+            <td style="text-align:right;">${r(rec.optRPM)}</td>
+            <td style="text-align:right;">${r(rec.optIPM)}</td>
+            <td style="text-align:right;">${this._round(hiAtRpm(rec.optRPM), 3)} kJ</td>
+            <td style="text-align:right;">${r(ripAtRpm(rec.optRPM))}mm</td>
+          </tr>
+          <tr style="color:#ea580c;">
+            <td style="padding:0.25rem 0;">빠름 (생산성)</td>
+            <td style="text-align:right;">${r(rec.maxRPM)}</td>
+            <td style="text-align:right;">${r(rec.maxIPM)}</td>
+            <td style="text-align:right;">${this._round(hiAtRpm(rec.maxRPM), 3)} kJ</td>
+            <td style="text-align:right;">${r(ripAtRpm(rec.maxRPM))}mm</td>
+          </tr>
+        </table>
+      </div>`;
+    } else {
+      // 벽 두께 없음 → 기본 분석만
+      if (rpm <= 0) {
+        html += `
+        <div class="calc-result__breakdown" style="margin-top:0.75rem; background:var(--color-bg-alt, #f0f9ff); padding:0.75rem; border-radius:8px;">
+          <p style="color:#ea580c; font-weight:bold;">벽 두께를 입력하면 업계 표준 기반 추천을 받을 수 있습니다</p>
+          <p style="color:var(--text-muted); font-size:0.85rem;">STS: 벽 두께(mil)당 1A 평균 전류 + 4-10 IPM 이동속도 연립 계산</p>
+        </div>`;
+      }
+    }
+
+    // ── STS 팁 ──
+    html += `
+      <div class="calc-result__breakdown" style="margin-top:0.75rem; border-top:1px solid var(--border); padding-top:0.75rem;">
+        <p><strong>STS 열변형 줄이기</strong></p>
+        <p>1. Duty 30~40% (냉각 시간 확보)</p>
+        <p>2. Peak:BG = 3:1~5:1 (BG 최소화)</p>
+        <p>3. 벽 두께에 맞는 속도 유지 (4-10 IPM)</p>
+        <p>4. 고주파 PPS 100+ (열 분산, 비드 균일)</p>
+        <p>5. 인터패스 온도 150°C 이하</p>
+      </div>`;
+
+    html += `<p class="calc-result__note">${sizeInfo.nominal} (OD ${odMm}mm, 원주 ${r(circumMm)}mm) 펄스 TIG — 업계표준 기반</p>`;
+    this._showResult('result-weldparam', html);
+  },
+
+  _showConvertResult(inch, mm) {
+    // 가장 가까운 분수 inch 찾기
+    const fractions = [
+      [1, 64], [1, 32], [1, 16], [3, 32], [1, 8], [5, 32], [3, 16], [7, 32],
+      [1, 4], [9, 32], [5, 16], [11, 32], [3, 8], [13, 32], [7, 16], [15, 32],
+      [1, 2], [17, 32], [9, 16], [19, 32], [5, 8], [21, 32], [11, 16], [23, 32],
+      [3, 4], [25, 32], [13, 16], [27, 32], [7, 8], [29, 32], [15, 16], [31, 32], [1, 1]
+    ];
+
+    const remainder = inch % 1;
+    let closest = '';
+    let minDiff = 1;
+
+    fractions.forEach(([n, d]) => {
+      const val = n / d;
+      const diff = Math.abs(remainder - val);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closest = d === 1 ? `${n}` : `${n}/${d}`;
+      }
+    });
+
+    const wholeInch = Math.floor(inch);
+    const fracStr = wholeInch > 0 && closest !== '0'
+      ? `${wholeInch} ${closest}"`
+      : wholeInch > 0 ? `${wholeInch}"` : `${closest}"`;
+
+    this._showResult('result-convert', `
+      <div class="calc-result__grid">
+        <div class="calc-result__item">
+          <span class="calc-result__label">분수 inch (근사)</span>
+          <span class="calc-result__value">${fracStr}</span>
+        </div>
+      </div>
+    `);
+  }
+};
+
+document.addEventListener('DOMContentLoaded', () => Calculator.init());

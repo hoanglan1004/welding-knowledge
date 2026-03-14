@@ -1,0 +1,237 @@
+{
+  "materials": [
+    {
+      "id": "sus304",
+      "name": "STS 304",
+      "category": "스테인리스강",
+      "composition": "18Cr-8Ni (18% 크롬, 8% 니켈)",
+      "characteristics": ["내식성 우수", "비자성 (냉간가공 시 약간 자성)", "가공경화 발생", "열전도율 낮음"],
+      "commonUse": ["식품설비", "화학플랜트", "건축 인테리어", "배관"],
+      "weldingNotes": [
+        "입열량 최소화 (예민화 방지 — 크롬탄화물 석출로 내식성 저하)",
+        "층간온도 150℃ 이하 유지",
+        "백실드(아르곤) 필수 — 이면 산화 방지",
+        "용접 후 산세처리 또는 패시베이션 권장",
+        "열팽창 계수가 크므로 변형 주의 — 역변형법 또는 구속 지그 활용"
+      ],
+      "recommendedProcesses": [
+        {
+          "process": "TIG",
+          "processId": "tig",
+          "filler": "ER308L",
+          "suitability": "최적",
+          "notes": "박판, 정밀 용접에 최적. 배관 루트패스에 필수."
+        },
+        {
+          "process": "MIG",
+          "processId": "mig",
+          "filler": "ER308LSi",
+          "suitability": "양호",
+          "notes": "두꺼운 판 대량 생산에 적합. Ar+2%CO₂ 혼합가스 사용."
+        },
+        {
+          "process": "피복아크(SMAW)",
+          "processId": "smaw",
+          "filler": "E308L-16",
+          "suitability": "양호",
+          "notes": "현장 보수 용접에 적합. 용접봉 건조 필수 (300℃, 1시간)."
+        }
+      ],
+      "cautions": [
+        "304와 탄소강 이종용접 시 ER309L 용접봉 사용 (희석 보상)",
+        "용접열로 인한 예민화(Sensitization) → 입계부식 주의",
+        "연마 시 탄소강 연마석과 구분 사용 (탄소 오염 방지)",
+        "고온에서 장시간 사용 시 475℃ 취화 주의"
+      ],
+      "relatedMaterials": ["sus316l"]
+    },
+    {
+      "id": "sus316l",
+      "name": "STS 316L",
+      "category": "스테인리스강",
+      "composition": "16Cr-10Ni-2Mo, 저탄소(C≤0.03%)",
+      "characteristics": ["304 대비 내식성 우수 (Mo 함유)", "내공식성 우수", "비자성", "고온강도 양호"],
+      "commonUse": ["해양설비", "제약/바이오", "화학플랜트", "반도체장비"],
+      "weldingNotes": [
+        "316L의 'L'은 저탄소 — 예민화 위험 304보다 낮음",
+        "그래도 입열량 관리는 필수 (층간온도 150℃ 이하)",
+        "백실드 필수",
+        "용접 후 패시베이션 처리 권장 (내식성 회복)"
+      ],
+      "recommendedProcesses": [
+        {
+          "process": "TIG",
+          "processId": "tig",
+          "filler": "ER316L",
+          "suitability": "최적",
+          "notes": "제약/바이오 배관은 TIG 용접만 허용되는 경우 많음."
+        },
+        {
+          "process": "MIG",
+          "processId": "mig",
+          "filler": "ER316LSi",
+          "suitability": "양호",
+          "notes": "두꺼운 판재 용접에 적합."
+        }
+      ],
+      "cautions": [
+        "316L과 탄소강 이종용접 시 ER309LMo 사용",
+        "316과 316L 구분 주의 — L이 없으면 탄소 함량이 높아 예민화 위험 증가",
+        "해양 환경에서는 용접부 후처리(패시베이션) 필수"
+      ],
+      "relatedMaterials": ["sus304"]
+    },
+    {
+      "id": "al6061",
+      "name": "알루미늄 6061",
+      "category": "알루미늄",
+      "composition": "Al-Mg-Si계 (Mg 1.0%, Si 0.6%, Cu 0.28%)",
+      "characteristics": ["경량 (밀도 2.7g/cm³)", "열처리 가능 (T6 템퍼)", "내식성 양호", "열전도율 높음"],
+      "commonUse": ["자전거 프레임", "선박 구조물", "건축 커튼월", "자동차 부품"],
+      "weldingNotes": [
+        "용접 시 열영향부(HAZ) 강도 저하 — T6 템퍼가 풀림(O) 상태로 돌아감",
+        "예열 불필요 (오히려 과열 주의)",
+        "산화피막(Al₂O₃) 융점 2072℃ — 모재보다 훨씬 높으므로 AC TIG 필수",
+        "용접 전 아세톤으로 유분 제거 + 스테인리스 브러시로 산화피막 제거",
+        "용접부 기공 발생 빈번 — 재료 건조, 청소 철저"
+      ],
+      "recommendedProcesses": [
+        {
+          "process": "TIG (AC)",
+          "processId": "tig",
+          "filler": "ER4043",
+          "suitability": "최적",
+          "notes": "AC 모드 필수 (클리닝 작용). 박판, 정밀 부품에 최적."
+        },
+        {
+          "process": "MIG (펄스)",
+          "processId": "mig",
+          "filler": "ER4043 또는 ER5356",
+          "suitability": "양호",
+          "notes": "두꺼운 판재. 펄스 MIG 권장 (입열량 제어)."
+        }
+      ],
+      "cautions": [
+        "ER4043 vs ER5356: 양극산화 처리 시 ER5356 사용 (색상 일치)",
+        "6061과 5083 이종용접 시 ER5356 사용",
+        "용접 후 열처리로 강도 회복 가능하나 용접부 주변 변형 주의"
+      ],
+      "relatedMaterials": ["al5083"]
+    },
+    {
+      "id": "al5083",
+      "name": "알루미늄 5083",
+      "category": "알루미늄",
+      "composition": "Al-Mg계 (Mg 4.5%, Mn 0.7%)",
+      "characteristics": ["비열처리 합금", "해수 내식성 최우수", "용접성 우수", "저온 인성 양호"],
+      "commonUse": ["선박/보트", "LNG 탱크", "해양구조물", "차량 탱크로리"],
+      "weldingNotes": [
+        "비열처리 합금이므로 용접 후 강도 저하가 적음 (6061 대비 유리)",
+        "Mg 함량이 높아 용접 시 산화 경향 강함 — 차폐 철저",
+        "예열 불필요",
+        "용접부 기공 방지: 재료 청소, 가스 순도 관리 핵심"
+      ],
+      "recommendedProcesses": [
+        {
+          "process": "TIG (AC)",
+          "processId": "tig",
+          "filler": "ER5356 또는 ER5183",
+          "suitability": "최적",
+          "notes": "박판 정밀 용접. 해양/LNG 배관에 필수."
+        },
+        {
+          "process": "MIG",
+          "processId": "mig",
+          "filler": "ER5356",
+          "suitability": "양호",
+          "notes": "후판 대량 생산. 순 아르곤 가스 사용."
+        }
+      ],
+      "cautions": [
+        "65℃ 이상 장시간 노출 시 응력부식균열(SCC) 위험",
+        "ER4043 용접봉은 5083에 부적합 (크랙 발생 가능)",
+        "해양 환경 사용 시 도장 또는 양극산화 처리 권장"
+      ],
+      "relatedMaterials": ["al6061"]
+    },
+    {
+      "id": "cs-ss400",
+      "name": "SS400 (일반구조용 압연강)",
+      "category": "탄소강",
+      "composition": "저탄소강 (C≤0.20%, Mn≤1.40%)",
+      "characteristics": ["가격 저렴", "용접성 우수", "가공성 양호", "인장강도 400~510 MPa"],
+      "commonUse": ["건축 철골", "교량", "일반 구조물", "기계 부품"],
+      "weldingNotes": [
+        "용접성 우수 — 특별한 주의 없이 용접 가능",
+        "두꺼운 판(25mm 이상) 시 예열 필요 (100~150℃)",
+        "저수소계 용접봉(E7016) 사용 권장 (두꺼운 판, 구속도 높은 이음)",
+        "용접 후 변형 관리가 주요 과제"
+      ],
+      "recommendedProcesses": [
+        {
+          "process": "MIG/MAG",
+          "processId": "mig",
+          "filler": "ER70S-6 1.2mm",
+          "suitability": "최적",
+          "notes": "가장 범용적. CO₂ 또는 Ar+CO₂ 혼합가스."
+        },
+        {
+          "process": "피복아크(SMAW)",
+          "processId": "smaw",
+          "filler": "E7016 / E7018",
+          "suitability": "양호",
+          "notes": "현장 작업에 적합. 야외 가능."
+        },
+        {
+          "process": "FCAW",
+          "processId": "fcaw",
+          "filler": "E71T-1C 1.2mm",
+          "suitability": "양호",
+          "notes": "후판 고속 용접. 조선/철골에 많이 사용."
+        }
+      ],
+      "cautions": [
+        "두꺼운 판의 T형/십자 이음은 라멜라 테어(Lamellar Tear) 주의",
+        "녹이 있는 상태로 용접 금지 — 반드시 제거 후 용접",
+        "이종용접(STS와 접합) 시 ER309L 사용"
+      ],
+      "relatedMaterials": ["cs-a106"]
+    },
+    {
+      "id": "cs-a106",
+      "name": "A106 Gr.B (배관용 탄소강)",
+      "category": "탄소강",
+      "composition": "C≤0.30%, Mn 0.29~1.06%, Si≥0.10%",
+      "characteristics": ["고온 강도 양호", "배관 전용", "인장강도 415 MPa 이상", "무이음(seamless) 강관"],
+      "commonUse": ["발전소 배관", "석유화학 배관", "보일러 배관", "고온 증기배관"],
+      "weldingNotes": [
+        "탄소당량(CE)에 따라 예열 필요 — CE > 0.40이면 예열 필수 (150~200℃)",
+        "저수소계 용접봉(E7016/E7018) 사용 필수",
+        "PWHT(용접 후 열처리) 규정 확인 — 두께, 사용 온도에 따라 필요",
+        "루트패스는 TIG, 나머지는 SMAW 또는 FCAW 조합 많음"
+      ],
+      "recommendedProcesses": [
+        {
+          "process": "TIG (루트)",
+          "processId": "tig",
+          "filler": "ER70S-2 또는 ER70S-6",
+          "suitability": "최적",
+          "notes": "루트패스(첫 번째 용접층)에 필수. 완전 용입 확보."
+        },
+        {
+          "process": "피복아크(SMAW)",
+          "processId": "smaw",
+          "filler": "E7016 / E7018",
+          "suitability": "양호",
+          "notes": "필패스/커버패스에 사용. 현장 배관 용접의 표준."
+        }
+      ],
+      "cautions": [
+        "수소유기균열(HIC) 방지 — 저수소계 용접봉 + 예열 필수",
+        "PWHT 여부는 ASME Sec.VIII 또는 발주처 사양서 확인",
+        "용접 후 RT(방사선검사) 100% 적용되는 경우 많음"
+      ],
+      "relatedMaterials": ["cs-ss400"]
+    }
+  ]
+}

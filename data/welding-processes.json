@@ -1,0 +1,195 @@
+{
+  "processes": [
+    {
+      "id": "tig",
+      "name": "TIG 용접",
+      "nameEn": "GTAW (Gas Tungsten Arc Welding)",
+      "category": "아크용접",
+      "summary": "텅스텐 전극봉으로 아크를 발생시키고, 별도의 용가재를 공급하는 정밀 용접. 용접 품질이 가장 우수하나 속도가 느림.",
+      "shieldingGas": ["아르곤(Ar)", "헬륨(He)", "Ar+He 혼합"],
+      "applications": ["배관", "압력용기", "식품설비", "반도체장비", "항공우주"],
+      "pros": ["용접 품질 최상", "스패터 없음", "모든 자세 가능", "박판 용접 우수"],
+      "cons": ["속도 느림", "숙련도 필요", "바람에 취약", "생산성 낮음"],
+      "settings": [
+        {
+          "material": "STS 304",
+          "thickness": "3mm",
+          "current": "90~110A",
+          "voltage": "10~14V",
+          "gasFlow": "8~12 L/min",
+          "electrode": "WT20 (2% 토리움) 2.4mm",
+          "fillerWire": "ER308L 2.0mm",
+          "notes": "백실드(Back Purge) 필수. 입열량 최소화."
+        },
+        {
+          "material": "STS 316L",
+          "thickness": "6mm",
+          "current": "130~160A",
+          "voltage": "11~15V",
+          "gasFlow": "10~15 L/min",
+          "electrode": "WT20 2.4mm",
+          "fillerWire": "ER316L 2.4mm",
+          "notes": "층간온도 150℃ 이하 유지. 다층 용접 시 슬래그 제거 철저."
+        },
+        {
+          "material": "알루미늄 6061",
+          "thickness": "3mm",
+          "current": "100~130A (AC)",
+          "voltage": "10~14V",
+          "gasFlow": "12~18 L/min",
+          "electrode": "WP (순텅스텐) 3.2mm",
+          "fillerWire": "ER4043 2.4mm",
+          "notes": "AC 모드 사용. 클리닝 비율 30% 내외. 예열 불필요."
+        }
+      ],
+      "tips": [
+        "텅스텐 전극은 용접 전 그라인더로 뾰족하게 연마할 것 (DC: 뾰족하게, AC: 볼형)",
+        "아르곤 가스 순도 99.99% 이상 사용 권장",
+        "용접봉 끝이 산화되면 잘라내고 다시 사용",
+        "토치 각도 15~20° 유지, 진행 방향으로 기울임",
+        "용접 시작 전 프리플로우 2~3초, 종료 후 포스트플로우 5~8초"
+      ],
+      "relatedDefects": ["tungsten-inclusion", "porosity", "oxidation"]
+    },
+    {
+      "id": "mig",
+      "name": "MIG/MAG 용접",
+      "nameEn": "GMAW (Gas Metal Arc Welding)",
+      "category": "아크용접",
+      "summary": "와이어가 자동 송급되면서 아크를 발생시키는 반자동 용접. 생산성이 높고 배우기 쉬움.",
+      "shieldingGas": ["CO₂ (MAG)", "Ar+CO₂ 혼합 (MIG)", "순 아르곤 (알루미늄)"],
+      "applications": ["철골 구조물", "자동차", "조선", "일반 제작"],
+      "pros": ["생산성 높음", "배우기 쉬움", "연속 용접 가능", "전 자세 가능"],
+      "cons": ["스패터 발생", "바람에 취약", "TIG 대비 품질 낮음"],
+      "settings": [
+        {
+          "material": "SS400 (일반강)",
+          "thickness": "6mm",
+          "current": "180~220A",
+          "voltage": "22~26V",
+          "gasFlow": "15~20 L/min (CO₂)",
+          "electrode": "-",
+          "fillerWire": "ER70S-6 1.2mm",
+          "notes": "CO₂ 100% 사용 시 스패터 많음. Ar+CO₂ 혼합 시 비드 외관 양호."
+        },
+        {
+          "material": "STS 304",
+          "thickness": "4mm",
+          "current": "150~180A",
+          "voltage": "20~24V",
+          "gasFlow": "15~20 L/min (Ar+2%CO₂)",
+          "electrode": "-",
+          "fillerWire": "ER308LSi 1.0mm",
+          "notes": "Ar+2%CO₂ 혼합가스 사용. 순 CO₂ 사용 금지 (산화 발생)."
+        }
+      ],
+      "tips": [
+        "와이어 돌출 길이(CTWD) 15~20mm 유지",
+        "토치 각도 10~15° 전진법 또는 후진법 선택",
+        "스패터 방지액을 노즐에 도포하면 스패터 부착 감소",
+        "와이어 송급 속도와 전압의 밸런스가 핵심"
+      ],
+      "relatedDefects": ["porosity", "spatter", "undercut", "lack-of-fusion"]
+    },
+    {
+      "id": "smaw",
+      "name": "피복아크 용접",
+      "nameEn": "SMAW (Shielded Metal Arc Welding)",
+      "category": "아크용접",
+      "summary": "피복제가 도포된 용접봉을 사용하는 수동 용접. 장비가 간단하고 야외 작업에 적합. 가장 오래된 아크용접법.",
+      "shieldingGas": ["피복제 분해 가스 (별도 보호가스 불필요)"],
+      "applications": ["건설 현장", "배관 보수", "구조물", "야외 작업"],
+      "pros": ["장비 간단/저렴", "바람에 강함 (가스 불필요)", "야외 작업 적합", "전 자세 가능"],
+      "cons": ["생산성 낮음 (용접봉 교체)", "슬래그 제거 필요", "숙련도 필요", "스패터 발생"],
+      "settings": [
+        {
+          "material": "SS400 (일반강)",
+          "thickness": "6mm",
+          "current": "130~170A",
+          "voltage": "20~24V",
+          "gasFlow": "-",
+          "electrode": "-",
+          "fillerWire": "E7016 (저수소계) 3.2mm",
+          "notes": "용접봉 건조 필수 (300~350℃, 1~2시간). 짧은 아크 유지."
+        },
+        {
+          "material": "STS 304",
+          "thickness": "6mm",
+          "current": "90~120A",
+          "voltage": "20~24V",
+          "gasFlow": "-",
+          "electrode": "-",
+          "fillerWire": "E308L-16 3.2mm",
+          "notes": "직선 비드 운봉. 위빙 최소화. 용접봉 건조 필수."
+        }
+      ],
+      "tips": [
+        "용접봉은 반드시 건조기에 보관 (흡습 시 기공 발생)",
+        "아크 길이는 용접봉 심선 직경 이내로 유지",
+        "슬래그 제거는 완전히 냉각 후 실시 (급냉 시 크랙 위험)",
+        "용접봉 각도 70~80° 유지 (진행 방향 기준)"
+      ],
+      "relatedDefects": ["slag-inclusion", "porosity", "undercut", "crack"]
+    },
+    {
+      "id": "fcaw",
+      "name": "플럭스코어드 아크 용접",
+      "nameEn": "FCAW (Flux Cored Arc Welding)",
+      "category": "아크용접",
+      "summary": "플럭스가 내장된 튜브형 와이어를 사용하는 반자동 용접. MIG의 생산성과 피복아크의 야외 적응성을 결합.",
+      "shieldingGas": ["CO₂ (가스실드형)", "없음 (셀프실드형)"],
+      "applications": ["조선", "철골 구조물", "교량", "중장비"],
+      "pros": ["높은 용착 속도", "후판 용접 우수", "야외 가능 (셀프실드)", "전 자세 가능"],
+      "cons": ["슬래그 제거 필요", "흄 발생 많음", "와이어 가격 높음", "박판에 부적합"],
+      "settings": [
+        {
+          "material": "SS400 (일반강)",
+          "thickness": "12mm",
+          "current": "250~300A",
+          "voltage": "26~30V",
+          "gasFlow": "20~25 L/min (CO₂)",
+          "electrode": "-",
+          "fillerWire": "E71T-1C 1.2mm",
+          "notes": "가스실드형. 다층 용접 시 슬래그 완전 제거 후 다음 패스."
+        }
+      ],
+      "tips": [
+        "가스실드형(E71T-1C)과 셀프실드형(E71T-8) 구분 사용",
+        "와이어 돌출 길이 20~25mm (MIG보다 약간 길게)",
+        "슬래그가 비드를 덮으므로 매 패스마다 슬래그 제거 필수",
+        "흄 발생이 많으므로 환기/국소배기 반드시 확보"
+      ],
+      "relatedDefects": ["slag-inclusion", "porosity", "crack", "spatter"]
+    },
+    {
+      "id": "saw",
+      "name": "서브머지드 아크 용접",
+      "nameEn": "SAW (Submerged Arc Welding)",
+      "category": "아크용접",
+      "summary": "분말 형태의 플럭스 속에 아크가 잠긴 상태로 용접하는 자동 용접법. 후판 대량 생산에 최적.",
+      "shieldingGas": ["플럭스 (분말형, 별도 보호가스 불필요)"],
+      "applications": ["압력용기", "선박 외판", "대형 탱크", "강관 제조"],
+      "pros": ["최고 생산성", "깊은 용입", "비드 외관 매우 양호", "스패터 없음"],
+      "cons": ["아래보기(1G/1F) 자세만 가능", "장비 대형/고가", "박판 부적합", "현장 이동 어려움"],
+      "settings": [
+        {
+          "material": "SS400 (일반강)",
+          "thickness": "20mm",
+          "current": "500~600A",
+          "voltage": "30~34V",
+          "gasFlow": "-",
+          "electrode": "-",
+          "fillerWire": "EL12 4.0mm + F7A2 플럭스",
+          "notes": "용접 속도 300~500mm/min. 플럭스 높이 30~50mm. 이면 백킹 필수."
+        }
+      ],
+      "tips": [
+        "플럭스 재사용 시 미세 분말 제거 후 건조 (250℃, 1시간)",
+        "용접 속도가 핵심 — 너무 빠르면 언더컷, 느리면 비드 과대",
+        "다전극 SAW로 생산성 극대화 가능 (탠덤, 트윈)",
+        "용접 후 슬래그는 자동으로 박리되나, 확인 필수"
+      ],
+      "relatedDefects": ["crack", "lack-of-penetration", "porosity"]
+    }
+  ]
+}

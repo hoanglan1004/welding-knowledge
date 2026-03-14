@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>파이프 계산기 - 용접 지식 백과</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="header header--detail">
+    <div class="container header__nav">
+      <a href="index.html" class="header__back">&larr; 목록으로</a>
+      <span class="header__title-small">파이프 계산기</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="calc-page">
+      <!-- 계산기 탭 -->
+      <nav class="calc-tabs" id="calcTabs">
+        <button class="calc-tab calc-tab--active" data-calc="offset">오프셋</button>
+        <button class="calc-tab" data-calc="elbow">엘보</button>
+        <button class="calc-tab" data-calc="cutlength">절단길이</button>
+        <button class="calc-tab" data-calc="circumference">원주</button>
+        <button class="calc-tab" data-calc="shrinkage">수축량</button>
+        <button class="calc-tab" data-calc="convert">단위변환</button>
+        <button class="calc-tab" data-calc="tolerance">각도/투영</button>
+        <button class="calc-tab" data-calc="weldparam">용접설정</button>
+      </nav>
+
+      <!-- 1. 파이프 오프셋 -->
+      <section class="calc-panel calc-panel--active" id="panel-offset">
+        <h2 class="calc-panel__title">파이프 오프셋 계산</h2>
+        <p class="calc-panel__desc">각도와 높이차(Set)를 입력하면 Travel과 Run을 계산합니다.</p>
+
+        <div class="calc-form">
+          <div class="calc-field">
+            <label class="calc-label">각도</label>
+            <select class="calc-select" id="offsetAngle">
+              <option value="11.25">11.25°</option>
+              <option value="22.5">22.5°</option>
+              <option value="30">30°</option>
+              <option value="45" selected>45°</option>
+              <option value="60">60°</option>
+            </select>
+          </div>
+          <div class="calc-field">
+            <label class="calc-label">Set (높이차)</label>
+            <div class="calc-input-group">
+              <input type="number" class="calc-input" id="offsetSet" inputmode="decimal" placeholder="0.00" step="any">
+              <select class="calc-unit-select" id="offsetUnit">
+                <option value="inch">inch</option>
+                <option value="mm">mm</option>
+              </select>
+            </div>
+          </div>
+          <button class="calc-btn" onclick="Calculator.calcOffset()">계산</button>
+        </div>
+
+        <div class="calc-result" id="result-offset"></div>
+
+        <details class="calc-formula">
+          <summary>공식 보기</summary>
+          <div class="calc-formula__content">
+            <p><strong>Travel</strong> = Set / sin(θ)</p>
+            <p><strong>Run</strong> = Set / tan(θ)</p>
+            <p class="calc-formula__tip">45° 오프셋: Travel = Set × 1.414, Run = Set</p>
+          </div>
+        </details>
+      </section>
+
+      <!-- 2. 엘보 테이크아웃 -->
+      <section class="calc-panel" id="panel-elbow">
+        <h2 class="calc-panel__title">엘보 계산</h2>
+
+        <!-- 2-1. 기성품 엘보 -->
+        <h3 class="calc-panel__subtitle">기성품 엘보 테이크아웃</h3>
+        <p class="calc-panel__desc">테이크아웃 = 중심~끝 거리. 도면 C-C 치수에서 양쪽 테이크아웃을 빼면 파이프 절단 길이.</p>
+
+        <div class="calc-form">
+          <div class="calc-field">
+            <label class="calc-label">파이프 사이즈</label>
+            <select class="calc-select" id="elbowSize"></select>
+          </div>
+          <div class="calc-field">
+            <label class="calc-label">엘보 타입</label>
+            <select class="calc-select" id="elbowType">
+              <option value="90LR">90° Long Radius</option>
+              <option value="90SR">90° Short Radius</option>
+              <option value="45LR">45° Long Radius</option>
+            </select>
+          </div>
+          <button class="calc-btn" onclick="Calculator.calcElbow()">계산</button>
+        </div>
+
+        <div class="calc-result" id="result-elbow"></div>
+
+        <!-- 2-2. 탄젠트 엘보 (직관 제작) -->
+        <div style="margin-top: 1.5rem; border-top: 2px solid var(--border); padding-top: 1.25rem;">
+          <h3 class="calc-panel__subtitle">탄젠트 엘보 (직관 제작)</h3>
+          <p class="calc-panel__desc">직관 파이프를 마이터 절단하여 엘보를 제작할 때 절단 각도와 마킹 치수를 계산합니다.</p>
+
+          <div class="calc-form">
+            <div class="calc-field">
+              <label class="calc-label">파이프 사이즈</label>
+              <select class="calc-select" id="tangentSize"></select>
+            </div>
+            <div class="calc-field">
+              <label class="calc-label">회전 각도</label>
+              <select class="calc-select" id="tangentAngle">
+                <option value="90" selected>90°</option>
+                <option value="45">45°</option>
+                <option value="30">30°</option>
+                <option value="60">60°</option>
+              </select>
+            </div>
+            <div class="calc-field">
+              <label class="calc-label">피스 수</label>
+              <select class="calc-select" id="tangentPieces">
+                <option value="2" selected>2-piece (1 용접)</option>
+                <option value="3">3-piece (2 용접)</option>
+              </select>
+            </div>
+            <button class="calc-btn" onclick="Calculator.calcTangentElbow()">계산</button>
+          </div>
+
+          <div class="calc-result" id="result-tangent"></div>
+        </div>
+
+        <details class="calc-formula">
+          <summary>공식 보기</summary>
+          <div class="calc-formula__content">
+            <p><strong>기성품 90° LR</strong>: 테이크아웃 = NPS × 1.5</p>
+            <p><strong>기성품 90° SR</strong>: 테이크아웃 = NPS × 1.0</p>
+            <p><strong>기성품 45° LR</strong>: 테이크아웃 = NPS × 0.625</p>
+            <hr style="margin: 0.5rem 0; border-color: var(--border);">
+            <p><strong>탄젠트 절단 각도</strong> = 회전각도 / (2 × 용접수)</p>
+            <p><strong>파이프 마킹</strong> = OD × tan(절단각도)</p>
+            <p class="calc-formula__tip">2-piece 90°: 45° 절단, 마킹 = OD. 3-piece 90°: 22.5° 절단, 마킹 = OD × 0.414</p>
+          </div>
+        </details>
+      </section>
+
+      <!-- 3. 절단 길이 -->
+      <section class="calc-panel" id="panel-cutlength">
+        <h2 class="calc-panel__title">튜빙 절단 길이</h2>
+        <p class="calc-panel__desc">도면 치수에서 피팅 허용량과 용접 수축을 빼고 실제 절단 길이를 계산합니다.</p>
+
+        <div class="calc-form">
+          <div class="calc-field">
+            <label class="calc-label">도면 전체 길이</label>
+            <div class="calc-input-group">
+              <input type="number" class="calc-input" id="cutTotal" inputmode="decimal" placeholder="0.00" step="any">
+              <select class="calc-unit-select" id="cutUnit">
+                <option value="inch">inch</option>
+                <option value="mm">mm</option>
+              </select>
+            </div>
+          </div>
+          <div class="calc-field">
+            <label class="calc-label">피팅 허용량 (양쪽 합계)</label>
+            <input type="number" class="calc-input" id="cutFitting" inputmode="decimal" placeholder="0.00" step="any">
+          </div>
+          <div class="calc-field">
+            <label class="calc-label">용접 개소 수</label>
+            <input type="number" class="calc-input" id="cutWelds" inputmode="numeric" placeholder="2" value="2">
+          </div>
+          <div class="calc-field">
+            <label class="calc-label">1개소당 수축량</label>
+            <input type="number" class="calc-input" id="cutShrinkage" inputmode="decimal" placeholder="2.0" value="2.0" step="any">
+            <span class="calc-hint">mm</span>
+          </div>
+          <button class="calc-btn" onclick="Calculator.calcCutLength()">계산</button>
+        </div>
+
+        <div class="calc-result" id="result-cutlength"></div>
+
+        <details class="calc-formula">
+          <summary>공식 보기</summary>
+          <div class="calc-formula__content">
+            <p><strong>절단 길이</strong> = 전체 길이 - 피팅 허용량 - (수축량 × 용접 수)</p>
+            <p class="calc-formula__tip">수축량은 단위에 주의. 전체 길이가 inch면 수축량도 inch로 변환됩니다.</p>
+          </div>
+        </details>
+      </section>
+
+      <!-- 4. 파이프 원주 -->
+      <section class="calc-panel" id="panel-circumference">
+        <h2 class="calc-panel__title">파이프 원주</h2>
+        <p class="calc-panel__desc">외경(OD)을 입력하면 원주와 반원주를 계산합니다. 마킹/래핑 템플릿용.</p>
+
+        <div class="calc-form">
+          <div class="calc-field">
+            <label class="calc-label">외경 (OD)</label>
+            <div class="calc-input-group">
+              <input type="number" class="calc-input" id="circOD" inputmode="decimal" placeholder="0.00" step="any">
+              <select class="calc-unit-select" id="circUnit">
+                <option value="inch">inch</option>
+                <option value="mm">mm</option>
+              </select>
+            </div>
+          </div>
+          <button class="calc-btn" onclick="Calculator.calcCircumference()">계산</button>
+        </div>
+
+        <div class="calc-result" id="result-circumference"></div>
+
+        <details class="calc-formula">
+          <summary>공식 보기</summary>
+          <div class="calc-formula__content">
+            <p><strong>원주</strong> = π × OD</p>
+            <p><strong>반원주</strong> = π × OD / 2</p>
+          </div>
+        </details>
+      </section>
+
+      <!-- 5. 용접 수축량 -->
+      <section class="calc-panel" id="panel-shrinkage">
+        <h2 class="calc-panel__title">용접 수축량</h2>
+        <p class="calc-panel__desc">파이프 사이즈와 용접 개소 수를 입력하면 총 수축량을 계산합니다.</p>
+
+        <div class="calc-form">
+          <div class="calc-field">
+            <label class="calc-label">파이프 사이즈 (OD)</label>
+            <select class="calc-select" id="shrinkageSize"></select>
+          </div>
+          <div class="calc-field">
+            <label class="calc-label">용접 개소 수</label>
+            <input type="number" class="calc-input" id="shrinkageWelds" inputmode="numeric" placeholder="1" value="1">
+          </div>
+          <button class="calc-btn" onclick="Calculator.calcShrinkage()">계산</button>
+        </div>
+
+        <div class="calc-result" id="result-shrinkage"></div>
+
+        <details class="calc-formula">
+          <summary>공식 보기</summary>
+          <div class="calc-formula__content">
+            <p><strong>총 수축량</strong> = 1개소 수축량 × 용접 개소 수</p>
+            <p class="calc-formula__tip">고순도 SST TIG 기준. 실제 값은 전류/패스 수/갭에 따라 달라짐.</p>
+          </div>
+        </details>
+      </section>
+
+      <!-- 6. 단위 변환 -->
+      <section class="calc-panel" id="panel-convert">
+        <h2 class="calc-panel__title">단위 변환</h2>
+        <p class="calc-panel__desc">inch ↔ mm 상호 변환. 분수 inch도 지원합니다.</p>
+
+        <div class="calc-form">
+          <div class="calc-field">
+            <label class="calc-label">inch</label>
+            <input type="number" class="calc-input" id="convertInch" inputmode="decimal" placeholder="0.00" step="any" oninput="Calculator.convertFromInch()">
+          </div>
+          <div class="calc-field">
+            <label class="calc-label">mm</label>
+            <input type="number" class="calc-input" id="convertMm" inputmode="decimal" placeholder="0.00" step="any" oninput="Calculator.convertFromMm()">
+          </div>
+        </div>
+
+        <div class="calc-result" id="result-convert"></div>
+
+        <div class="calc-fraction-grid" id="fractionGrid">
+          <p class="calc-label" style="grid-column: 1/-1; margin-bottom: 0.25rem;">자주 쓰는 분수 inch</p>
+        </div>
+
+        <details class="calc-formula">
+          <summary>공식 보기</summary>
+          <div class="calc-formula__content">
+            <p><strong>mm</strong> = inch × 25.4</p>
+            <p><strong>inch</strong> = mm / 25.4</p>
+          </div>
+        </details>
+      </section>
+
+      <!-- 7. 각도 편차 -->
+      <section class="calc-panel" id="panel-tolerance">
+        <h2 class="calc-panel__title">각도 / 투영 보정</h2>
+        <p class="calc-panel__desc">도면 치수와 각도를 입력하면 실제 파이프 컷팅 길이를 계산합니다. 각도 편차를 추가 입력하면 오차 영향도 함께 분석합니다.</p>
+
+        <div class="calc-form">
+          <div class="calc-field">
+            <label class="calc-label">도면 치수 (길이)</label>
+            <div class="calc-input-group">
+              <input type="number" class="calc-input" id="tolLength" inputmode="decimal" placeholder="2.30" step="any">
+              <select class="calc-unit-select" id="tolUnit">
+                <option value="inch">inch</option>
+                <option value="mm">mm</option>
+              </select>
+            </div>
+          </div>
+          <div class="calc-field">
+            <label class="calc-label">각도</label>
+            <select class="calc-select" id="tolAngle">
+              <option value="6">6°</option>
+              <option value="10">10°</option>
+              <option value="22.5">22.5°</option>
+              <option value="30">30°</option>
+              <option value="45" selected>45°</option>
+              <option value="60">60°</option>
+              <option value="90">90° (직각)</option>
+            </select>
+          </div>
+          <div class="calc-field">
+            <label class="calc-label">각도 편차 (±) <span style="color:var(--text-muted); font-weight:normal;">— 선택 입력</span></label>
+            <div class="calc-input-group">
+              <input type="number" class="calc-input" id="tolDeviation" inputmode="decimal" placeholder="비워두면 투영만 계산" step="any">
+              <span class="calc-hint" style="padding: 0.5rem;">°</span>
+            </div>
+          </div>
+          <button class="calc-btn" onclick="Calculator.calcTolerance()">계산</button>
+        </div>
+
+        <div class="calc-result" id="result-tolerance"></div>
+
+        <details class="calc-formula">
+          <summary>공식 보기</summary>
+          <div class="calc-formula__content">
+            <p><strong>투영 보정</strong>: 실제 파이프 = 도면치수 / cos(θ) (수평 투영일 때)</p>
+            <p><strong>높이</strong> = 파이프길이 × sin(θ)</p>
+            <p><strong>수평거리</strong> = 파이프길이 × cos(θ)</p>
+            <p><strong>높이 변화</strong> = 길이 × |sin(θ±δ) - sin(θ)| (편차 입력 시)</p>
+            <p class="calc-formula__tip">6°에서 2.30" → 차이 0.013" (직선 OK). 45°에서 12.97" → 직선으로 자르면 5.37" 차이!</p>
+          </div>
+        </details>
+      </section>
+      <!-- 8. 용접 파라미터 (펄스 TIG) -->
+      <section class="calc-panel" id="panel-weldparam">
+        <h2 class="calc-panel__title">용접 파라미터 (펄스 TIG)</h2>
+        <p class="calc-panel__desc">펄스 TIG 설정값으로 열입력을 계산하고, STS 열변형을 최소화하는 턴테이블 RPM을 추천합니다.</p>
+
+        <div class="calc-form">
+          <h3 class="calc-panel__subtitle">파이프 정보</h3>
+          <div class="calc-field">
+            <label class="calc-label">파이프 사이즈</label>
+            <select class="calc-select" id="weldSize"></select>
+          </div>
+          <div class="calc-field">
+            <label class="calc-label">벽 두께</label>
+            <div class="calc-input-group">
+              <input type="number" class="calc-input" id="weldWall" inputmode="decimal" placeholder="1.65" step="any">
+              <select class="calc-select" id="weldWallUnit" style="width:auto; min-width:60px; padding:0.4rem;">
+                <option value="mm">mm</option>
+                <option value="inch">inch</option>
+              </select>
+            </div>
+          </div>
+
+          <h3 class="calc-panel__subtitle" style="margin-top: 1rem;">펄스 설정 (Dynasty 300)</h3>
+          <div class="calc-field">
+            <label class="calc-label">피크 전류 (Peak)</label>
+            <div class="calc-input-group">
+              <input type="number" class="calc-input" id="weldPeak" inputmode="decimal" placeholder="80" step="any">
+              <span class="calc-hint" style="padding: 0.5rem;">A</span>
+            </div>
+          </div>
+          <div class="calc-field">
+            <label class="calc-label">백그라운드 전류 (BG)</label>
+            <div class="calc-input-group">
+              <input type="number" class="calc-input" id="weldBG" inputmode="decimal" placeholder="25" step="any">
+              <span class="calc-hint" style="padding: 0.5rem;">%</span>
+            </div>
+          </div>
+          <div class="calc-field">
+            <label class="calc-label">펄스 주파수 (PPS)</label>
+            <div class="calc-input-group">
+              <input type="number" class="calc-input" id="weldPPS" inputmode="decimal" placeholder="1" value="1" step="any">
+              <span class="calc-hint" style="padding: 0.5rem;">Hz</span>
+            </div>
+          </div>
+          <div class="calc-field">
+            <label class="calc-label">피크 비율 (Duty)</label>
+            <div class="calc-input-group">
+              <input type="number" class="calc-input" id="weldDuty" inputmode="decimal" placeholder="50" value="50" step="any">
+              <span class="calc-hint" style="padding: 0.5rem;">%</span>
+            </div>
+          </div>
+          <div class="calc-field">
+            <label class="calc-label">전압</label>
+            <div class="calc-input-group">
+              <input type="number" class="calc-input" id="weldVolt" inputmode="decimal" placeholder="8" value="8" step="any">
+              <span class="calc-hint" style="padding: 0.5rem;">V</span>
+            </div>
+          </div>
+
+          <h3 class="calc-panel__subtitle" style="margin-top: 1rem;">턴테이블</h3>
+          <div class="calc-field">
+            <label class="calc-label">턴테이블 RPM <span style="color:var(--text-muted); font-weight:normal;">— 비워두면 권장 RPM만 표시</span></label>
+            <div class="calc-input-group">
+              <input type="number" class="calc-input" id="weldRPM" inputmode="decimal" placeholder="비워두면 자동 추천" step="any">
+              <span class="calc-hint" style="padding: 0.5rem;">RPM</span>
+            </div>
+          </div>
+
+          <button class="calc-btn" onclick="Calculator.calcWeldParam()">계산</button>
+        </div>
+
+        <div class="calc-result" id="result-weldparam"></div>
+
+        <details class="calc-formula">
+          <summary>공식 보기</summary>
+          <div class="calc-formula__content">
+            <p><strong>BG 전류</strong> = Peak × BG%</p>
+            <p><strong>평균 전류</strong> = Peak × Duty% + BG전류 × (100-Duty%)</p>
+            <p><strong>이동 속도</strong> = RPM × π × OD (mm/min)</p>
+            <p><strong>열입력</strong> = (V × I_avg × 60) / Speed (J/mm)</p>
+            <p><strong>리플 간격</strong> = 이동속도(mm/s) / PPS</p>
+            <p class="calc-formula__tip">STS 열변형 기준: 0.5 kJ/mm 이하 권장. 1.0 kJ/mm 초과 시 변형 위험. Duty 낮추고 RPM 올리면 열입력 감소.</p>
+          </div>
+        </details>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">&copy; 2026 용접 지식 백과</div>
+  </footer>
+
+  <script src="js/calculator.js"></script>
+</body>
+</html>

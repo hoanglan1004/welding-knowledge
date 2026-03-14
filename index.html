@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="용접 기법, 재료, 결함 관리에 대한 종합 지식 사이트. 현장에서 바로 참조할 수 있는 용접 가이드.">
+  <title>용접 지식 백과</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <h1 class="header__title">용접 지식 백과</h1>
+      <p class="header__subtitle">용접 기법 · 재료 · 품질관리 종합 레퍼런스</p>
+      <a href="calculator.html" class="header__calc-link">파이프 계산기 &rarr;</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- 검색 및 필터 영역 -->
+    <section class="search-section">
+      <div class="search-bar">
+        <input
+          type="text"
+          id="searchInput"
+          class="search-bar__input"
+          placeholder="검색어 입력... (예: TIG, 304, 기공)"
+          autocomplete="off"
+        >
+      </div>
+      <div class="filter-bar">
+        <div class="filter-group">
+          <label for="typeFilter" class="filter-group__label">분류</label>
+          <select id="typeFilter" class="filter-group__select">
+            <option value="all">전체</option>
+            <option value="processes">용접 공법</option>
+            <option value="materials">소재</option>
+            <option value="defects">결함</option>
+            <option value="inspections">비파괴검사</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="processFilter" class="filter-group__label">용접 종류</label>
+          <select id="processFilter" class="filter-group__select">
+            <option value="all">전체</option>
+            <option value="tig">TIG</option>
+            <option value="mig">MIG/MAG</option>
+            <option value="smaw">피복아크(SMAW)</option>
+            <option value="fcaw">FCAW</option>
+            <option value="saw">SAW</option>
+          </select>
+        </div>
+        <span id="resultCount" class="filter-bar__count"></span>
+      </div>
+    </section>
+
+    <!-- 카드 목록 영역 -->
+    <section id="cardGrid" class="card-grid">
+      <!-- JavaScript에서 카드가 동적으로 삽입됩니다 -->
+    </section>
+
+    <!-- 검색 결과 없음 메시지 -->
+    <div id="noResults" class="no-results" style="display: none;">
+      <p>검색 결과가 없습니다.</p>
+      <p class="no-results__hint">다른 검색어를 입력하거나 필터를 변경해 보세요.</p>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2026 용접 지식 백과. 현장에서 바로 참조하는 용접 가이드.</p>
+    </div>
+  </footer>
+
+  <script src="js/data-loader.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
