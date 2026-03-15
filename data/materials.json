@@ -79,6 +79,15 @@
         "316과 316L 구분 주의 — L이 없으면 탄소 함량이 높아 예민화 위험 증가",
         "해양 환경에서는 용접부 후처리(패시베이션) 필수"
       ],
+      "metallurgy": {
+        "sensitization": "저탄소(C≤0.03%)로 304보다 예민화 저항성 높으나 475~850°C 장시간 노출 시 Cr₂₃C₆ 석출 가능. 입열 최소화 + 층간온도 150°C 이하 엄수",
+        "lowSulfur": "316L의 S 함량이 0.005% 미만이면 Marangoni 대류 반전 → 넓고 얕은 용입. VIM/VAR 소재일수록 S가 극저. Mill Cert에서 S 확인 필수. 대응: 전류 10~15% 증가 또는 펄스 사용",
+        "surfaceFinish": {
+          "BA": "Bright Annealed — 1050~1100°C 수소분위기 열처리. Ra 0.25~0.5μm. LOD 배관 표준. 용접 시 변색(Heat Tint) 관리가 품질 기준. 연금색까지 허용",
+          "EP": "Electropolished — 전해연마로 Ra 0.1~0.25μm. Cr/Fe 비율 향상. UHP 반도체/제약 배관 필수. 산소 ppm 레벨 관리 필요"
+        },
+        "manufacturing": "일반 상용: AOD/VOD 정련. 고급: VIM(진공유도용해) → VAR(진공아크재용해) 이중정련. VIM/VAR = 불순물 극저 → 로우셀파 주의"
+      },
       "relatedMaterials": ["sus304"]
     },
     {
