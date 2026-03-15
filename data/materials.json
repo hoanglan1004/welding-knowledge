@@ -50,7 +50,8 @@
           "BA": "BA 304는 식품/건축 장식용 배관에 사용. 316L BA보다 내식성 낮으나 가격 유리",
           "EP": "EP 304는 일부 반도체 보조 배관에 사용. UHP 핵심라인은 316L EP 사용"
         },
-        "manufacturing": "일반 AOD 정련이 대부분. VIM/VAR는 드묾. 316L 대비 성분 편차 적음"
+        "manufacturing": "일반 AOD 정련이 대부분. VIM/VAR는 드묾. 316L 대비 성분 편차 적음",
+        "deltaFerrite": "304 용접부 Delta-Ferrite: FN 5~10% 범위 유지 권장. 3% 미만이면 고온 균열(Hot Cracking) 위험 증가. 8% 초과 시 내식성 저하 가능. 316L보다 Ferrite 형성 경향 높음"
       },
       "relatedMaterials": ["sus316l"]
     },
