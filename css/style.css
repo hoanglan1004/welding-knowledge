@@ -1,9 +1,10 @@
 /* ============================================
    용접 지식 백과 - 스타일시트
    모바일 퍼스트 + CSS 변수 테마
+   v2.0 — 현장 문제해결 + 용접 과학 추가
    ============================================ */
 
-/* --- CSS 변수 (색상/크기를 여기서만 바꾸면 전체 변경) --- */
+/* --- CSS 변수 --- */
 :root {
   --color-primary: #1a5276;
   --color-primary-light: #2980b9;
@@ -16,15 +17,17 @@
   --color-danger: #e74c3c;
   --color-success: #27ae60;
   --color-info: #3498db;
+  --color-warning: #f39c12;
   --color-tag-process: #2980b9;
   --color-tag-material: #27ae60;
   --color-tag-defect: #e74c3c;
   --color-tag-inspection: #8e44ad;
+  --color-tag-trouble: #e74c3c;
+  --color-tag-science: #16a085;
   --radius: 8px;
   --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.12);
   --max-width: 1200px;
-  --header-height: auto;
 }
 
 /* --- 리셋 & 기본 --- */
@@ -44,6 +47,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  -webkit-text-size-adjust: 100%;
 }
 
 a {
@@ -67,7 +71,7 @@ a:hover {
 .header {
   background: var(--color-primary);
   color: #fff;
-  padding: 1.5rem 0;
+  padding: 1.25rem 0;
   text-align: center;
 }
 
@@ -83,20 +87,37 @@ a:hover {
   margin-top: 0.25rem;
 }
 
-.header__calc-link {
-  display: inline-block;
-  margin-top: 0.5rem;
-  padding: 0.4rem 1rem;
-  background: var(--color-accent);
-  color: #fff;
-  border-radius: 100px;
-  font-size: 0.85rem;
-  font-weight: 600;
+.header__links {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
 }
 
-.header__calc-link:hover {
-  opacity: 0.9;
+.header__link {
+  display: inline-block;
+  padding: 0.5rem 1.25rem;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border-radius: 100px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.header__link:hover {
+  background: rgba(255, 255, 255, 0.25);
   text-decoration: none;
+}
+
+.header__link--emergency {
+  background: var(--color-danger);
+  animation: pulse-glow 2s infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(231, 76, 60, 0); }
 }
 
 /* 상세 페이지 헤더 */
@@ -127,9 +148,272 @@ a:hover {
   font-weight: 600;
 }
 
+/* ===================================
+   현장 문제해결 퀵 액세스
+   =================================== */
+.troubleshoot-quick {
+  margin: 1.25rem 0 0.5rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #2c3e50, #1a5276);
+  border-radius: var(--radius);
+  color: #fff;
+}
+
+.troubleshoot-quick__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.15rem;
+}
+
+.troubleshoot-quick__desc {
+  font-size: 0.8rem;
+  opacity: 0.75;
+  margin-bottom: 0.75rem;
+}
+
+.troubleshoot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.5rem;
+}
+
+/* 트러블슈팅 퀵 버튼 */
+.ts-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.75rem 0.5rem;
+  border-radius: var(--radius);
+  color: #fff;
+  text-align: center;
+  transition: transform 0.1s, opacity 0.2s;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ts-btn:hover {
+  text-decoration: none;
+  transform: scale(1.03);
+}
+
+.ts-btn:active {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+
+.ts-btn--critical {
+  background: #c0392b;
+}
+
+.ts-btn--high {
+  background: rgba(231, 76, 60, 0.85);
+}
+
+.ts-btn--medium {
+  background: rgba(230, 126, 34, 0.85);
+}
+
+.ts-btn--low {
+  background: rgba(52, 152, 219, 0.7);
+}
+
+.ts-btn__icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.ts-btn__label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+/* ===================================
+   트러블슈팅 상세 페이지
+   =================================== */
+.ts-detail__header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.ts-detail__icon {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.ts-detail__title {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+/* 즉시 조치 섹션 */
+.ts-quickfix-section {
+  margin-bottom: 1.5rem;
+}
+
+.ts-quickfix-section__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-danger);
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 2px solid var(--color-danger);
+  display: inline-block;
+}
+
+.ts-quickfix {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  background: rgba(231, 76, 60, 0.06);
+  border-radius: var(--radius);
+  border-left: 4px solid var(--color-danger);
+}
+
+.ts-quickfix__num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  background: var(--color-danger);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.ts-quickfix__text {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5;
+  padding-top: 0.1rem;
+}
+
+/* 상세 해결 방법 */
+.ts-solution {
+  margin-bottom: 0.75rem;
+  padding: 1rem;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.ts-solution__action {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 0.35rem;
+}
+
+.ts-solution__detail {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--color-text);
+}
+
+/* 다른 문제 보기 링크 */
+.ts-nav {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.ts-nav__back {
+  display: inline-block;
+  padding: 0.75rem 2rem;
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.ts-nav__back:hover {
+  opacity: 0.9;
+  text-decoration: none;
+}
+
+/* ===================================
+   용접 과학 카드/상세
+   =================================== */
+.card--trouble {
+  border-left-color: var(--color-danger);
+  background: #fff9f8;
+}
+
+.card--science {
+  border-left-color: var(--color-tag-science);
+}
+
+.card__tag--trouble {
+  background: var(--color-danger);
+}
+
+.card__tag--critical {
+  background: #c0392b;
+}
+
+.card__tag--high {
+  background: var(--color-danger);
+}
+
+.card__tag--medium {
+  background: var(--color-warning);
+}
+
+.card__tag--low {
+  background: var(--color-info);
+}
+
+.card__tag--science {
+  background: var(--color-tag-science);
+}
+
+.card__quickfix {
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(231, 76, 60, 0.06);
+  border-radius: 4px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--color-danger);
+}
+
+.card__quickfix strong {
+  color: #c0392b;
+}
+
+/* 과학 포인트 */
+.science-point {
+  margin-bottom: 0.75rem;
+  padding: 1rem;
+  background: rgba(22, 160, 133, 0.06);
+  border-left: 4px solid var(--color-tag-science);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.science-point__title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 0.35rem;
+}
+
+.science-point__detail {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--color-text);
+}
+
 /* --- 검색 & 필터 --- */
 .search-section {
-  margin: 1.5rem 0 1rem;
+  margin: 1rem 0 1rem;
 }
 
 .search-bar {
@@ -209,6 +493,10 @@ a:hover {
 .card:hover {
   box-shadow: var(--shadow-hover);
   transform: translateY(-2px);
+}
+
+.card:active {
+  transform: translateY(0);
 }
 
 .card--process {
@@ -379,7 +667,7 @@ a:hover {
 }
 
 .detail-section__list li::before {
-  content: "•";
+  content: "\2022";
   position: absolute;
   left: 0.25rem;
   color: var(--color-primary-light);
@@ -435,6 +723,7 @@ a:hover {
 .settings-table-wrapper {
   overflow-x: auto;
   margin-bottom: 1rem;
+  -webkit-overflow-scrolling: touch;
 }
 
 .settings-table {
@@ -772,7 +1061,9 @@ a:hover {
   font-size: 0.85rem;
 }
 
-/* --- 반응형 (데스크탑 보정) --- */
+/* ===================================
+   반응형 — 데스크탑 보정
+   =================================== */
 @media (min-width: 768px) {
   .header__title {
     font-size: 2rem;
@@ -791,12 +1082,22 @@ a:hover {
     font-size: 2rem;
   }
 
+  .ts-detail__title {
+    font-size: 2rem;
+  }
+
   .card-grid {
     gap: 1.25rem;
   }
+
+  .troubleshoot-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
 }
 
-/* 모바일 최적화 */
+/* ===================================
+   모바일 최적화 (핵심)
+   =================================== */
 @media (max-width: 500px) {
   .pros-cons {
     grid-template-columns: 1fr;
@@ -807,11 +1108,38 @@ a:hover {
   }
 
   .search-section {
-    margin: 1rem 0 0.75rem;
+    margin: 0.75rem 0 0.75rem;
   }
 
   .filter-bar {
     gap: 0.5rem;
+  }
+
+  /* 트러블슈팅 버튼 — 모바일에서 2열 고정 (터치하기 좋게 큼직하게) */
+  .troubleshoot-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.4rem;
+  }
+
+  .ts-btn {
+    padding: 0.6rem 0.35rem;
+  }
+
+  .ts-btn__icon {
+    font-size: 1.3rem;
+  }
+
+  .ts-btn__label {
+    font-size: 0.75rem;
+  }
+
+  /* 즉시 조치 — 모바일에서 더 눈에 띄게 */
+  .ts-quickfix {
+    padding: 0.6rem 0.75rem;
+  }
+
+  .ts-quickfix__text {
+    font-size: 0.95rem;
   }
 
   /* 테이블 → 카드 변환 */
@@ -875,6 +1203,11 @@ a:hover {
     font-size: 1.3rem;
   }
 
+  .header__links {
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
   .card {
     padding: 1rem;
   }
@@ -887,12 +1220,21 @@ a:hover {
     padding: 1rem 0 1.5rem;
   }
 
-  .detail__title {
+  .detail__title,
+  .ts-detail__title {
     font-size: 1.4rem;
   }
 
   .tip-box,
   .caution-box {
     padding: 0.6rem 0.75rem;
+  }
+
+  .troubleshoot-quick {
+    padding: 0.75rem;
+  }
+
+  .ts-btn__label {
+    font-size: 0.7rem;
   }
 }
