@@ -234,6 +234,206 @@
         }
       ],
       "relatedTopics": ["pool-pushing", "undercut-issue", "distortion-issue"]
+    },
+    {
+      "id": "fabrication-math",
+      "name": "AMAT 도면 계산 가이드",
+      "nameEn": "Fabrication Math for Semiconductor Equipment",
+      "category": "현장 기술",
+      "summary": "Applied Materials(AMAT) 납품용 정밀 배관 작업에 필요한 삼각함수 계산, 인치 환산, 각도 오차 법칙.",
+      "keyPoints": [
+        {
+          "title": "삼각형 법칙 (SOH-CAH-TOA)",
+          "detail": "높이(Rise) = 수평거리 × tan(각도). 대각선(Travel) = 수평거리 ÷ cos(각도). 수평 거리(Run) = 대각선 × cos(각도). 예: 11.45\" 거리에 45도 파이프 길이 = 11.45 ÷ 0.707 = 16.19\""
+        },
+        {
+          "title": "0.5도의 법칙 (레버리지 효과)",
+          "detail": "오차 거리 = 전체 길이 × tan(오차 각도). 10\" 거리에서 0.5도 차이 → 약 0.087\"(2.2mm). 20\" 거리에서 0.5도 차이 → 약 0.174\"(4.4mm). 거리가 멀수록 디지털 각도기로 정각도 잡는 것 필수!"
+        },
+        {
+          "title": "인치 소수점 환산표",
+          "detail": ".0625 = 1/16\" = 1.58mm. .125 = 1/8\" = 3.17mm. .25 = 1/4\" = 6.35mm. .5 = 1/2\" = 12.7mm. .75 = 3/4\" = 19.05mm"
+        },
+        {
+          "title": "AMAT 316L 용접 팁",
+          "detail": "수축량 계산: 용접 후 냉각 시 0.1~0.2도 정도 안쪽으로 당겨짐 → 가접 시 여유 필요. Faceback 수치는 비드와 피팅 위치 결정 → 이중 체크. 백퍼지(Back Purging) 필수"
+        },
+        {
+          "title": "현장 체크리스트",
+          "detail": "1. 기준점 확인: 고정 치수 vs 계산 치수 구분. 2. 각도 검증: 디지털 각도기로 최소 2회 측정. 3. 간섭 체크: 계산된 높이가 주변 프레임과 간섭되지 않는지 확인"
+        }
+      ],
+      "relatedTopics": ["speed-effect"]
+    },
+    {
+      "id": "uhp-oxidation-control",
+      "name": "UHP 배관 산화 방지 최적화",
+      "nameEn": "UHP Pipe Oxidation Prevention",
+      "category": "UHP/반도체",
+      "summary": "반도체 UHP 배관 용접의 산화 방지. 산소뿐 아니라 수분 제어와 층류(Laminar Flow) 유지가 핵심.",
+      "keyPoints": [
+        {
+          "title": "산소 vs 수분 — 진짜 적은 수분",
+          "detail": "산소 10ppm 이하가 기본이지만, 수분(H₂O)이 더 위험. 고온 아크에서 수분이 해리되어 활성 산소로 변함. 이슬점(Dew Point) 확인으로 수분 1ppm 이하 관리 필수"
+        },
+        {
+          "title": "Blue Tint의 정체",
+          "detail": "40~70nm 두께의 산화막이 빛의 간섭으로 만드는 색상. 변색 순서: 투명→연금(Straw)→보라→파랑→회색→검정. Silver/Straw = 합격, Blue/Purple = 위험, Grey = 불량"
+        },
+        {
+          "title": "망간(Mn) 증발 함정",
+          "detail": "입열량을 낮추면 무조건 좋다? 아님! 0.5 kJ/mm 이하에서 냉각이 빨라지면 망간 증기가 비드 주변에 조밀하게 응축 → 변색 가속. 기술이 정밀해질수록 상식은 배신한다"
+        },
+        {
+          "title": "층류(Laminar Flow) 유지",
+          "detail": "레이놀즈 수(Re) 2,000 이하 유지 필수. 유량이 너무 높으면 난류 → 외부 공기 유입(와류). 토치 유량 대비 이면 퍼지 유량 = 1:4 비율 고정. 마그네헬릭 게이지로 압력 모니터링(0.5~3.0 IWC)"
+        },
+        {
+          "title": "퍼지 실전 체크",
+          "detail": "가스 렌즈 메쉬 상태 매일 점검(난류의 주범). 이면 퍼지: 내부 체적의 5~7배 치환. 후속 퍼지: 150°C 이하까지 유지. DI Water 세척 후 고순도 질소로 완전 건조 확인"
+        },
+        {
+          "title": "가스 댐(Gas Dam) 설치",
+          "detail": "설치 위치와 배출 구멍 크기가 퍼지 효율 결정. 배관 길이가 수십 미터면 끝단 압력 손실 고려 필수. 가스 공급 라인 자체 미세 누설 점검도 필수"
+        }
+      ],
+      "relatedTopics": ["ba-vs-ep", "oxidation-issue"]
+    },
+    {
+      "id": "instantaneous-power",
+      "name": "순시 전력 제어 & Rule of 33",
+      "nameEn": "Instantaneous Power Control & Rule of 33",
+      "category": "용접 파라미터",
+      "summary": "2026년 ASME 규정 강화로 입열량 계산이 '평균'에서 '순시(Instantaneous)'로 정밀화. Rule of 33과 고주파 펄스 전략.",
+      "keyPoints": [
+        {
+          "title": "QW-409.1(c) — 순시 전력 요구",
+          "detail": "2026년 개정 ASME Section IX에서 펄스 용접 시 순시 전력(W) 또는 에너지(J) 실시간 기록 요구. 기존 평균 전류 방식으로는 부적합 판정 위험. 현장 장비가 순시 전력 출력 가능한지 확인 필수"
+        },
+        {
+          "title": "Rule of 33 — 기본 방어선",
+          "detail": "박판(1~2mm) 작업 시 기본값: 주파수 33Hz, 피크 시간 33%, 베이스 전류 33%. 이것은 정답이 아닌 최소 방어선. 여기서 시작해서 비드 색상 관찰하며 조정"
+        },
+        {
+          "title": "고주파 펄스 전략 (150Hz+)",
+          "detail": "고주파 아크는 바늘처럼 집중 → 열영향부(HAZ) 극소화. 500Hz에서 아크 강직성 최대. 소리가 날카로워짐 → 소리만으로 집중도 판단 가능. 수동 용접 시 손떨림이 심하면 오히려 불안정할 수 있으므로 주의"
+        },
+        {
+          "title": "Ar+H₂ 혼합 가스",
+          "detail": "표면 산화(Straw Color 미달) 시 Ar + 2% H₂ 가스 도입 제안. H₂의 환원 작용으로 산화 억제. 316L 오스테나이트 조직은 수소 취성에 강함(금속학적 근거 있음). 단, 공정 엔지니어 승인 필요"
+        },
+        {
+          "title": "입열량 기록 습관",
+          "detail": "용접 후 단순히 '양호'가 아닌, Heat Input (J/mm) 값을 업무 일지에 기록. 비드 폭 1인치(25mm) 초과 시 위빙 거리 포함한 선형 주행 속도로 입열 계산. 이것이 2026년 오디트 대비의 핵심"
+        },
+        {
+          "title": "Delta-Ferrite 제어",
+          "detail": "hot cracking 방지를 위해 FN(Ferrite Number) 3~8% 범위 유지. 316L은 Mo 함량으로 304보다 쇳물 유동성 낮음 → 피크 전류 5~10% 높게 설정 권장. 펄스 주파수 3Hz, 5Hz, 10Hz 대역에서 결정립 미세화(Grain Refinement) 효과"
+        }
+      ],
+      "relatedTopics": ["pulse-parameters", "chromium-carbide"]
+    },
+    {
+      "id": "welding-fundamentals",
+      "name": "용접 기초 이론",
+      "nameEn": "Welding Fundamentals",
+      "category": "기초 이론",
+      "summary": "용접의 물리적 원리, 에너지 법칙, 아크 특성, 극성의 이해. 한국산업인력공단 용접 일반 기반.",
+      "keyPoints": [
+        {
+          "title": "용접의 본질 — 원자 간 결합",
+          "detail": "금속 원자 간 인력이 작용하는 거리(10⁻⁸cm)까지 접근시키기 위해 방해물(산화피막, 요철)을 에너지로 제거하는 공정. 단순히 녹여 붙이는 것이 아닌 물리·화학적 과정"
+        },
+        {
+          "title": "줄의 법칙 — 입열의 기본",
+          "detail": "H = 0.238 × I² × R × t (cal). 전류(I)의 제곱에 비례 → 전류가 2배면 발열은 4배! 이것이 전류 제어가 가장 중요한 이유. 입열량(J/mm) = 전류(A) × 전압(V) × 60 / 속도(mm/min)"
+        },
+        {
+          "title": "옴의 법칙과 전력",
+          "detail": "E = I × R (전압 = 전류 × 저항). 전력 P = E × I = I²R. 아크 전압은 아크 길이에 비례 → 아크 길이 유지가 전압 안정의 핵심"
+        },
+        {
+          "title": "아크 특성 — 부저항/자기제어",
+          "detail": "아크는 '부저항 특성': 전류↑ → 아크 온도↑ → 이온화↑ → 저항↓. 자기제어 특성: 와이어 돌출 길이가 변해도 아크 스스로 안정점을 찾음. CTWD(Contact Tip to Work Distance) 유지가 중요"
+        },
+        {
+          "title": "극성의 선택",
+          "detail": "DCEN(정극성): 전극(-), 모재(+). 열의 70%가 모재에 → 깊은 용입. TIG 표준. DCEP(역극성): 전극(+), 모재(-). 열의 70%가 전극에 → 클리닝 효과. AC: 정극+역극 교번 → 알루미늄 TIG에 사용(클리닝+용입 동시)"
+        },
+        {
+          "title": "용접 결함의 본질",
+          "detail": "결함은 우연이 아닌 변수 제어 실패의 필연적 결과. 고온 균열: 응고취성온도(BTR)에서 인장 변형 → S, P 불순물이 원인. 저온 균열: 수소+잔류응력+경화조직 → 예열과 용접봉 건조로 예방. 기공: 수소/질소/CO 가스 포획 → 가스 제어와 청결이 핵심"
+        }
+      ],
+      "relatedTopics": ["speed-effect", "chromium-carbide"]
+    },
+    {
+      "id": "welding-equipment",
+      "name": "용접기 구조와 용어",
+      "nameEn": "Welding Equipment Fundamentals",
+      "category": "기초 이론",
+      "summary": "용접기의 핵심 부품(IGBT, 리액터, 콘덴서)과 사용률(Duty Cycle) 개념. 장비를 이해해야 세팅을 이해한다.",
+      "keyPoints": [
+        {
+          "title": "IGBT — 인버터의 심장",
+          "detail": "Insulated Gate Bipolar Transistor. 전력 제어를 위한 반도체 소자. 초고속 스위칭으로 AC→DC 변환 및 펄스 파형 생성. 게이트 드라이버 제어 알고리즘이 아크 안정성을 결정"
+        },
+        {
+          "title": "사용률 (Duty Cycle)",
+          "detail": "10분 주기 기준 용접기가 작동 가능한 시간 비율. 60% = 6분 작동 + 4분 휴식 (IEC 60974-1 기준). 초과 시 IGBT 열폭주(Thermal Runaway) 위험. 현장에서 연속 작업 시 반드시 확인"
+        },
+        {
+          "title": "직류 리액터 (Reactor)",
+          "detail": "직류의 맥동(Ripple)을 평활하게 다듬는 부품. 용접 중 전류 기울기 제어 → 아크 시작과 종료의 부드러움에 영향. 리액터 값이 클수록 전류 변화가 완만"
+        },
+        {
+          "title": "콘덴서 (Capacitor)",
+          "detail": "전하를 축적했다가 방출하는 소자. 순간적인 전력 수요에 대응. 인버터 회로의 안정성 유지에 필수. 노후화 시 아크 불안정의 원인이 됨"
+        },
+        {
+          "title": "NFB/MCCB — 과부하 차단기",
+          "detail": "과부하 및 단락 시 회로 차단. 선로 보호용이지 IGBT 직접 보호는 아님(반응 속도 차이). 장비 보호의 마지막 방어선. 자주 트립되면 입력 전원 또는 내부 회로 점검 필요"
+        },
+        {
+          "title": "용접 이음 효율",
+          "detail": "이론적 100% — 리벳(80%) 대비 우수. 다만 실제 구조물에서는 HAZ(열영향부) 취성, 잔류 응력이 존재. 비파괴검사(RT, UT)로 내부 결함 확인 필수. 용접의 장점은 수밀/기밀성과 구조 경량화"
+        }
+      ],
+      "relatedTopics": ["welding-fundamentals", "pulse-parameters"]
+    },
+    {
+      "id": "wps-pqr-standards",
+      "name": "WPS/PQR 규격 시스템",
+      "nameEn": "WPS/PQR Standards System",
+      "category": "규격/표준",
+      "summary": "용접절차사양서(WPS)와 절차인정기록서(PQR)의 이해. ASME/AWS 규격에 따른 품질 관리 체계.",
+      "keyPoints": [
+        {
+          "title": "WPS (Welding Procedure Specification)",
+          "detail": "용접 작업 지시서. 모재, 용가재, 전류, 전압, 속도, 예열, 후열, 가스, 자세 등 모든 변수를 문서화. 현장에서 이 사양서대로 시공해야 함. KS B ISO 15614 / ASME Section IX 준거"
+        },
+        {
+          "title": "PQR (Procedure Qualification Record)",
+          "detail": "WPS대로 시험 용접 후 기계적 시험(인장, 굽힘, 충격) 결과를 기록한 문서. PQR이 합격해야 해당 WPS 사용 가능. 실제 데이터 기반의 품질 증명"
+        },
+        {
+          "title": "필수 변수 (Essential Variables)",
+          "detail": "P-No: 모재 분류 번호 (8.1 = 오스테나이트 STS). F-No: 용가재 분류 (F6 = STS 용가재). A-No: 용착 금속 화학 분류. 이 번호가 바뀌면 WPS 재인정 필요"
+        },
+        {
+          "title": "열관리 — 예열/층간/후열",
+          "detail": "예열: 수소 균열 방지, 탄소강 10~80°C 이상. STS는 보통 예열 불필요. 층간온도: 304/316L은 150°C 이하 유지(예민화 방지). 후열(PWHT): 잔류응력 제거, 코드에서 요구 시 실시"
+        },
+        {
+          "title": "이종강 용접의 주의점",
+          "detail": "다른 금속을 용접할 때 선팽창 계수 차이로 열변형/균열 위험. 버터링(Buttering) 기법: 한쪽 모재에 중간 성분 용가재를 먼저 올려 완충. 탄소강+STS 시 ER309L 사용(희석 보상)"
+        },
+        {
+          "title": "KS 용접 기호",
+          "detail": "도면에 용접 이음을 표시하는 표준 기호 (KS B 0052). 화살표, 기준선, 꼬리로 구성. 설계자의 의도가 현장에 정확히 전달되는 유일한 방법. 기호 해독 능력 = 도면 독해력"
+        }
+      ],
+      "relatedTopics": ["welding-fundamentals", "chromium-carbide"]
     }
   ]
 }
