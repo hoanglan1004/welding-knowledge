@@ -602,6 +602,48 @@
         }
       ],
       "relatedTopics": ["valex-drawing", "fabrication-math", "drawing-basics"]
+    },
+    {
+      "id": "work-order-picklist",
+      "name": "워킹 오더 피크리스트 읽기",
+      "nameEn": "Work Order Picklist Reading Guide",
+      "category": "도면/설계",
+      "summary": "Valex Work Order Picklist의 구조와 부품 목록 읽는 법. 헤더 정보, 부품 약어 해독, 로트 추적, 스테이션 코드까지 현장에서 바로 활용할 수 있는 가이드.",
+      "keyPoints": [
+        {
+          "title": "피크리스트 헤더 — 기본 정보",
+          "detail": "Work Order: 작업지시 번호 (예: 2400918). Batch: 생산 배치 (예: 24001 BO). Item Number: 도면/부품 식별번호 (예: 0001-31306_03 → 도면번호_리비전). Qty Ordered: 주문 수량 (2.0 EA = 2개). Description: 제품명 (예: WELDMENT 4IN VAC LINE = 4인치 진공 라인 용접 어셈블리). Rev: 도면 리비전. Net Weight: 완성품 총 중량. SalesJob: 영업/프로젝트 추적 번호. Due Date: 납기일"
+        },
+        {
+          "title": "부품 약어 — 피팅 유형 (FTG)",
+          "detail": "FTG = Fitting (피팅). TIG = TIG 용접된 (TIG Welded). TBG = Tubing (튜빙 계열). EL = Elbow (엘보). NUT = 너트. 조합 읽기: 'FTG TIG EL' = TIG 용접형 엘보 피팅. 'FTG TBG NUT' = 튜빙용 너트 피팅. 'FTG TBG EL' = 튜빙 엘보 피팅"
+        },
+        {
+          "title": "부품 약어 — 연결 방식",
+          "detail": "VCR = VCR 피팅 (Metal Gasket Face Seal). VCR-MX = VCR Male (수) 연결. VCR-F = VCR Female (암) 연결. 1/4VCR = 1/4인치 VCR 규격. BUTTWELD = 버트 용접 (맞대기 용접). SIMULTAWELD = Simultaneous Weld (동시 용접) — Valex 특수 공법으로 양쪽을 동시에 용접하는 피팅"
+        },
+        {
+          "title": "부품 약어 — 소재/마감",
+          "detail": "SST = Stainless Steel (스테인리스강). SST3 = 300계열 스테인리스 (304/316L). SST-EP = Electropolished Stainless Steel (전해연마 스테인리스). SS 304 = STS 304 스테인리스. EP가 붙으면 내면이 전해연마 처리된 UHP급 부품"
+        },
+        {
+          "title": "부품 약어 — 치수/규격",
+          "detail": "OD = Outer Diameter (외경). THK = Thickness (벽두께). LG = Length/Long (길이). DEG = Degree (각도). HEX = Hexagonal (육각). D = Diameter ratio (엘보 곡률). 읽기 예시: '4.5D 1/4VCR' = 4.5배 직경비 엘보에 1/4인치 VCR 연결. '40DEG X 4.0OD X .083 THK' = 40도 각도, 외경 4인치, 벽두께 0.083인치. '5/8HEX 72LG' = 5/8인치 육각, 길이 72(단위는 맥락에 따라 mm 또는 1/100인치)"
+        },
+        {
+          "title": "부품 설명 전체 해독 예시",
+          "detail": "① 'FTG TIG EL 4.5D 1/4VCR-MX' → TIG 용접형 엘보 피팅, 곡률 4.5D, 1/4인치 VCR 수(Male) 연결. ② '1.7TO LG BUTTWELD SST-EP' → 길이 1.7인치 버트용접 튜브, EP 스테인리스. ③ 'FTG TBG NUT 1/4M VCR 5/8HEX 72LG SST3' → 튜빙 너트, 1/4인치 Male VCR, 5/8 육각, 길이 72, 300계열 스테인리스. ④ 'SS 304 NON ROTATE FLANGE' → STS 304 회전방지 플랜지. ⑤ 'SIMULTAWELD ED ELBOW' → 동시용접형 엘보 (VD-2X-VW64는 Valex 부품번호). ⑥ 'FTG TBG EL 40DEG X 4.0OD X .083 THK SST' → 튜빙 엘보, 40도, 외경 4인치, 벽두께 0.083인치, 스테인리스"
+        },
+        {
+          "title": "로트/스테이션 추적",
+          "detail": "Lot-Status: 자재 로트 상태 (입고/검사 완료 여부). Lot-HT: Heat Number — 소재 제조 로트 추적번호 (Mill Certificate와 대조). Station: 작업 공정 위치. PRE/SS: Pre-Assembly / Stainless Steel 작업 스테이션 — 가접/조립 공정. MM PROD: Main Manufacturing Production — 본 생산 공정. 숫자 500: 스테이션 코드 (공장 내 작업 위치 번호). Required qty: 해당 부품 필요 수량. 무게(KG): 부품 단위 중량 — 자재 관리용"
+        },
+        {
+          "title": "피크리스트 vs 도면 크로스체크",
+          "detail": "① 피크리스트의 Item Number가 도면번호와 일치하는지 확인 (리비전 포함). ② 피크리스트 부품 수량이 도면 BOM(Bill of Materials)과 일치하는지 대조. ③ 피팅 규격이 도면의 부품 목록과 동일한지 확인 — 특히 VCR 사이즈, 플랜지 규격. ④ 바코드가 각 부품에 부착되어 있어 MES(Manufacturing Execution System)에서 로트 추적 가능. ⑤ 피크리스트에 없는 소모품(용접 와이어, 퍼지 가스, 가스켓)은 별도 출고. ⑥ 'Remarks'의 A번호는 내부 추적 코드 — 품질 기록과 연결됨"
+        }
+      ],
+      "relatedTopics": ["valex-drawing", "pipe-fittings", "drawing-practical"]
     }
   ]
 }
