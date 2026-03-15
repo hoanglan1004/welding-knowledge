@@ -1,0 +1,223 @@
+{
+  "science": [
+    {
+      "id": "marangoni-convection",
+      "name": "Marangoni 대류",
+      "nameEn": "Marangoni Convection",
+      "category": "용융풀 과학",
+      "summary": "용융풀 내부의 표면장력 차이에 의한 대류 흐름. 황(S) 함량에 따라 대류 방향이 바뀌어 용입 형상이 완전히 달라진다.",
+      "keyPoints": [
+        {
+          "title": "저황(S < 0.005%) — 넓고 얕은 용입",
+          "detail": "표면장력이 온도↑ → ↓. 풀 중심(고온)에서 바깥(저온)으로 흐름. 열이 바깥으로 분산 → 넓고 얕은 D/W 비 낮음"
+        },
+        {
+          "title": "고황(S > 0.01%) — 좁고 깊은 용입",
+          "detail": "표면장력이 온도↑ → ↑ (S가 표면장력 온도계수를 반전시킴). 바깥→중심으로 흐름. 열이 깊이 전달 → 좁고 깊은 용입"
+        },
+        {
+          "title": "Lot별 편차",
+          "detail": "같은 316L이라도 제조 Lot마다 S 함량이 0.001~0.025% 범위에서 다름. Mill Certificate 확인 필수. 열간가공 중 S 분포도 불균일할 수 있음"
+        },
+        {
+          "title": "현장 대응",
+          "detail": "로우셀파 의심 시: 전류 10~15% 증가, 아크 길이 짧게, 펄스 사용(피크↑/듀티↓). WPS에 S 함량 범위별 세팅 차이를 명시"
+        }
+      ],
+      "relatedTopics": ["low-sulfur-effect", "pulse-parameters"]
+    },
+    {
+      "id": "pulse-parameters",
+      "name": "펄스 파라미터와 용융풀",
+      "nameEn": "Pulse Parameters & Weld Pool",
+      "category": "용접 파라미터",
+      "summary": "펄스 주파수, 듀티사이클, 피크/베이스 전류가 용융풀 크기, 형상, 용입 깊이에 미치는 영향.",
+      "keyPoints": [
+        {
+          "title": "주파수 (Hz) — 풀 응고 패턴 제어",
+          "detail": "저주파(0.5~2Hz): 피크에서 큰 풀 → 베이스에서 부분 응고 → '동전 쌓기' 비드. 중주파(3~10Hz): 풀 진동 → 조직 미세화, 기공 감소. 고주파(100Hz+): 거의 DC와 유사, 아크 안정화 효과"
+        },
+        {
+          "title": "듀티사이클 (%) — 입열량 조절",
+          "detail": "듀티 높으면(60~70%): 피크 시간 ↑ → 높은 입열, 깊은 용입. 듀티 낮으면(30~40%): 피크 시간 ↓ → 낮은 입열, 변형 적음. 평균 전류 = 피크×듀티 + 베이스×(1-듀티)"
+        },
+        {
+          "title": "피크 전류 — 용입 깊이 결정",
+          "detail": "피크에서 아크 압력이 최대 → 용융풀을 아래로 밀어 깊은 용입. DC 연속 용접 대비 피크를 20~30% 높여도 평균 입열은 비슷 → 깊은 용입 + 적은 변형"
+        },
+        {
+          "title": "베이스 전류 — 풀 냉각/유지",
+          "detail": "아크를 꺼지지 않게 유지하는 최소 전류 (보통 피크의 20~40%). 너무 낮으면 아크 끊김. 너무 높으면 풀 냉각 불충분 → 연속 DC와 차이 없어짐"
+        }
+      ],
+      "practicalGuide": {
+        "title": "LOD BA 파이프 펄스 세팅 가이드",
+        "settings": [
+          {
+            "scenario": "304 BA 3mm (Sch.10 소구경)",
+            "peak": "100~120A",
+            "base": "30~40A",
+            "frequency": "1~2 Hz",
+            "duty": "40~50%",
+            "notes": "동전 쌓기 비드. 깨끗한 외관"
+          },
+          {
+            "scenario": "316L BA 6mm (Sch.40 중구경)",
+            "peak": "150~180A",
+            "base": "50~70A",
+            "frequency": "1~2 Hz",
+            "duty": "45~55%",
+            "notes": "로우셀파 의심 시 피크 20% 증가"
+          },
+          {
+            "scenario": "316L BA 대구경 (8\"+) 루트패스",
+            "peak": "110~140A",
+            "base": "35~50A",
+            "frequency": "1~1.5 Hz",
+            "duty": "40~50%",
+            "notes": "백퍼지 필수. 키홀 유지하며 진행"
+          },
+          {
+            "scenario": "로우셀파 316L 대응",
+            "peak": "정상대비 +15~20%",
+            "base": "정상대비 동일",
+            "frequency": "1~3 Hz",
+            "duty": "30~40%",
+            "notes": "피크↑ + 듀티↓ = 순간 깊은 용입 + 총 입열 억제"
+          }
+        ]
+      },
+      "relatedTopics": ["marangoni-convection", "low-sulfur-effect"]
+    },
+    {
+      "id": "vim-var-welding",
+      "name": "VIM/VAR 제조와 용접",
+      "nameEn": "VIM/VAR Manufacturing & Welding Impact",
+      "category": "재료 제조",
+      "summary": "진공유도용해(VIM)와 진공아크재용해(VAR)로 제조된 소재의 특성이 용접에 미치는 영향.",
+      "keyPoints": [
+        {
+          "title": "VIM (Vacuum Induction Melting)",
+          "detail": "진공에서 유도가열로 용해. 산소(O), 질소(N), 황(S), 인(P) 등 불순물 극저 수준으로 제거. 고순도 합금 제조에 필수. 반도체/UHP 배관용 소재의 기본"
+        },
+        {
+          "title": "VAR (Vacuum Arc Remelting)",
+          "detail": "VIM으로 만든 전극을 진공에서 재용해. 편석(Segregation) 감소, 비금속 개재물 제거, 미세조직 균일화. VIM+VAR 이중정련이 최고 품질"
+        },
+        {
+          "title": "용접에 미치는 영향",
+          "detail": "극저 불순물 → 로우셀파 효과 극대화 (S < 0.002%). 깨끗한 조직 → 열영향부 예민화 감소. 균일한 성분 → 용접부 품질 안정적이나 용입 확보가 도전 과제"
+        },
+        {
+          "title": "LOD BA에서의 의미",
+          "detail": "LOD BA 파이프의 316L도 일부 VIM/VAR 소재 사용. UHP만큼 극순도는 아니지만, 일반 상용 316L보다 불순물 낮음 → 로우셀파 경향 있을 수 있음"
+        }
+      ],
+      "relatedTopics": ["marangoni-convection", "ba-vs-ep"]
+    },
+    {
+      "id": "ba-vs-ep",
+      "name": "BA vs EP — 표면 처리와 용접",
+      "nameEn": "Bright Annealed vs Electropolished",
+      "category": "표면 처리",
+      "summary": "BA(Bright Annealing)와 EP(Electropolishing)의 차이와 각각의 용접 특성.",
+      "keyPoints": [
+        {
+          "title": "BA (Bright Annealing) — 광휘소둔",
+          "detail": "수소/질소 혼합 분위기에서 고온 열처리(1050~1100°C). 표면이 거울같이 밝고 매끄러움. 부동태 피막(Cr₂O₃) 균일. Ra 0.25~0.5μm. 용접 시 깨끗한 표면으로 가스 트랩 적음"
+        },
+        {
+          "title": "EP (Electropolishing) — 전해연마",
+          "detail": "전해액에서 전류를 흘려 표면 돌출부를 선택적 용해. BA보다 더 매끄러움. Ra 0.1~0.25μm. 크롬 농축 부동태 피막(Cr/Fe 비율 높음). UHP 반도체/제약 배관 필수"
+        },
+        {
+          "title": "BA 용접 특성 (LOD 현장 기준)",
+          "detail": "표면 청결 → 기공 발생률 낮음. 열변색(Heat Tint) 관리가 핵심 품질 기준. 연금색까지 허용이 일반적. 용접 후 패시베이션 권장. UHP 대비 품질 기준은 완화되지만 변색 최소화 노력 필요"
+        },
+        {
+          "title": "EP 용접 특성 (UHP 참고)",
+          "detail": "극도로 깨끗한 표면 → 용접부도 동일 수준 요구. 산소 ppm 레벨 관리. 변색 불허 (투명/연금색만). Orbital 자동 용접이 표준. LOD에서는 EP 수준까지 요구되지 않음"
+        }
+      ],
+      "relatedTopics": ["vim-var-welding", "sensitization-issue"]
+    },
+    {
+      "id": "chromium-carbide",
+      "name": "크롬카바이드 예민화",
+      "nameEn": "Chromium Carbide Sensitization (Cr₂₃C₆)",
+      "category": "금속학",
+      "summary": "스테인리스강의 최대 약점. 용접 열로 크롬카바이드가 입계에 석출되면 내식성이 급격히 떨어진다.",
+      "keyPoints": [
+        {
+          "title": "메커니즘",
+          "detail": "475~850°C 온도 범위에서 탄소(C)가 결정 입계로 이동 → 크롬(Cr)과 결합하여 Cr₂₃C₆ 석출 → 입계 주변 Cr 함량이 12% 미만으로 감소 → 부동태 피막 형성 불가 → 입계부식(IGC)"
+        },
+        {
+          "title": "위험 온도 범위",
+          "detail": "475~850°C, 특히 600~700°C가 가장 위험(코 온도). 용접 열영향부(HAZ)가 이 온도를 통과하는 시간이 길수록 예민화 심화. 입열량↑ → 통과 시간↑ → 위험↑"
+        },
+        {
+          "title": "304 vs 316L 비교",
+          "detail": "304: C ≤ 0.08% → 예민화 위험 높음. 316L: C ≤ 0.03% → 탄소가 적어 카바이드 석출량 감소. L(Low Carbon) 등급이 용접용으로 필수인 이유"
+        },
+        {
+          "title": "예방 및 복원",
+          "detail": "예방: 저탄소(L) 등급 사용, 입열 최소화, 층간온도 150°C 이하. 복원: 고용화 열처리(Solution Annealing) 1050~1100°C → 급냉. 카바이드가 재용해되어 Cr 복원"
+        }
+      ],
+      "relatedTopics": ["sensitization-issue", "ba-vs-ep"]
+    },
+    {
+      "id": "weld-pool-reading",
+      "name": "용융풀 읽기 기술",
+      "nameEn": "Weld Pool Reading",
+      "category": "현장 기술",
+      "summary": "용융풀의 크기, 색상, 움직임, 형상으로 용접 상태를 실시간 판단하는 기술.",
+      "keyPoints": [
+        {
+          "title": "풀 크기로 입열 판단",
+          "detail": "적정: 용가재 직경의 2~3배. 풀이 너무 크면 과열 → 변형/변색. 풀이 너무 작으면 열 부족 → 용입 불량/볼록 비드"
+        },
+        {
+          "title": "풀 형상으로 용입 판단",
+          "detail": "넓고 얕은 타원: 저황 소재 또는 입열 부족. 좁고 깊은 물방울: 적정 용입. 불규칙/비대칭: 아크 편향 또는 모재 오염"
+        },
+        {
+          "title": "풀 색상으로 온도 판단",
+          "detail": "밝은 백색: 매우 고온 (>1600°C) → 과열 주의. 밝은 황색: 적정 온도. 주황색: 온도 부족 (루트패스 제외). 풀 주변 변색: 연금→보라→파랑→검정 순으로 과열 정도 파악"
+        },
+        {
+          "title": "풀 움직임으로 문제 감지",
+          "detail": "풀이 앞으로 밀림: 과열/속도 느림. 풀이 한쪽으로 쏠림: 자기편향 또는 모재 두께 불균일. 풀이 불규칙 진동: 가스 문제 또는 전극 오염. 키홀(구멍)이 보임: 완전 용입 상태 (배관 루트패스에서 정상)"
+        }
+      ],
+      "relatedTopics": ["pool-pushing", "pool-spreading", "no-penetration"]
+    },
+    {
+      "id": "speed-effect",
+      "name": "용접 속도와 비드 변화",
+      "nameEn": "Travel Speed Effect on Bead",
+      "category": "용접 파라미터",
+      "summary": "용접 속도(Travel Speed)가 비드 형상, 용입, 열영향부에 미치는 영향. 현장에서 속도 조절은 가장 직관적인 제어 수단.",
+      "keyPoints": [
+        {
+          "title": "속도 느림 → 과입열",
+          "detail": "비드 폭 증가, 용입 깊어짐(한계까지), 열영향부(HAZ) 넓어짐, 변형/변색 증가, 풀이 밀림, 언더컷 위험"
+        },
+        {
+          "title": "속도 빠름 → 입열 부족",
+          "detail": "비드 좁고 볼록, 용입 얕아짐, 언더컷 발생(금속이 채워지기 전 지나감), 용합 불량 위험"
+        },
+        {
+          "title": "적정 속도 판단",
+          "detail": "풀이 진행방향 뒤로 약간 치우친 타원형 유지. 비드 폭이 용가재 직경의 3~4배. 일정한 동전 쌓기 패턴(펄스 시)"
+        },
+        {
+          "title": "입열량 계산",
+          "detail": "입열(J/mm) = 전류(A) × 전압(V) × 60 / 속도(mm/min). TIG 목표: 0.5~1.5 kJ/mm (스테인리스). 속도를 2배로 올리면 입열이 절반"
+        }
+      ],
+      "relatedTopics": ["pool-pushing", "undercut-issue", "distortion-issue"]
+    }
+  ]
+}
