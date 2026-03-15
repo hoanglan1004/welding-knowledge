@@ -86,6 +86,7 @@ const DataLoader = {
         metTexts.push(item.metallurgy.sensitization || '');
         metTexts.push(item.metallurgy.lowSulfur || '');
         metTexts.push(item.metallurgy.manufacturing || '');
+        metTexts.push(item.metallurgy.deltaFerrite || '');
         if (item.metallurgy.surfaceFinish) {
           metTexts.push(item.metallurgy.surfaceFinish.BA || '');
           metTexts.push(item.metallurgy.surfaceFinish.EP || '');
