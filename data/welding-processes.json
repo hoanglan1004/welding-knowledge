@@ -12,6 +12,26 @@
       "cons": ["속도 느림", "숙련도 필요", "바람에 취약", "생산성 낮음"],
       "settings": [
         {
+          "material": "304 BA 박판 (LOD)",
+          "thickness": "1.65mm (0.065\")",
+          "current": "40~55A",
+          "voltage": "8~10V",
+          "gasFlow": "8~10 L/min",
+          "electrode": "WCe20 1.6mm",
+          "fillerWire": "ER308L 1.0~1.6mm",
+          "notes": "박판 — 번스루 주의. 펄스 필수 권장. 백퍼지 5~8 L/min. 속도 빠르게. 용가재 1.0mm로 열 흡수 최소화."
+        },
+        {
+          "material": "316L BA 박판 (LOD)",
+          "thickness": "1.65mm (0.065\")",
+          "current": "40~60A",
+          "voltage": "8~10V",
+          "gasFlow": "8~10 L/min",
+          "electrode": "WCe20 1.6mm",
+          "fillerWire": "ER316L 1.0~1.6mm",
+          "notes": "박판 316L — 로우셀파 시 전류 소폭 증가(+5A). 펄스 듀티 30~40%로 열 제어. 변색 관리 중요."
+        },
+        {
           "material": "STS 304",
           "thickness": "3mm",
           "current": "90~110A",
