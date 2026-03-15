@@ -421,6 +421,7 @@ const App = {
           ${m.sensitization ? `<div class="science-point"><div class="science-point__title">예민화 (Sensitization)</div><div class="science-point__detail">${m.sensitization}</div></div>` : ''}
           ${m.lowSulfur ? `<div class="science-point"><div class="science-point__title">로우셀파 (Low Sulfur) 효과</div><div class="science-point__detail">${m.lowSulfur}</div></div>` : ''}
           ${m.manufacturing ? `<div class="science-point"><div class="science-point__title">제조 공정</div><div class="science-point__detail">${m.manufacturing}</div></div>` : ''}
+          ${m.deltaFerrite ? `<div class="science-point"><div class="science-point__title">Delta-Ferrite 제어</div><div class="science-point__detail">${m.deltaFerrite}</div></div>` : ''}
           ${m.surfaceFinish ? `
             <div class="science-point"><div class="science-point__title">표면 처리: BA</div><div class="science-point__detail">${m.surfaceFinish.BA}</div></div>
             <div class="science-point"><div class="science-point__title">표면 처리: EP</div><div class="science-point__detail">${m.surfaceFinish.EP}</div></div>
