@@ -32,6 +32,26 @@
           "notes": "층간온도 150℃ 이하 유지. 다층 용접 시 슬래그 제거 철저."
         },
         {
+          "material": "304 BA 파이프 (LOD)",
+          "thickness": "3mm (Sch.10)",
+          "current": "85~100A",
+          "voltage": "10~13V",
+          "gasFlow": "10~12 L/min",
+          "electrode": "WCe20 2.4mm",
+          "fillerWire": "ER308L 2.0mm",
+          "notes": "BA 표면 — 변색 최소화. 백퍼지 필수. 연금색까지 허용."
+        },
+        {
+          "material": "316L BA 파이프 (LOD)",
+          "thickness": "6mm (Sch.40)",
+          "current": "130~160A",
+          "voltage": "11~15V",
+          "gasFlow": "10~15 L/min",
+          "electrode": "WCe20 2.4mm",
+          "fillerWire": "ER316L 2.4mm",
+          "notes": "로우셀파 주의. BA 변색 관리. 백퍼지 10~15 L/min. 층간온도 150℃ 이하."
+        },
+        {
           "material": "알루미늄 6061",
           "thickness": "3mm",
           "current": "100~130A (AC)",
@@ -40,6 +60,40 @@
           "electrode": "WP (순텅스텐) 3.2mm",
           "fillerWire": "ER4043 2.4mm",
           "notes": "AC 모드 사용. 클리닝 비율 30% 내외. 예열 불필요."
+        }
+      ],
+      "pulseSettings": [
+        {
+          "scenario": "304 BA 3mm 루트패스",
+          "peakCurrent": "100~120A",
+          "baseCurrent": "30~40A",
+          "frequency": "1~2 Hz",
+          "dutyCycle": "40~50%",
+          "notes": "동전 쌓기 비드. 깨끗한 외관. 키홀 유지하며 진행."
+        },
+        {
+          "scenario": "316L BA 6mm 필패스",
+          "peakCurrent": "150~180A",
+          "baseCurrent": "50~70A",
+          "frequency": "1~2 Hz",
+          "dutyCycle": "45~55%",
+          "notes": "로우셀파 의심 시 피크 20% 증가."
+        },
+        {
+          "scenario": "대구경(8\"+) 316L BA 루트",
+          "peakCurrent": "110~140A",
+          "baseCurrent": "35~50A",
+          "frequency": "1~1.5 Hz",
+          "dutyCycle": "40~50%",
+          "notes": "대구경은 열 분산 빠름. 백퍼지 체적 계산 필수."
+        },
+        {
+          "scenario": "로우셀파 316L 대응",
+          "peakCurrent": "정상 대비 +15~20%",
+          "baseCurrent": "정상 동일",
+          "frequency": "1~3 Hz",
+          "dutyCycle": "30~40%",
+          "notes": "피크↑ + 듀티↓ = 순간 깊은 용입 + 총 입열 억제"
         }
       ],
       "tips": [
