@@ -11,12 +11,24 @@
   <header class="header">
     <div class="container">
       <h1 class="header__title">용접 지식 백과</h1>
-      <p class="header__subtitle">용접 기법 · 재료 · 품질관리 종합 레퍼런스</p>
-      <a href="calculator.html" class="header__calc-link">파이프 계산기 &rarr;</a>
+      <p class="header__subtitle">용접 기법 · 재료 · 품질관리 · 현장 문제해결</p>
+      <div class="header__links">
+        <a href="#troubleshoot-section" class="header__link header__link--emergency">현장 문제해결</a>
+        <a href="calculator.html" class="header__link">파이프 계산기</a>
+      </div>
     </div>
   </header>
 
   <main class="container">
+    <!-- 현장 문제해결 퀵 액세스 -->
+    <section id="troubleshoot-section" class="troubleshoot-quick">
+      <h2 class="troubleshoot-quick__title">현장 문제해결</h2>
+      <p class="troubleshoot-quick__desc">지금 발생하는 문제를 탭하세요</p>
+      <div id="troubleshootGrid" class="troubleshoot-grid">
+        <!-- JavaScript에서 동적으로 삽입 -->
+      </div>
+    </section>
+
     <!-- 검색 및 필터 영역 -->
     <section class="search-section">
       <div class="search-bar">
@@ -24,7 +36,7 @@
           type="text"
           id="searchInput"
           class="search-bar__input"
-          placeholder="검색어 입력... (예: TIG, 304, 기공)"
+          placeholder="검색... (예: 용입, 펄스, 316L, Marangoni, BA)"
           autocomplete="off"
         >
       </div>
@@ -33,10 +45,12 @@
           <label for="typeFilter" class="filter-group__label">분류</label>
           <select id="typeFilter" class="filter-group__select">
             <option value="all">전체</option>
+            <option value="troubleshooting">문제해결</option>
             <option value="processes">용접 공법</option>
             <option value="materials">소재</option>
             <option value="defects">결함</option>
             <option value="inspections">비파괴검사</option>
+            <option value="science">용접 과학</option>
           </select>
         </div>
         <div class="filter-group">
@@ -56,7 +70,6 @@
 
     <!-- 카드 목록 영역 -->
     <section id="cardGrid" class="card-grid">
-      <!-- JavaScript에서 카드가 동적으로 삽입됩니다 -->
     </section>
 
     <!-- 검색 결과 없음 메시지 -->
