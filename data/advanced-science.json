@@ -54,6 +54,22 @@
         "title": "LOD BA 파이프 펄스 세팅 가이드",
         "settings": [
           {
+            "scenario": "304 BA 박판 1.65mm (LOD)",
+            "peak": "55~70A",
+            "base": "15~25A",
+            "frequency": "2~4 Hz",
+            "duty": "30~40%",
+            "notes": "박판 번스루 방지. 높은 주파수+낮은 듀티. 용가재 1.0mm"
+          },
+          {
+            "scenario": "316L BA 박판 1.65mm (LOD)",
+            "peak": "60~75A",
+            "base": "18~28A",
+            "frequency": "2~4 Hz",
+            "duty": "30~40%",
+            "notes": "로우셀파 시 피크 +10A. 듀티 30%로 입열 억제"
+          },
+          {
             "scenario": "304 BA 3mm (Sch.10 소구경)",
             "peak": "100~120A",
             "base": "30~40A",
