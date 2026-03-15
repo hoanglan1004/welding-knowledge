@@ -84,6 +84,22 @@
       ],
       "pulseSettings": [
         {
+          "scenario": "304 BA 박판 1.65mm (LOD)",
+          "peakCurrent": "55~70A",
+          "baseCurrent": "15~25A",
+          "frequency": "2~4 Hz",
+          "dutyCycle": "30~40%",
+          "notes": "박판 번스루 방지 핵심. 높은 주파수 + 낮은 듀티 = 입열 최소화. 용가재 1.0mm 사용. 속도 빠르게."
+        },
+        {
+          "scenario": "316L BA 박판 1.65mm (LOD)",
+          "peakCurrent": "60~75A",
+          "baseCurrent": "18~28A",
+          "frequency": "2~4 Hz",
+          "dutyCycle": "30~40%",
+          "notes": "로우셀파 시 피크 +10A. 듀티 30%로 낮춰 총 입열 억제. 변색 관리 위해 백퍼지 필수."
+        },
+        {
           "scenario": "304 BA 3mm 루트패스",
           "peakCurrent": "100~120A",
           "baseCurrent": "30~40A",
