@@ -96,7 +96,8 @@
           "BA": "Bright Annealed — 1050~1100°C 수소분위기 열처리. Ra 0.25~0.5μm. LOD 배관 표준. 용접 시 변색(Heat Tint) 관리가 품질 기준. 연금색까지 허용",
           "EP": "Electropolished — 전해연마로 Ra 0.1~0.25μm. Cr/Fe 비율 향상. UHP 반도체/제약 배관 필수. 산소 ppm 레벨 관리 필요"
         },
-        "manufacturing": "일반 상용: AOD/VOD 정련. 고급: VIM(진공유도용해) → VAR(진공아크재용해) 이중정련. VIM/VAR = 불순물 극저 → 로우셀파 주의"
+        "manufacturing": "일반 상용: AOD/VOD 정련. 고급: VIM(진공유도용해) → VAR(진공아크재용해) 이중정련. VIM/VAR = 불순물 극저 → 로우셀파 주의",
+        "deltaFerrite": "316L 용접부 Delta-Ferrite: FN 3~8% 범위 유지. Mo 함량으로 인해 304보다 쇳물 유동성 낮음 → 피크 전류 5~10% 높게 설정 권장. Hot cracking 방지를 위해 FN 3% 이상 확보 필수. 펄스 3~10Hz에서 결정립 미세화 효과"
       },
       "relatedMaterials": ["sus304"]
     },
