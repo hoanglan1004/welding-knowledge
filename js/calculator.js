@@ -521,33 +521,44 @@ const Calculator = {
       const thermalFactor = Math.pow(curArea / refArea, 0.15);
       // 범위 제한: 0.70 ~ 1.10 (극단적 보정 방지)
       rec.odFactor = Math.max(0.70, Math.min(1.10, thermalFactor));
-      rec.targetIAvg = wallMils * 1.0 * rec.odFactor;
+      rec.isFlange = isFlange;
 
-      // 2. 최적 속도 (IPM): 실무 검증 범위 4-7 IPM
-      // Pro-Fusion: "4-10 IPM, 5 IPM 시작 권장"
-      // Pharmaceutical Online (바이오프로세스): "4-7 IPM" (단일 패스 퓨전)
-      // MDPI 최적 실험값: 5.4 IPM (304 얇은벽)
-      // 보간: 0.030" → 7 IPM (얇음=빠르게), 0.109" → 4 IPM (두꺼움=느리게)
-      // 기준점: 0.065" → 5.3 IPM (5 IPM 시작 권장값 부근)
-      rec.optIPM = Math.max(4, Math.min(7, 7 - (wallMils - 30) * (3 / 79)));
-      rec.minIPM = Math.max(3.5, rec.optIPM * 0.85);
-      rec.maxIPM = Math.min(7.5, rec.optIPM * 1.15);
+      if (isFlange) {
+        // ── 플랜지-파이프 필렛 용접 모드 ──
+        // 원리: 표면 필렛 (완전 용입 아님) + 플랜지 히트싱크 보상
+        // 플랜지가 열을 빨아들이므로 평균 전류 ↑, 파이프 번스루 방지로 Peak ↓
+        // 실측 기준: 3" OD, 0.065" wall → Peak 90A, Duty 70%, BG 50%, RPM 1.2
 
-      // 3. 속도 → mm/min, RPM
-      // "RPM = ipm / (3.1415 x dia.)" — Pro-Fusion 공식
-      rec.optSpeed = rec.optIPM * 25.4;
-      rec.optRPM = rec.optIPM / (Math.PI * od);
-      rec.minRPM = rec.minIPM / (Math.PI * od);
-      rec.maxRPM = rec.maxIPM / (Math.PI * od);
+        // 1. 목표 평균 전류: 맞대기 기준 × OD 보정 × 히트싱크 보상(1.18)
+        const flangeHeatSinkFactor = 1.18;
+        rec.targetIAvg = wallMils * 1.0 * rec.odFactor * flangeHeatSinkFactor;
 
-      // 4. 목표 열입력 (전류+속도에서 자연 도출)
-      rec.targetHI = (voltage * rec.targetIAvg * 60) / (rec.optSpeed * 1000);
+        // 2. 플랜지 펄스 전략: 높은 Duty(70%) + 높은 BG(50%)
+        // 낮은 Peak로 파이프 보호, 높은 Duty/BG로 플랜지에 충분한 열 전달
+        rec.bgPct = 50;
+        rec.duty = 70;
 
-      // 5. 추천 펄스 설정 (Pro-Fusion 표준)
-      // "Background Current will be 1/3rd of peak current" → BG 33%
-      // "Pulse width 20 to 50 percent, 35% recommended starting"
-      rec.bgPct = 33;
-      rec.duty = 35; // Pro-Fusion: 35% 시작점 (벽 두께 무관)
+        // 3. 속도: 맞대기보다 빠르게 (표면 wetting, 깊은 용입 불필요)
+        // 실측: 3" OD → RPM 1.2 → 약 9.6 IPM
+        // 플랜지 필렛은 6-12 IPM 범위 (두께별 보간)
+        rec.optIPM = Math.max(6, Math.min(12, 12 - (wallMils - 30) * (6 / 79)));
+        rec.minIPM = Math.max(5, rec.optIPM * 0.85);
+        rec.maxIPM = Math.min(13, rec.optIPM * 1.15);
+      } else {
+        // ── 맞대기 용접 모드 (기존) ──
+        rec.targetIAvg = wallMils * 1.0 * rec.odFactor;
+
+        // 펄스 설정 (Pro-Fusion 표준)
+        rec.bgPct = 33;
+        rec.duty = 35;
+
+        // 속도: 4-7 IPM (실무 검증 범위)
+        rec.optIPM = Math.max(4, Math.min(7, 7 - (wallMils - 30) * (3 / 79)));
+        rec.minIPM = Math.max(3.5, rec.optIPM * 0.85);
+        rec.maxIPM = Math.min(7.5, rec.optIPM * 1.15);
+      }
+
+      // 공통: Peak, 속도, PPS 계산
       const avgFactor = rec.duty / 100 + (rec.bgPct / 100) * (1 - rec.duty / 100);
       rec.peak = Math.round(rec.targetIAvg / avgFactor);
       if (rec.peak > 250) rec.peak = 250;
@@ -556,15 +567,28 @@ const Calculator = {
       rec.iAvg = rec.peak * (rec.duty / 100) + rec.bgAmps * (1 - rec.duty / 100);
       rec.iRMS = Math.sqrt(rec.peak * rec.peak * (rec.duty / 100) + rec.bgAmps * rec.bgAmps * (1 - rec.duty / 100));
 
-      // 6. 추천 PPS (Pro-Fusion: 75% 오버랩)
-      // "PPS rate for thin-wall tube is often equal to weld speed in IPM"
+      // 속도 → mm/min, RPM
+      rec.optSpeed = rec.optIPM * 25.4;
+      rec.optRPM = rec.optIPM / (Math.PI * od);
+      rec.minRPM = rec.minIPM / (Math.PI * od);
+      rec.maxRPM = rec.maxIPM / (Math.PI * od);
+
+      // 목표 열입력
+      rec.targetHI = (voltage * rec.targetIAvg * 60) / (rec.optSpeed * 1000);
+
+      // 추천 PPS (Pro-Fusion: 75% 오버랩)
       const spotDia = 2.5 * wallInch;
-      const stepPerPulse = spotDia * 0.25; // 75% overlap
+      const stepPerPulse = spotDia * 0.25;
       rec.pps = stepPerPulse > 0 ? Math.max(1, Math.round((rec.optIPM / 60) / stepPerPulse)) : 3;
 
-      // 7. 아크 갭 (Pro-Fusion 공식)
-      // "0.010" + half the penetration required (usually wall thickness)"
-      rec.arcGap = 0.010 + wallInch / 2;
+      // 아크 갭
+      if (isFlange) {
+        // 플랜지: 표면 필렛이므로 갭 줄임
+        rec.arcGap = 0.010 + wallInch / 4;
+      } else {
+        // 맞대기: Pro-Fusion 공식 "0.010" + half the wall thickness"
+        rec.arcGap = 0.010 + wallInch / 2;
+      }
       rec.arcGapMm = rec.arcGap * 25.4;
 
       // 8. 열입력 검증
