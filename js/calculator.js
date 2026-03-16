@@ -542,6 +542,7 @@ const Calculator = {
       if (rec.peak < 30) rec.peak = 30;
       rec.bgAmps = rec.peak * rec.bgPct / 100;
       rec.iAvg = rec.peak * (rec.duty / 100) + rec.bgAmps * (1 - rec.duty / 100);
+      rec.iRMS = Math.sqrt(rec.peak * rec.peak * (rec.duty / 100) + rec.bgAmps * rec.bgAmps * (1 - rec.duty / 100));
 
       // 6. 추천 PPS (Pro-Fusion: 75% 오버랩)
       // "PPS rate for thin-wall tube is often equal to weld speed in IPM"
