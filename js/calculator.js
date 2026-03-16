@@ -482,8 +482,10 @@ const Calculator = {
     const bgAmps = peak * (bgPercent / 100);
     const peakBgRatio = bgPercent > 0 ? (100 / bgPercent) : 999;
 
-    // 평균 전류
+    // 평균 전류 (산술 평균 + RMS)
     const iAvg = peak * (duty / 100) + bgAmps * (1 - duty / 100);
+    // RMS 전류: 용접기 모니터 표시값 (실효 열입력 기준)
+    const iRMS = Math.sqrt(peak * peak * (duty / 100) + bgAmps * bgAmps * (1 - duty / 100));
 
     // ── 업계 표준 추천 엔진 (Pro-Fusion + OD 열용량 보정) ──
     // 출처: Pro-Fusion "Parameters for Orbital Tube Welding" (1999)
