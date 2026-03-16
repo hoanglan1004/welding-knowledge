@@ -485,14 +485,27 @@ const Calculator = {
     // 평균 전류
     const iAvg = peak * (duty / 100) + bgAmps * (1 - duty / 100);
 
-    // 열입력 판정
+    // 열입력 판정 (벽 두께 기반)
+    // 근거: Pro-Fusion 1A/mil + 5 IPM + 8V → 기준 HI = 0.15 × wallMm (kJ/mm)
+    // 출처: Pro-Fusion Orbital Welding, MDPI 2025 SUS304 연구 (최적 0.29-0.32 kJ/mm @2mm벽)
     const judgeHI = (hi) => {
-      if (hi <= 0.2) return ['극저 (용입 부족 주의)', '#2563eb'];
-      if (hi <= 0.35) return ['최적 (STS 권장)', '#16a34a'];
-      if (hi <= 0.5) return ['안전', '#16a34a'];
-      if (hi <= 1.0) return ['보통 (모니터링)', '#2563eb'];
-      if (hi <= 1.5) return ['주의 (변형 가능)', '#ea580c'];
-      return ['위험 (열변형 발생)', '#dc2626'];
+      if (wallMm <= 0) {
+        // 벽 두께 모를 때 일반 판정
+        if (hi <= 0.1) return ['극저 (용입 부족)', '#dc2626'];
+        if (hi <= 0.5) return ['일반 범위', '#16a34a'];
+        if (hi <= 1.0) return ['보통', '#2563eb'];
+        if (hi <= 1.5) return ['주의 (변형 가능)', '#ea580c'];
+        return ['위험 (열변형)', '#dc2626'];
+      }
+      // 벽 두께 기준: 적정 중심 = 0.15 × wallMm kJ/mm
+      const hiCenter = 0.15 * wallMm;
+      const ratio = hi / hiCenter;
+      if (ratio < 0.4) return ['극저 (용입 부족)', '#dc2626'];
+      if (ratio < 0.7) return ['낮음 (용입 확인)', '#2563eb'];
+      if (ratio <= 1.3) return ['최적', '#16a34a'];
+      if (ratio <= 2.0) return ['안전', '#16a34a'];
+      if (ratio <= 3.0) return ['주의 (변형 가능)', '#ea580c'];
+      return ['위험 (열변형)', '#dc2626'];
     };
 
     // ── 업계 표준 기반 추천 엔진 (벽 두께가 모든 것을 결정) ──
