@@ -660,9 +660,13 @@ const Calculator = {
 
       html += `
       <div class="calc-result__breakdown" style="margin-top:0.75rem; border-top:1px solid var(--border); padding-top:0.75rem; background:var(--color-bg-alt, #f0f9ff); padding:0.75rem; border-radius:8px;">
-        <p style="font-weight:bold; font-size:1.05rem;">업계 표준 추천 (${wallDisplay}, OD ${od}")</p>
-        <p style="color:var(--text-muted); font-size:0.85rem;">Pro-Fusion 1A/mil × OD 보정(${r(rec.odFactor)}) + 4~7 IPM + BG 1/3 + Duty 35%</p>
-        <p style="color:var(--text-muted); font-size:0.8rem;">※ 오비탈 기준. 턴테이블(평용접)은 최대 ~15% 빠를 수 있음</p>
+        <p style="font-weight:bold; font-size:1.05rem;">${rec.isFlange ? '🔩 플랜지 필렛' : '⚡ 맞대기 완전용입'} 추천 (${wallDisplay}, OD ${od}")</p>
+        <p style="color:var(--text-muted); font-size:0.85rem;">${rec.isFlange
+          ? '1A/mil × OD(' + r(rec.odFactor) + ') × 히트싱크(1.18) + Duty 70% + BG 50%'
+          : 'Pro-Fusion 1A/mil × OD 보정(' + r(rec.odFactor) + ') + 4~7 IPM + BG 1/3 + Duty 35%'}</p>
+        <p style="color:var(--text-muted); font-size:0.8rem;">${rec.isFlange
+          ? '※ 표면 필렛. 낮은 Peak + 높은 Duty로 파이프 번스루 방지'
+          : '※ 오비탈 기준. 턴테이블(평용접)은 최대 ~15% 빠를 수 있음'}</p>
         <table style="width:100%; font-size:0.9rem; margin-top:0.5rem; border-collapse:collapse;">
           <tr style="border-bottom:1px solid var(--border);">
             <th style="text-align:left; padding:0.25rem 0;"></th>
