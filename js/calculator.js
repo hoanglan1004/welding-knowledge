@@ -485,56 +485,41 @@ const Calculator = {
     // 평균 전류
     const iAvg = peak * (duty / 100) + bgAmps * (1 - duty / 100);
 
-    // 열입력 판정 (벽 두께 기반)
-    // 근거: Pro-Fusion 1A/mil + 5 IPM + 8V → 기준 HI = 0.15 × wallMm (kJ/mm)
-    // 출처: Pro-Fusion Orbital Welding, MDPI 2025 SUS304 연구 (최적 0.29-0.32 kJ/mm @2mm벽)
-    const judgeHI = (hi) => {
-      if (wallMm <= 0) {
-        // 벽 두께 모를 때 일반 판정
-        if (hi <= 0.1) return ['극저 (용입 부족)', '#dc2626'];
-        if (hi <= 0.5) return ['일반 범위', '#16a34a'];
-        if (hi <= 1.0) return ['보통', '#2563eb'];
-        if (hi <= 1.5) return ['주의 (변형 가능)', '#ea580c'];
-        return ['위험 (열변형)', '#dc2626'];
-      }
-      // 벽 두께 기준: 적정 중심 = 0.15 × wallMm kJ/mm
-      const hiCenter = 0.15 * wallMm;
-      const ratio = hi / hiCenter;
-      if (ratio < 0.4) return ['극저 (용입 부족)', '#dc2626'];
-      if (ratio < 0.7) return ['낮음 (용입 확인)', '#2563eb'];
-      if (ratio <= 1.3) return ['최적', '#16a34a'];
-      if (ratio <= 2.0) return ['안전', '#16a34a'];
-      if (ratio <= 3.0) return ['주의 (변형 가능)', '#ea580c'];
-      return ['위험 (열변형)', '#dc2626'];
-    };
-
-    // ── 업계 표준 기반 추천 엔진 (벽 두께가 모든 것을 결정) ──
-    // 출처: Pro-Fusion Orbital Welding, 1A/mil 규칙, 4-10 IPM 범위
+    // ── 업계 표준 추천 엔진 (벽 두께 + OD 동시 고려) ──
+    // 출처: Pro-Fusion Orbital Welding, Miller TIG Chart, MDPI 2025 SUS304 연구
+    // 핵심: OD가 클수록 열 질량이 많아 더 높은 전류 + 더 빠른 속도 가능
     let rec = null;
     if (wallMm > 0) {
       rec = {};
-      // 1. 목표 평균 전류: STS는 1A per mil (CS 대비 ~10% 감소)
-      rec.targetIAvg = wallMils * 1.0;
 
-      // 2. 목표 열입력 → 최적 속도 역산
-      // 근거: Pro-Fusion 기준 HI = 0.15 × wallMm (kJ/mm), 5 IPM 기준선
-      // 공식: speed = (V × I_avg × 60) / (HI × 1000)
-      rec.targetHI = 0.15 * wallMm; // kJ/mm (적정 중심)
-      rec.optSpeed = (voltage * rec.targetIAvg * 60) / (rec.targetHI * 1000); // mm/min
-      rec.optIPM = rec.optSpeed / 25.4;
-      // 실용 범위 제한 (2~10 IPM)
-      rec.optIPM = Math.max(2, Math.min(10, rec.optIPM));
+      // OD 보정 계수: 1" 기준, 큰 파이프는 열 분산 유리 (+5%/inch)
+      // 근거: 열 질량 ∝ OD × wall, 한 바퀴 시간이 길어 냉각 유리
+      rec.odFactor = 1 + 0.05 * (od - 1);
+
+      // 1. 목표 평균 전류: 1A/mil × OD 보정
+      // Pro-Fusion: 1A per mil (1" 기준), 큰 파이프는 열 흡수 능력↑
+      rec.targetIAvg = wallMils * 1.0 * rec.odFactor;
+
+      // 2. 최적 속도 (IPM): Pro-Fusion 4-10 IPM 범위 + OD 보정
+      // 얇은 벽 → 빠르게 (열 축적 방지), 두꺼운 벽 → 느리게 (용입 확보)
+      // wallRatio: 0(최대 154mil) ~ 1(최소), baseIPM: 5~8 범위
+      const wallRatio = 1 - wallMils / 154;
+      const baseIPM = 5 + 3 * wallRatio;
+      rec.optIPM = Math.max(3, Math.min(10, baseIPM * rec.odFactor));
+      rec.minIPM = Math.max(2, rec.optIPM * 0.75);
+      rec.maxIPM = Math.min(10, rec.optIPM * 1.15);
+
+      // 3. 속도 → mm/min, RPM
       rec.optSpeed = rec.optIPM * 25.4;
-      rec.minIPM = Math.max(2, rec.optIPM * 0.8);
-      rec.maxIPM = Math.min(10, rec.optIPM * 1.2);
-
-      // 3. RPM = 속도 / 원주
       rec.optRPM = rec.optSpeed / circumMm;
       rec.minRPM = (rec.minIPM * 25.4) / circumMm;
       rec.maxRPM = (rec.maxIPM * 25.4) / circumMm;
 
-      // 4. 추천 펄스 설정 (Peak:BG = 3:1, Duty 벽 두께별)
-      rec.bgPct = 33; // 3:1 비율
+      // 4. 목표 열입력 (전류+속도에서 자연 도출)
+      rec.targetHI = (voltage * rec.targetIAvg * 60) / (rec.optSpeed * 1000);
+
+      // 5. 추천 펄스 설정 (Peak:BG = 3:1, Duty 벽 두께별)
+      rec.bgPct = 33;
       rec.duty = wallMils <= 50 ? 30 : wallMils <= 80 ? 35 : wallMils <= 120 ? 40 : 45;
       const avgFactor = rec.duty / 100 + (rec.bgPct / 100) * (1 - rec.duty / 100);
       rec.peak = Math.round(rec.targetIAvg / avgFactor);
@@ -543,17 +528,31 @@ const Calculator = {
       rec.bgAmps = rec.peak * rec.bgPct / 100;
       rec.iAvg = rec.peak * (rec.duty / 100) + rec.bgAmps * (1 - rec.duty / 100);
 
-      // 5. 추천 PPS (75% 오버랩 기준: 용융지 ≈ 2.5×벽)
-      const spotDia = 2.5 * wallInch; // inch
-      const stepPerPulse = spotDia * 0.25; // 75% overlap
+      // 6. 추천 PPS (75% 오버랩 기준: 용융지 ≈ 2.5×벽)
+      const spotDia = 2.5 * wallInch;
+      const stepPerPulse = spotDia * 0.25;
       rec.pps = stepPerPulse > 0 ? Math.max(1, Math.round((rec.optIPM / 60) / stepPerPulse)) : 3;
 
-      // 6. 열입력 검증
+      // 7. 열입력 검증
       rec.heatKJ = (voltage * rec.iAvg * 60) / rec.optSpeed / 1000;
 
-      // 7. 리플 간격 검증
+      // 8. 리플 간격 검증
       rec.ripple = rec.pps > 0 ? (rec.optSpeed / 60) / rec.pps : 0;
     }
+
+    // 열입력 판정 (추천 엔진의 targetHI를 중심으로 판정)
+    // 추천이 있으면 추천 HI가 중심, 없으면 보수적 Pro-Fusion 기준
+    const judgeHI = (hi) => {
+      const hiCenter = rec ? rec.targetHI : (wallMm > 0 ? 0.15 * wallMm : 0.35);
+      if (hiCenter <= 0) return ['데이터 부족', '#888'];
+      const ratio = hi / hiCenter;
+      if (ratio < 0.4) return ['극저 (용입 부족)', '#dc2626'];
+      if (ratio < 0.7) return ['낮음 (용입 확인)', '#2563eb'];
+      if (ratio <= 1.3) return ['최적', '#16a34a'];
+      if (ratio <= 2.0) return ['안전', '#16a34a'];
+      if (ratio <= 3.0) return ['주의 (변형 가능)', '#ea580c'];
+      return ['위험 (열변형)', '#dc2626'];
+    };
 
     // ── 결과 출력 ──
     let html = `
