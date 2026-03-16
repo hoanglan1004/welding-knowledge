@@ -37,7 +37,7 @@ const Calculator = {
   // --- 사이즈 드롭다운 채우기 ---
   _populateSizeSelects() {
     const sizes = this.data.pipeSizes;
-    ['elbowSize', 'shrinkageSize', 'tangentSize', 'weldSize'].forEach(id => {
+    ['elbowSize', 'shrinkageSize', 'tangentSize', 'weldSize', 'purgeSize'].forEach(id => {
       const sel = document.getElementById(id);
       sizes.forEach(s => {
         const opt = document.createElement('option');
