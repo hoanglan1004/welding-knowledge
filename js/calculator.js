@@ -485,16 +485,29 @@ const Calculator = {
     // 평균 전류
     const iAvg = peak * (duty / 100) + bgAmps * (1 - duty / 100);
 
-    // ── 업계 표준 추천 엔진 (Pro-Fusion 공식 기준, 보정 없음) ──
+    // ── 업계 표준 추천 엔진 (Pro-Fusion + OD 열용량 보정) ──
     // 출처: Pro-Fusion "Parameters for Orbital Tube Welding" (1999)
-    // 원칙: 벽 두께가 모든 파라미터를 결정. OD는 RPM 변환에만 사용.
+    // 기본: 벽 두께 → 전류(1A/mil), OD → RPM + 열용량 보정
+    // 보정 원리: 파이프 단면적(thermal mass) 비율로 전류 자동 조정
+    //   - 작은 OD: 열 축적 빠름 → 전류 감소
+    //   - 큰 OD: 열 방출 큼 → 전류 유지/증가
     let rec = null;
     if (wallMm > 0) {
       rec = {};
 
-      // 1. 목표 평균 전류: STS 1A per mil (Pro-Fusion 표준)
-      // "use 1 ampere average current for every 0.001 inch of wall thickness"
-      rec.targetIAvg = wallMils * 1.0;
+      // 1. 목표 평균 전류: 1A/mil 기본 + OD 열용량 보정
+      // Pro-Fusion 기본: "1 ampere average current per 0.001 inch wall thickness"
+      // OD 보정: 단면적 비율의 거듭제곱 (열 전달은 비선형)
+      //   기준 파이프: 3" OD × 0.065" wall (보정 계수 = 1.0)
+      //   공식: factor = (현재 단면적 / 기준 단면적) ^ 0.15
+      const refOD = 3.0;       // 기준 외경 (inch)
+      const refWall = 0.065;   // 기준 벽 두께 (inch)
+      const refArea = Math.PI * (refOD - refWall) * refWall;
+      const curArea = Math.PI * (od - wallInch) * wallInch;
+      const thermalFactor = Math.pow(curArea / refArea, 0.15);
+      // 범위 제한: 0.70 ~ 1.10 (극단적 보정 방지)
+      rec.odFactor = Math.max(0.70, Math.min(1.10, thermalFactor));
+      rec.targetIAvg = wallMils * 1.0 * rec.odFactor;
 
       // 2. 최적 속도 (IPM): 실무 검증 범위 4-7 IPM
       // Pro-Fusion: "4-10 IPM, 5 IPM 시작 권장"
