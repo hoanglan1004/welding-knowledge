@@ -450,8 +450,20 @@ const Calculator = {
   // ===== 8. 용접 파라미터 (펄스 TIG) =====
   // 알고리즘 근거: Pro-Fusion Orbital Welding, AWS B2.1, MDPI 2025 연구
   // 핵심 공식: 벽 두께 → 전류(1A/mil) + 이동속도(4-10 IPM) + PPS(75% 오버랩) 연립
+  // 플랜지 모드: 히트싱크 보상 ×1.18, Duty 70%, BG 50% (표면 필렛)
+  _weldType: 'butt', // 'butt' | 'flange'
+
+  _setWeldType(type) {
+    this._weldType = type;
+    const buttBtn = document.getElementById('weldTypeButt');
+    const flangeBtn = document.getElementById('weldTypeFlange');
+    buttBtn.classList.toggle('calc-tab--active', type === 'butt');
+    flangeBtn.classList.toggle('calc-tab--active', type === 'flange');
+  },
+
   calcWeldParam() {
     const od = parseFloat(document.getElementById('weldSize').value);
+    const isFlange = this._weldType === 'flange';
     const wallRaw = parseFloat(document.getElementById('weldWall').value) || 0;
     const wallUnit = document.getElementById('weldWallUnit').value;
     const peak = parseFloat(document.getElementById('weldPeak').value);
