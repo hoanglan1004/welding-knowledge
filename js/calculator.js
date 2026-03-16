@@ -749,17 +749,16 @@ const Calculator = {
     this._showResult('result-weldparam', html);
   },
 
-  // ===== 9. 백퍼지 계산 =====
+  // ===== 9. 백퍼지 계산 (자동 유량 추천) =====
+  // 근거: NCPWB Purge Tips, AWS 포럼 실무 데이터, 층류 유속 원칙
+  // 핵심: 파이프 ID 단면적 × 목표 유속 = 적정 유량 (층류 유지)
   calcPurge() {
     const od = parseFloat(document.getElementById('purgeSize').value);
     const wallRaw = parseFloat(document.getElementById('purgeWall').value) || 0;
     const wallUnit = document.getElementById('purgeWallUnit').value;
     const lengthRaw = parseFloat(document.getElementById('purgeLength').value) || 0;
     const lengthUnit = document.getElementById('purgeLengthUnit').value;
-    const flowRaw = parseFloat(document.getElementById('purgeFlow').value) || 0;
-    const flowUnit = document.getElementById('purgeFlowUnit').value;
-    const o2Target = parseFloat(document.getElementById('purgeO2Target').value) || 10;
-    const method = document.getElementById('purgeMethod').value;
+    const o2Target = 10; // LOD BA 기준 고정
 
     if (!wallRaw || wallRaw <= 0) {
       this._showResult('result-purge', '<p class="calc-result__error">벽 두께를 입력하세요</p>');
@@ -769,17 +768,12 @@ const Calculator = {
       this._showResult('result-purge', '<p class="calc-result__error">파이프 길이를 입력하세요</p>');
       return;
     }
-    if (!flowRaw || flowRaw <= 0) {
-      this._showResult('result-purge', '<p class="calc-result__error">유량을 입력하세요</p>');
-      return;
-    }
 
     const sizeInfo = this.data.pipeSizes.find(s => s.od_inch === od);
     const odMm = od * 25.4;
     const wallMm = wallUnit === 'inch' ? wallRaw * 25.4 : wallRaw;
     const idMm = odMm - 2 * wallMm;
     const lengthMm = lengthUnit === 'inch' ? lengthRaw * 25.4 : lengthRaw;
-    const flowLpm = flowUnit === 'scfh' ? flowRaw * 0.4719 : flowRaw;
     const r = (v, d) => this._round(v, d || 2);
 
     if (idMm <= 0) {
@@ -787,90 +781,116 @@ const Calculator = {
       return;
     }
 
+    // 내부 단면적 (mm²)
+    const areaMm2 = Math.PI * Math.pow(idMm / 2, 2);
+
     // 내부 체적 (리터)
-    const volumeMm3 = Math.PI * Math.pow(idMm / 2, 2) * lengthMm;
+    const volumeMm3 = areaMm2 * lengthMm;
     const volumeL = volumeMm3 / 1e6;
 
-    // 대기 산소 209,000 ppm → 목표 ppm
-    const c0 = 209000;
-    const lnRatio = Math.log(c0 / o2Target);
+    // ── 유량 자동 계산 (층류 유속 기준) ──
+    // 초기 퍼지: 0.2 m/s (빠르게 치환, 층류 상한 내)
+    // 용접 중: 0.05 m/s (안정 유지, 석백 방지)
+    const vPurge = 0.2;  // m/s
+    const vWeld = 0.05;  // m/s
 
-    // 이론적 교환 횟수
-    const theoreticalN = lnRatio;
+    // 유량(L/min) = 단면적(m²) × 유속(m/s) × 60초 × 1000(L/m³)
+    const areaM2 = areaMm2 / 1e6;
+    let flowPurgeLpm = areaM2 * vPurge * 60 * 1000;
+    let flowWeldLpm = areaM2 * vWeld * 60 * 1000;
 
-    // 효율 계수: 치환(댐)=1.5, 희석(댐 없음)=2.5
-    const effFactor = method === 'displacement' ? 1.5 : 2.5;
-    const practicalN = theoreticalN * effFactor;
+    // 실용 범위 제한
+    flowPurgeLpm = Math.max(1, Math.min(30, flowPurgeLpm));
+    flowWeldLpm = Math.max(0.5, Math.min(10, flowWeldLpm));
 
-    // 필요 가스량과 시간
+    const flowPurgeSCFH = flowPurgeLpm / 0.4719;
+    const flowWeldSCFH = flowWeldLpm / 0.4719;
+
+    // ── 퍼지 시간 계산 ──
+    const c0 = 209000; // 대기 산소 ppm
+    const lnRatio = Math.log(c0 / o2Target); // ≈ 9.95
+    const effFactor = 1.5; // 치환 방식 (LOD BA 표준)
+    const practicalN = lnRatio * effFactor; // ≈ 14.9회 교환
+
     const gasNeededL = volumeL * practicalN;
-    const purgeTimeMin = gasNeededL / flowLpm;
+    const purgeTimeMin = gasNeededL / flowPurgeLpm;
 
-    // 유지 유량 (용접 중): 체적의 2~3배/분 권장 → 최소값
-    const maintainFlow = Math.max(1, volumeL * 2);
+    // ── Dwyer 플로미터 눈금 매칭 ──
+    // Dwyer 스케일: SCFH 10~50 / L/min 2~24
+    const dwyerSCFH = Math.round(flowPurgeSCFH / 5) * 5; // 5 단위 반올림
+    const dwyerLpm = Math.round(flowPurgeLpm);
+    const dwyerWeldSCFH = Math.max(10, Math.round(flowWeldSCFH / 5) * 5);
+    const dwyerWeldLpm = Math.max(2, Math.round(flowWeldLpm));
 
-    // 유량 판정
-    const flowSpeedMps = (flowLpm / 60 / 1000) / (Math.PI * Math.pow(idMm / 2000, 2));
-    const flowJudge = flowSpeedMps <= 0.5 ? ['적정 (층류)', '#16a34a'] :
-                      flowSpeedMps <= 1.0 ? ['주의 (경계)', '#ea580c'] :
-                      ['과다 (난류 위험)', '#dc2626'];
-
-    // 중간 산소 농도 체크포인트
+    // ── 산소 농도 변화 체크포인트 ──
     const o2At = (n) => Math.round(c0 * Math.exp(-n / effFactor));
 
     let html = `
       <div class="calc-result__grid">
         <div class="calc-result__item calc-result__item--primary">
           <span class="calc-result__label">퍼지 시간</span>
-          <span class="calc-result__value">${r(purgeTimeMin)} 분</span>
-          <span class="calc-result__sub">${r(purgeTimeMin / 60)} 시간</span>
+          <span class="calc-result__value">${r(purgeTimeMin, 1)} 분</span>
+          <span class="calc-result__sub">산소 분석기 10ppm 확인 후 용접</span>
         </div>
         <div class="calc-result__item">
           <span class="calc-result__label">필요 가스량</span>
-          <span class="calc-result__value">${r(gasNeededL)} L</span>
-          <span class="calc-result__sub">${r(gasNeededL / 28.317, 1)} ft³</span>
+          <span class="calc-result__value">${r(gasNeededL, 1)} L</span>
+          <span class="calc-result__sub">${r(gasNeededL / 28.317, 2)} ft³</span>
         </div>
       </div>
 
-      <div class="calc-result__breakdown">
+      <div class="calc-result__breakdown" style="background:var(--color-bg-alt, #f0f9ff); padding:0.75rem; border-radius:8px;">
+        <p style="font-weight:bold; font-size:1.05rem;">Dwyer 플로미터 설정</p>
+        <table style="width:100%; font-size:0.95rem; margin-top:0.5rem; border-collapse:collapse;">
+          <tr style="border-bottom:1px solid var(--border);">
+            <th style="text-align:left; padding:0.3rem 0;"></th>
+            <th style="text-align:right;">SCFH</th>
+            <th style="text-align:right;">L/min</th>
+            <th style="text-align:right;">유속</th>
+          </tr>
+          <tr style="font-weight:bold; font-size:1.05rem;">
+            <td style="padding:0.3rem 0;">초기 퍼지</td>
+            <td style="text-align:right;">${dwyerSCFH}</td>
+            <td style="text-align:right;">${dwyerLpm}</td>
+            <td style="text-align:right; color:#16a34a;">${r(vPurge, 2)} m/s</td>
+          </tr>
+          <tr style="font-weight:bold; font-size:1.05rem;">
+            <td style="padding:0.3rem 0;">용접 중</td>
+            <td style="text-align:right;">${dwyerWeldSCFH}</td>
+            <td style="text-align:right;">${dwyerWeldLpm}</td>
+            <td style="text-align:right; color:#2563eb;">${r(vWeld, 2)} m/s</td>
+          </tr>
+        </table>
+        <p style="color:var(--text-muted); font-size:0.85rem; margin-top:0.5rem;">용접 시작 전 유량을 줄여야 석백(suck-back) 방지</p>
+      </div>
+
+      <div class="calc-result__breakdown" style="margin-top:0.75rem;">
         <p><strong>파이프 내부</strong></p>
         <p>OD ${r(odMm)}mm → ID ${r(idMm)}mm (벽 ${r(wallMm)}mm)</p>
         <p>길이: ${r(lengthMm)}mm (${r(lengthMm / 25.4)}")</p>
-        <p>내부 체적: <strong>${r(volumeL, 3)} L</strong> (${r(volumeMm3 / 1000, 1)} cm³)</p>
-      </div>
-
-      <div class="calc-result__breakdown" style="margin-top:0.75rem; border-top:1px solid var(--border); padding-top:0.75rem;">
-        <p><strong>퍼지 조건</strong></p>
-        <p>방식: ${method === 'displacement' ? '치환 (댐 사용)' : '희석 (댐 없음)'} — 효율계수 ×${effFactor}</p>
-        <p>이론 교환: ${r(theoreticalN, 1)}회 → 실제 필요: <strong>${r(practicalN, 1)}회</strong></p>
-        <p>유량: ${r(flowLpm)} L/min (${r(flowLpm / 0.4719)} SCFH)</p>
-        <p>내부 유속: ${r(flowSpeedMps, 3)} m/s — <span style="color:${flowJudge[1]}">${flowJudge[0]}</span></p>
+        <p>내부 체적: <strong>${r(volumeL, 3)} L</strong> | 단면적: ${r(areaMm2, 1)} mm²</p>
       </div>
 
       <div class="calc-result__breakdown" style="margin-top:0.75rem; border-top:1px solid var(--border); padding-top:0.75rem;">
         <p><strong>산소 농도 변화 (예상)</strong></p>
         <table style="width:100%; font-size:0.9rem; border-collapse:collapse;">
           <tr style="border-bottom:1px solid var(--border);">
-            <th style="text-align:left; padding:0.25rem 0;">경과 시간</th>
-            <th style="text-align:right;">교환 횟수</th>
+            <th style="text-align:left; padding:0.25rem 0;">경과</th>
+            <th style="text-align:right;">교환</th>
             <th style="text-align:right;">예상 O₂</th>
           </tr>`;
 
-    // 시간별 체크포인트
-    const checkpoints = [0.25, 0.5, 0.75, 1.0].map(frac => {
+    [0.25, 0.5, 0.75, 1.0].forEach(frac => {
       const t = purgeTimeMin * frac;
       const n = practicalN * frac;
       const o2 = o2At(n);
-      return { t, n, o2, frac };
-    });
-
-    checkpoints.forEach(cp => {
-      const color = cp.o2 <= o2Target ? '#16a34a' : cp.o2 <= 100 ? '#2563eb' : cp.o2 <= 1000 ? '#ea580c' : 'inherit';
+      const color = o2 <= o2Target ? '#16a34a' : o2 <= 100 ? '#2563eb' : o2 <= 1000 ? '#ea580c' : 'inherit';
+      const display = o2 > 1000 ? r(o2 / 10000 * 100, 2) + '%' : o2 + ' ppm';
       html += `
           <tr>
-            <td style="padding:0.25rem 0;">${r(cp.t, 1)}분 (${Math.round(cp.frac * 100)}%)</td>
-            <td style="text-align:right;">${r(cp.n, 1)}회</td>
-            <td style="text-align:right; color:${color}; font-weight:${cp.o2 <= o2Target ? 'bold' : 'normal'};">${cp.o2 > 1000 ? r(cp.o2 / 10000 * 100, 2) + '%' : cp.o2 + ' ppm'}${cp.o2 <= o2Target ? ' ✓' : ''}</td>
+            <td style="padding:0.25rem 0;">${r(t, 1)}분</td>
+            <td style="text-align:right;">${r(n, 1)}회</td>
+            <td style="text-align:right; color:${color}; font-weight:${o2 <= o2Target ? 'bold' : 'normal'};">${display}${o2 <= o2Target ? ' ✓' : ''}</td>
           </tr>`;
     });
 
@@ -878,22 +898,16 @@ const Calculator = {
         </table>
       </div>
 
-      <div class="calc-result__breakdown" style="margin-top:0.75rem; border-top:1px solid var(--border); padding-top:0.75rem; background:var(--color-bg-alt, #f0f9ff); padding:0.75rem; border-radius:8px;">
-        <p style="font-weight:bold;">용접 중 유지</p>
-        <p>유지 유량: <strong>${r(maintainFlow, 1)} L/min</strong> 이상 (체적의 2배/분)</p>
-        <p>벤트 홀: 댐 반대쪽에 확보 (압력 축적 방지)</p>
-        <p style="color:#dc2626; font-weight:bold;">10ppm 이하 필수 확인 → 산소 분석기로 측정 후 용접 시작</p>
-      </div>`;
+      <div class="calc-result__breakdown" style="margin-top:0.75rem; border-top:1px solid var(--border); padding-top:0.75rem;">
+        <p style="font-weight:bold;">퍼지 순서</p>
+        <p>1. 양쪽 끝 캡/피팅으로 밀봉, 한쪽 입구 + 한쪽 벤트</p>
+        <p>2. 플로미터 <strong>${dwyerSCFH} SCFH</strong>로 설정, 퍼지 시작</p>
+        <p>3. <strong>${r(purgeTimeMin, 1)}분</strong> 후 산소 분석기로 확인</p>
+        <p>4. <strong>10ppm 이하</strong> 확인되면 유량을 <strong>${dwyerWeldSCFH} SCFH</strong>로 줄이기</p>
+        <p>5. 용접 시작 — 끝날 때까지 퍼지 유지</p>
+      </div>
 
-    if (method === 'dilution') {
-      html += `
-      <div class="calc-result__breakdown" style="margin-top:0.75rem; background:#fff3cd; padding:0.75rem; border-radius:8px;">
-        <p style="color:#856404; font-weight:bold;">⚠ 희석 방식으로 10ppm 도달은 매우 어렵습니다</p>
-        <p style="color:#856404;">댐(Purge Dam) 사용 치환 방식을 강력 권장합니다. 가스 사용량이 약 40% 절감됩니다.</p>
-      </div>`;
-    }
-
-    html += `<p class="calc-result__note">${sizeInfo.nominal} × ${r(lengthMm)}mm — 목표 ${o2Target}ppm — ${method === 'displacement' ? '치환' : '희석'} 퍼지</p>`;
+      <p class="calc-result__note">${sizeInfo.nominal} (ID ${r(idMm)}mm) × ${r(lengthMm)}mm — 10ppm 치환 퍼지</p>`;
     this._showResult('result-purge', html);
   },
 
