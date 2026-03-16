@@ -496,12 +496,15 @@ const Calculator = {
       // "use 1 ampere average current for every 0.001 inch of wall thickness"
       rec.targetIAvg = wallMils * 1.0;
 
-      // 2. 최적 속도 (IPM): Pro-Fusion 4-10 IPM 범위
-      // "4 to 10 inches per minute, faster for thinner-wall material"
-      // 선형 보간: 0.030" → 8 IPM (얇음), 0.154" → 4 IPM (두꺼움)
-      rec.optIPM = Math.max(4, Math.min(10, 8 - (wallMils - 30) * (4 / 124)));
-      rec.minIPM = Math.max(3, rec.optIPM * 0.8);
-      rec.maxIPM = Math.min(10, rec.optIPM * 1.2);
+      // 2. 최적 속도 (IPM): 실무 검증 범위 4-7 IPM
+      // Pro-Fusion: "4-10 IPM, 5 IPM 시작 권장"
+      // Pharmaceutical Online (바이오프로세스): "4-7 IPM" (단일 패스 퓨전)
+      // MDPI 최적 실험값: 5.4 IPM (304 얇은벽)
+      // 보간: 0.030" → 7 IPM (얇음=빠르게), 0.109" → 4 IPM (두꺼움=느리게)
+      // 기준점: 0.065" → 5.3 IPM (5 IPM 시작 권장값 부근)
+      rec.optIPM = Math.max(4, Math.min(7, 7 - (wallMils - 30) * (3 / 79)));
+      rec.minIPM = Math.max(3.5, rec.optIPM * 0.85);
+      rec.maxIPM = Math.min(7.5, rec.optIPM * 1.15);
 
       // 3. 속도 → mm/min, RPM
       // "RPM = ipm / (3.1415 x dia.)" — Pro-Fusion 공식
