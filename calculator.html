@@ -410,6 +410,78 @@
           </div>
         </details>
       </section>
+      <!-- 9. 퍼지 계산 -->
+      <section class="calc-panel" id="panel-purge">
+        <h2 class="calc-panel__title">백퍼지 계산</h2>
+        <p class="calc-panel__desc">파이프 내부 체적을 계산하고, 목표 산소 농도까지 퍼지에 필요한 가스량과 시간을 계산합니다.</p>
+
+        <div class="calc-form">
+          <div class="calc-field">
+            <label class="calc-label">파이프 사이즈</label>
+            <select class="calc-select" id="purgeSize"></select>
+          </div>
+          <div class="calc-field">
+            <label class="calc-label">벽 두께</label>
+            <div class="calc-input-group">
+              <input type="number" class="calc-input" id="purgeWall" inputmode="decimal" placeholder="1.65" step="any">
+              <select class="calc-select" id="purgeWallUnit" style="width:auto; min-width:60px; padding:0.4rem;">
+                <option value="mm">mm</option>
+                <option value="inch">inch</option>
+              </select>
+            </div>
+          </div>
+          <div class="calc-field">
+            <label class="calc-label">파이프 길이 (댐~댐 사이)</label>
+            <div class="calc-input-group">
+              <input type="number" class="calc-input" id="purgeLength" inputmode="decimal" placeholder="1000" step="any">
+              <select class="calc-select" id="purgeLengthUnit" style="width:auto; min-width:60px; padding:0.4rem;">
+                <option value="mm">mm</option>
+                <option value="inch">inch</option>
+              </select>
+            </div>
+          </div>
+          <div class="calc-field">
+            <label class="calc-label">유량 (Flow Rate)</label>
+            <div class="calc-input-group">
+              <input type="number" class="calc-input" id="purgeFlow" inputmode="decimal" placeholder="10" step="any">
+              <select class="calc-select" id="purgeFlowUnit" style="width:auto; min-width:80px; padding:0.4rem;">
+                <option value="lpm">L/min</option>
+                <option value="scfh">SCFH</option>
+              </select>
+            </div>
+          </div>
+          <div class="calc-field">
+            <label class="calc-label">목표 산소 농도</label>
+            <div class="calc-input-group">
+              <input type="number" class="calc-input" id="purgeO2Target" inputmode="decimal" placeholder="10" value="10" step="any">
+              <span class="calc-hint" style="padding: 0.5rem;">ppm</span>
+            </div>
+          </div>
+          <div class="calc-field">
+            <label class="calc-label">퍼지 방식</label>
+            <select class="calc-select" id="purgeMethod">
+              <option value="displacement" selected>치환 (댐 사용, 권장)</option>
+              <option value="dilution">희석 (댐 없음)</option>
+            </select>
+          </div>
+          <button class="calc-btn" onclick="Calculator.calcPurge()">계산</button>
+        </div>
+
+        <div class="calc-result" id="result-purge"></div>
+
+        <details class="calc-formula">
+          <summary>공식 보기</summary>
+          <div class="calc-formula__content">
+            <p><strong>내부 체적</strong> = π × (ID/2)² × 길이</p>
+            <p><strong>ID</strong> = OD - 2 × 벽 두께</p>
+            <p><strong>치환 퍼지</strong>: N = ln(C₀/C_target) × 효율계수(1.5)</p>
+            <p><strong>희석 퍼지</strong>: N = ln(C₀/C_target) × 효율계수(2.5)</p>
+            <p><strong>필요 가스량</strong> = 체적 × N회 교환</p>
+            <p><strong>퍼지 시간</strong> = 필요 가스량 / 유량</p>
+            <p class="calc-formula__tip">C₀ = 209,000 ppm (대기 산소). 치환이 희석보다 60% 이상 효율적. 10ppm 이하는 반드시 댐 사용 + 산소 분석기 확인.</p>
+          </div>
+        </details>
+      </section>
     </div>
   </main>
 
