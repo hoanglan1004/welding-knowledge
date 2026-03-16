@@ -731,6 +731,154 @@ const Calculator = {
     this._showResult('result-weldparam', html);
   },
 
+  // ===== 9. 백퍼지 계산 =====
+  calcPurge() {
+    const od = parseFloat(document.getElementById('purgeSize').value);
+    const wallRaw = parseFloat(document.getElementById('purgeWall').value) || 0;
+    const wallUnit = document.getElementById('purgeWallUnit').value;
+    const lengthRaw = parseFloat(document.getElementById('purgeLength').value) || 0;
+    const lengthUnit = document.getElementById('purgeLengthUnit').value;
+    const flowRaw = parseFloat(document.getElementById('purgeFlow').value) || 0;
+    const flowUnit = document.getElementById('purgeFlowUnit').value;
+    const o2Target = parseFloat(document.getElementById('purgeO2Target').value) || 10;
+    const method = document.getElementById('purgeMethod').value;
+
+    if (!wallRaw || wallRaw <= 0) {
+      this._showResult('result-purge', '<p class="calc-result__error">벽 두께를 입력하세요</p>');
+      return;
+    }
+    if (!lengthRaw || lengthRaw <= 0) {
+      this._showResult('result-purge', '<p class="calc-result__error">파이프 길이를 입력하세요</p>');
+      return;
+    }
+    if (!flowRaw || flowRaw <= 0) {
+      this._showResult('result-purge', '<p class="calc-result__error">유량을 입력하세요</p>');
+      return;
+    }
+
+    const sizeInfo = this.data.pipeSizes.find(s => s.od_inch === od);
+    const odMm = od * 25.4;
+    const wallMm = wallUnit === 'inch' ? wallRaw * 25.4 : wallRaw;
+    const idMm = odMm - 2 * wallMm;
+    const lengthMm = lengthUnit === 'inch' ? lengthRaw * 25.4 : lengthRaw;
+    const flowLpm = flowUnit === 'scfh' ? flowRaw * 0.4719 : flowRaw;
+    const r = (v, d) => this._round(v, d || 2);
+
+    if (idMm <= 0) {
+      this._showResult('result-purge', '<p class="calc-result__error">벽 두께가 OD보다 큽니다. 확인하세요.</p>');
+      return;
+    }
+
+    // 내부 체적 (리터)
+    const volumeMm3 = Math.PI * Math.pow(idMm / 2, 2) * lengthMm;
+    const volumeL = volumeMm3 / 1e6;
+
+    // 대기 산소 209,000 ppm → 목표 ppm
+    const c0 = 209000;
+    const lnRatio = Math.log(c0 / o2Target);
+
+    // 이론적 교환 횟수
+    const theoreticalN = lnRatio;
+
+    // 효율 계수: 치환(댐)=1.5, 희석(댐 없음)=2.5
+    const effFactor = method === 'displacement' ? 1.5 : 2.5;
+    const practicalN = theoreticalN * effFactor;
+
+    // 필요 가스량과 시간
+    const gasNeededL = volumeL * practicalN;
+    const purgeTimeMin = gasNeededL / flowLpm;
+
+    // 유지 유량 (용접 중): 체적의 2~3배/분 권장 → 최소값
+    const maintainFlow = Math.max(1, volumeL * 2);
+
+    // 유량 판정
+    const flowSpeedMps = (flowLpm / 60 / 1000) / (Math.PI * Math.pow(idMm / 2000, 2));
+    const flowJudge = flowSpeedMps <= 0.5 ? ['적정 (층류)', '#16a34a'] :
+                      flowSpeedMps <= 1.0 ? ['주의 (경계)', '#ea580c'] :
+                      ['과다 (난류 위험)', '#dc2626'];
+
+    // 중간 산소 농도 체크포인트
+    const o2At = (n) => Math.round(c0 * Math.exp(-n / effFactor));
+
+    let html = `
+      <div class="calc-result__grid">
+        <div class="calc-result__item calc-result__item--primary">
+          <span class="calc-result__label">퍼지 시간</span>
+          <span class="calc-result__value">${r(purgeTimeMin)} 분</span>
+          <span class="calc-result__sub">${r(purgeTimeMin / 60)} 시간</span>
+        </div>
+        <div class="calc-result__item">
+          <span class="calc-result__label">필요 가스량</span>
+          <span class="calc-result__value">${r(gasNeededL)} L</span>
+          <span class="calc-result__sub">${r(gasNeededL / 28.317, 1)} ft³</span>
+        </div>
+      </div>
+
+      <div class="calc-result__breakdown">
+        <p><strong>파이프 내부</strong></p>
+        <p>OD ${r(odMm)}mm → ID ${r(idMm)}mm (벽 ${r(wallMm)}mm)</p>
+        <p>길이: ${r(lengthMm)}mm (${r(lengthMm / 25.4)}")</p>
+        <p>내부 체적: <strong>${r(volumeL, 3)} L</strong> (${r(volumeMm3 / 1000, 1)} cm³)</p>
+      </div>
+
+      <div class="calc-result__breakdown" style="margin-top:0.75rem; border-top:1px solid var(--border); padding-top:0.75rem;">
+        <p><strong>퍼지 조건</strong></p>
+        <p>방식: ${method === 'displacement' ? '치환 (댐 사용)' : '희석 (댐 없음)'} — 효율계수 ×${effFactor}</p>
+        <p>이론 교환: ${r(theoreticalN, 1)}회 → 실제 필요: <strong>${r(practicalN, 1)}회</strong></p>
+        <p>유량: ${r(flowLpm)} L/min (${r(flowLpm / 0.4719)} SCFH)</p>
+        <p>내부 유속: ${r(flowSpeedMps, 3)} m/s — <span style="color:${flowJudge[1]}">${flowJudge[0]}</span></p>
+      </div>
+
+      <div class="calc-result__breakdown" style="margin-top:0.75rem; border-top:1px solid var(--border); padding-top:0.75rem;">
+        <p><strong>산소 농도 변화 (예상)</strong></p>
+        <table style="width:100%; font-size:0.9rem; border-collapse:collapse;">
+          <tr style="border-bottom:1px solid var(--border);">
+            <th style="text-align:left; padding:0.25rem 0;">경과 시간</th>
+            <th style="text-align:right;">교환 횟수</th>
+            <th style="text-align:right;">예상 O₂</th>
+          </tr>`;
+
+    // 시간별 체크포인트
+    const checkpoints = [0.25, 0.5, 0.75, 1.0].map(frac => {
+      const t = purgeTimeMin * frac;
+      const n = practicalN * frac;
+      const o2 = o2At(n);
+      return { t, n, o2, frac };
+    });
+
+    checkpoints.forEach(cp => {
+      const color = cp.o2 <= o2Target ? '#16a34a' : cp.o2 <= 100 ? '#2563eb' : cp.o2 <= 1000 ? '#ea580c' : 'inherit';
+      html += `
+          <tr>
+            <td style="padding:0.25rem 0;">${r(cp.t, 1)}분 (${Math.round(cp.frac * 100)}%)</td>
+            <td style="text-align:right;">${r(cp.n, 1)}회</td>
+            <td style="text-align:right; color:${color}; font-weight:${cp.o2 <= o2Target ? 'bold' : 'normal'};">${cp.o2 > 1000 ? r(cp.o2 / 10000 * 100, 2) + '%' : cp.o2 + ' ppm'}${cp.o2 <= o2Target ? ' ✓' : ''}</td>
+          </tr>`;
+    });
+
+    html += `
+        </table>
+      </div>
+
+      <div class="calc-result__breakdown" style="margin-top:0.75rem; border-top:1px solid var(--border); padding-top:0.75rem; background:var(--color-bg-alt, #f0f9ff); padding:0.75rem; border-radius:8px;">
+        <p style="font-weight:bold;">용접 중 유지</p>
+        <p>유지 유량: <strong>${r(maintainFlow, 1)} L/min</strong> 이상 (체적의 2배/분)</p>
+        <p>벤트 홀: 댐 반대쪽에 확보 (압력 축적 방지)</p>
+        <p style="color:#dc2626; font-weight:bold;">10ppm 이하 필수 확인 → 산소 분석기로 측정 후 용접 시작</p>
+      </div>`;
+
+    if (method === 'dilution') {
+      html += `
+      <div class="calc-result__breakdown" style="margin-top:0.75rem; background:#fff3cd; padding:0.75rem; border-radius:8px;">
+        <p style="color:#856404; font-weight:bold;">⚠ 희석 방식으로 10ppm 도달은 매우 어렵습니다</p>
+        <p style="color:#856404;">댐(Purge Dam) 사용 치환 방식을 강력 권장합니다. 가스 사용량이 약 40% 절감됩니다.</p>
+      </div>`;
+    }
+
+    html += `<p class="calc-result__note">${sizeInfo.nominal} × ${r(lengthMm)}mm — 목표 ${o2Target}ppm — ${method === 'displacement' ? '치환' : '희석'} 퍼지</p>`;
+    this._showResult('result-purge', html);
+  },
+
   _showConvertResult(inch, mm) {
     // 가장 가까운 분수 inch 찾기
     const fractions = [
