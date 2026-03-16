@@ -903,9 +903,63 @@ const Calculator = {
         </table>
       </div>
 
+      <div class="calc-result__breakdown" style="margin-top:0.75rem; border-top:1px solid var(--border); padding-top:0.75rem; background:var(--color-bg-alt, #f0f9ff); padding:0.75rem; border-radius:8px;">
+        <p style="font-weight:bold; font-size:1.05rem;">입/출 벤트 추천 (${sizeInfo.nominal})</p>
+        <p style="color:var(--text-muted); font-size:0.8rem;">근거: AWS 실무 가이드 + NCPWB Purge Tips + Huntingdon Fusion 기준</p>
+        ${(() => {
+          // 벤트 사이즈 추천 (실무 데이터 종합)
+          // ≤1": 1/8" 입구, 1/8"~3/16" 출구
+          // 1.5"~2": 1/4" 입구, 1/4" 출구
+          // 2.5"~3": 1/4" 입구, 1/4"~3/8" 출구
+          // 4"+: 3/8" 입구, 3/8" 출구 (또는 1/4" × 2)
+          // 원칙: 출구 ≥ 입구 (압력 축적 방지)
+          let inlet, outlet, inletMm, outletMm, note;
+          if (od <= 1.0) {
+            inlet = '1/8"'; outlet = '3/16"';
+            inletMm = 3.2; outletMm = 4.8;
+            note = '소구경 — 유량 적어 작은 벤트로 충분';
+          } else if (od <= 2.0) {
+            inlet = '1/4"'; outlet = '1/4"';
+            inletMm = 6.4; outletMm = 6.4;
+            note = '표준 — 1/4" 단일 벤트 (가장 일반적)';
+          } else if (od <= 3.0) {
+            inlet = '1/4"'; outlet = '3/8"';
+            inletMm = 6.4; outletMm = 9.5;
+            note = '출구를 입구보다 크게 — 내압 방지';
+          } else {
+            inlet = '3/8"'; outlet = '3/8"';
+            inletMm = 9.5; outletMm = 9.5;
+            note = '대구경 — 1/4"×2 병렬도 가능';
+          }
+          return `
+        <table style="width:100%; font-size:0.95rem; margin-top:0.5rem; border-collapse:collapse;">
+          <tr style="border-bottom:1px solid var(--border);">
+            <th style="text-align:left; padding:0.3rem 0;"></th>
+            <th style="text-align:right;">사이즈</th>
+            <th style="text-align:right;">mm</th>
+            <th style="text-align:right;">위치</th>
+          </tr>
+          <tr>
+            <td style="padding:0.3rem 0;">입구 (Inlet)</td>
+            <td style="text-align:right; font-weight:bold;">${inlet}</td>
+            <td style="text-align:right;">${inletMm} mm</td>
+            <td style="text-align:right; color:#2563eb;">하부 (6시)</td>
+          </tr>
+          <tr>
+            <td style="padding:0.3rem 0;">출구/벤트 (Outlet)</td>
+            <td style="text-align:right; font-weight:bold;">${outlet}</td>
+            <td style="text-align:right;">${outletMm} mm</td>
+            <td style="text-align:right; color:#ea580c;">상부 (12시)</td>
+          </tr>
+        </table>
+        <p style="font-size:0.85rem; margin-top:0.4rem;">💡 ${note}</p>
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-top:0.3rem;">원칙: 출구 ≥ 입구 (내압 축적 시 석백 발생). 아르곤은 공기보다 무거워 입구=하부, 출구=상부.</p>`;
+        })()}
+      </div>
+
       <div class="calc-result__breakdown" style="margin-top:0.75rem; border-top:1px solid var(--border); padding-top:0.75rem;">
         <p style="font-weight:bold;">퍼지 순서</p>
-        <p>1. 양쪽 끝 캡/피팅으로 밀봉, 한쪽 입구 + 한쪽 벤트</p>
+        <p>1. 양쪽 끝 밀봉 — 입구(하부) + 벤트(상부)</p>
         <p>2. 플로미터 <strong>${dwyerSCFH} SCFH</strong>로 설정, 퍼지 시작</p>
         <p>3. <strong>${r(purgeTimeMin, 1)}분</strong> 후 산소 분석기로 확인</p>
         <p>4. <strong>10ppm 이하</strong> 확인되면 유량을 <strong>${dwyerWeldSCFH} SCFH</strong>로 줄이기</p>
