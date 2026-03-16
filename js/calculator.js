@@ -601,7 +601,7 @@ const Calculator = {
       html += `
       <div class="calc-result__breakdown" style="margin-top:0.75rem; border-top:1px solid var(--border); padding-top:0.75rem; background:var(--color-bg-alt, #f0f9ff); padding:0.75rem; border-radius:8px;">
         <p style="font-weight:bold; font-size:1.05rem;">업계 표준 추천 (${wallDisplay})</p>
-        <p style="color:var(--text-muted); font-size:0.85rem;">STS 1A/mil × OD보정${r(rec.odFactor, 2)} + ${r(rec.optIPM)} IPM + Peak:BG 3:1</p>
+        <p style="color:var(--text-muted); font-size:0.85rem;">Pro-Fusion 표준: 1A/mil + ${r(rec.optIPM)} IPM + BG 1/3 + Duty 35%</p>
         <table style="width:100%; font-size:0.9rem; margin-top:0.5rem; border-collapse:collapse;">
           <tr style="border-bottom:1px solid var(--border);">
             <th style="text-align:left; padding:0.25rem 0;"></th>
