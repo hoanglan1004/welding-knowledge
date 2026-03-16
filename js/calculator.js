@@ -516,14 +516,19 @@ const Calculator = {
       // 1. 목표 평균 전류: STS는 1A per mil (CS 대비 ~10% 감소)
       rec.targetIAvg = wallMils * 1.0;
 
-      // 2. 이동 속도 (IPM): 벽 두께에 반비례 — 얇으면 빠름
-      //    0.030" → ~9.5 IPM, 0.065" → ~7.75, 0.083" → ~6.85, 0.120" → ~5, 0.154" → ~3.5
-      rec.optIPM = Math.max(3.5, Math.min(10, 11 - wallMils * 0.05));
-      rec.minIPM = rec.optIPM * 0.8;
+      // 2. 목표 열입력 → 최적 속도 역산
+      // 근거: Pro-Fusion 기준 HI = 0.15 × wallMm (kJ/mm), 5 IPM 기준선
+      // 공식: speed = (V × I_avg × 60) / (HI × 1000)
+      rec.targetHI = 0.15 * wallMm; // kJ/mm (적정 중심)
+      rec.optSpeed = (voltage * rec.targetIAvg * 60) / (rec.targetHI * 1000); // mm/min
+      rec.optIPM = rec.optSpeed / 25.4;
+      // 실용 범위 제한 (2~10 IPM)
+      rec.optIPM = Math.max(2, Math.min(10, rec.optIPM));
+      rec.optSpeed = rec.optIPM * 25.4;
+      rec.minIPM = Math.max(2, rec.optIPM * 0.8);
       rec.maxIPM = Math.min(10, rec.optIPM * 1.2);
 
       // 3. RPM = 속도 / 원주
-      rec.optSpeed = rec.optIPM * 25.4; // mm/min
       rec.optRPM = rec.optSpeed / circumMm;
       rec.minRPM = (rec.minIPM * 25.4) / circumMm;
       rec.maxRPM = (rec.maxIPM * 25.4) / circumMm;
