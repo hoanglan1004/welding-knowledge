@@ -741,10 +741,10 @@ const Calculator = {
       } else {
         html += `<p style="margin-top:0.5rem; font-weight:bold;">조정 가이드:</p>`;
         if (!iAvgOk) {
-          if (iAvg > rec.targetIAvg * 1.15) {
-            html += `<p>• 평균 전류 ${r(iAvg)}A → <strong>${r(rec.targetIAvg)}A</strong> (Peak↓ 또는 Duty↓)</p>`;
+          if (iRMS > rec.targetIRMS * 1.15) {
+            html += `<p>• 용접기 평균 ${r(iRMS)}A → <strong>${r(rec.targetIRMS)}A</strong> (Peak↓ 또는 Duty↓)</p>`;
           } else {
-            html += `<p>• 평균 전류 ${r(iAvg)}A → <strong>${r(rec.targetIAvg)}A</strong> (Peak↑ 또는 Duty↑)</p>`;
+            html += `<p>• 용접기 평균 ${r(iRMS)}A → <strong>${r(rec.targetIRMS)}A</strong> (Peak↑ 또는 Duty↑)</p>`;
           }
         }
         if (rpm > 0 && !rpmOk) {
