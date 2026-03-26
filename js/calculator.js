@@ -694,16 +694,16 @@ const Calculator = {
             <td style="text-align:right;">${Math.abs(duty - rec.duty) <= 15 ? '<span style="color:#16a34a">OK</span>' : '<span style="color:#ea580c">조정</span>'}</td>
           </tr>
           <tr style="font-weight:bold;">
-            <td>평균 전류</td>
-            <td style="text-align:right;">${r(iAvg)}A</td>
-            <td style="text-align:right;">${r(rec.iAvg)}A</td>
-            <td style="text-align:right;">${Math.abs(iAvg - rec.targetIAvg) <= rec.targetIAvg * 0.15 ? '<span style="color:#16a34a">OK</span>' : iAvg > rec.targetIAvg * 1.15 ? '<span style="color:#ea580c">과다</span>' : '<span style="color:#2563eb">부족</span>'}</td>
-          </tr>
-          <tr style="color:var(--text-muted);">
-            <td>RMS (용접기)</td>
+            <td>용접기 평균</td>
             <td style="text-align:right;">${r(iRMS)}A</td>
             <td style="text-align:right;">${r(rec.iRMS)}A</td>
-            <td style="text-align:right; font-size:0.8rem;">모니터 표시값</td>
+            <td style="text-align:right;">${Math.abs(iRMS - rec.targetIRMS) <= rec.targetIRMS * 0.15 ? '<span style="color:#16a34a">OK</span>' : iRMS > rec.targetIRMS * 1.15 ? '<span style="color:#ea580c">과다</span>' : '<span style="color:#2563eb">부족</span>'}</td>
+          </tr>
+          <tr style="color:var(--text-muted);">
+            <td>이론 평균</td>
+            <td style="text-align:right;">${r(iAvg)}A</td>
+            <td style="text-align:right;">${r(rec.iAvg)}A</td>
+            <td style="text-align:right; font-size:0.8rem;">열입력 계산용</td>
           </tr>
           <tr>
             <td>PPS</td>
