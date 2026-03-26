@@ -529,9 +529,9 @@ const Calculator = {
         // 플랜지가 열을 빨아들이므로 평균 전류 ↑, 파이프 번스루 방지로 Peak ↓
         // 실측 기준: 3" OD, 0.065" wall → Peak 90A, Duty 70%, BG 50%, RPM 1.2
 
-        // 1. 목표 평균 전류: 맞대기 기준 × OD 보정 × 히트싱크 보상(1.18)
+        // 1. 목표 용접기 표시 전류(RMS): 맞대기 기준 × OD 보정 × 히트싱크 보상(1.18)
         const flangeHeatSinkFactor = 1.18;
-        rec.targetIAvg = wallMils * 1.0 * rec.odFactor * flangeHeatSinkFactor;
+        rec.targetIRMS = wallMils * 1.0 * rec.odFactor * flangeHeatSinkFactor;
 
         // 2. 플랜지 펄스 전략: 높은 Duty(70%) + 높은 BG(50%)
         // 낮은 Peak로 파이프 보호, 높은 Duty/BG로 플랜지에 충분한 열 전달
