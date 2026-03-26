@@ -509,8 +509,8 @@ const Calculator = {
     if (wallMm > 0) {
       rec = {};
 
-      // 1. 목표 평균 전류: 1A/mil 기본 + OD 열용량 보정
-      // Pro-Fusion 기본: "1 ampere average current per 0.001 inch wall thickness"
+      // 1. 목표 용접기 표시 전류(RMS): 1A/mil 기본 + OD 열용량 보정
+      // Pro-Fusion: "1 ampere per 0.001 inch wall thickness" → 용접기 RMS 기준
       // OD 보정: 단면적 비율의 거듭제곱 (열 전달은 비선형)
       //   기준 파이프: 3" OD × 0.065" wall (보정 계수 = 1.0)
       //   공식: factor = (현재 단면적 / 기준 단면적) ^ 0.15
