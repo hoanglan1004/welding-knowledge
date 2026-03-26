@@ -616,14 +616,14 @@ const Calculator = {
     let html = `
       <div class="calc-result__grid">
         <div class="calc-result__item calc-result__item--primary">
-          <span class="calc-result__label">평균 전류 (산술)</span>
+          <span class="calc-result__label">용접기 표시 평균</span>
+          <span class="calc-result__value">${r(iRMS)} A</span>
+          <span class="calc-result__sub">Dynasty 300 디스플레이 값 (RMS)</span>
+        </div>
+        <div class="calc-result__item">
+          <span class="calc-result__label">이론 산술 평균</span>
           <span class="calc-result__value">${r(iAvg)} A</span>
           <span class="calc-result__sub">Peak ${peak}A × ${duty}% + BG ${r(bgAmps)}A × ${100-duty}%</span>
-        </div>
-        <div class="calc-result__item calc-result__item--primary">
-          <span class="calc-result__label">RMS 전류 (용접기 표시)</span>
-          <span class="calc-result__value">${r(iRMS)} A</span>
-          <span class="calc-result__sub">용접기 모니터에 찍히는 값</span>
         </div>
         <div class="calc-result__item">
           <span class="calc-result__label">BG 실제 전류</span>
