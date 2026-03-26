@@ -575,7 +575,7 @@ const Calculator = {
       rec.maxRPM = rec.maxIPM / (Math.PI * od);
 
       // 목표 열입력
-      rec.targetHI = (voltage * rec.targetIAvg * 60) / (rec.optSpeed * 1000);
+      rec.targetHI = (voltage * rec.iAvg * 60) / (rec.optSpeed * 1000);
 
       // 추천 PPS (Pro-Fusion: 75% 오버랩)
       const spotDia = 2.5 * wallInch;
