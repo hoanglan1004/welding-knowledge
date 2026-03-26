@@ -494,9 +494,9 @@ const Calculator = {
     const bgAmps = peak * (bgPercent / 100);
     const peakBgRatio = bgPercent > 0 ? (100 / bgPercent) : 999;
 
-    // 평균 전류 (산술 평균 + RMS)
+    // 산술 평균 전류 (열입력 계산용 이론값)
     const iAvg = peak * (duty / 100) + bgAmps * (1 - duty / 100);
-    // RMS 전류: 용접기 모니터 표시값 (실효 열입력 기준)
+    // 용접기 표시 평균 전류 (RMS - Dynasty 300 등 실제 용접기 디스플레이값)
     const iRMS = Math.sqrt(peak * peak * (duty / 100) + bgAmps * bgAmps * (1 - duty / 100));
 
     // ── 업계 표준 추천 엔진 (Pro-Fusion + OD 열용량 보정) ──
