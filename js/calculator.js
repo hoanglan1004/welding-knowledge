@@ -546,7 +546,7 @@ const Calculator = {
         rec.maxIPM = Math.min(13, rec.optIPM * 1.15);
       } else {
         // ── 맞대기 용접 모드 (기존) ──
-        rec.targetIAvg = wallMils * 1.0 * rec.odFactor;
+        rec.targetIRMS = wallMils * 1.0 * rec.odFactor;
 
         // 펄스 설정 (Pro-Fusion 표준)
         rec.bgPct = 33;
