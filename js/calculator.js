@@ -732,7 +732,7 @@ const Calculator = {
         </table>`;
 
       // ── 종합 판정 ──
-      const iAvgOk = Math.abs(iAvg - rec.targetIAvg) <= rec.targetIAvg * 0.15;
+      const iAvgOk = Math.abs(iRMS - rec.targetIRMS) <= rec.targetIRMS * 0.15;
       const rpmOk = rpm > 0 ? Math.abs(rpm - rec.optRPM) / rec.optRPM <= 0.2 : false;
       const allGood = iAvgOk && (rpm <= 0 || rpmOk);
 
