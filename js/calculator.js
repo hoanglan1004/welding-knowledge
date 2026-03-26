@@ -558,9 +558,10 @@ const Calculator = {
         rec.maxIPM = Math.min(7.5, rec.optIPM * 1.15);
       }
 
-      // 공통: Peak, 속도, PPS 계산
-      const avgFactor = rec.duty / 100 + (rec.bgPct / 100) * (1 - rec.duty / 100);
-      rec.peak = Math.round(rec.targetIAvg / avgFactor);
+      // 공통: Peak, 속도, PPS 계산 (RMS 기준으로 Peak 역산)
+      // RMS = Peak × √(Duty + BG%² × (1-Duty)) → Peak = targetRMS / rmsFactor
+      const rmsFactor = Math.sqrt(rec.duty / 100 + Math.pow(rec.bgPct / 100, 2) * (1 - rec.duty / 100));
+      rec.peak = Math.round(rec.targetIRMS / rmsFactor);
       if (rec.peak > 250) rec.peak = 250;
       if (rec.peak < 30) rec.peak = 30;
       rec.bgAmps = rec.peak * rec.bgPct / 100;
