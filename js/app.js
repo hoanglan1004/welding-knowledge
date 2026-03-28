@@ -299,6 +299,7 @@ const App = {
                   <th>베이스</th>
                   <th>주파수</th>
                   <th>듀티</th>
+                  <th>이송속도</th>
                   <th>비고</th>
                 </tr>
               </thead>
@@ -310,6 +311,7 @@ const App = {
                     <td data-label="베이스">${s.base || s.baseCurrent || ''}</td>
                     <td data-label="주파수">${s.frequency}</td>
                     <td data-label="듀티">${s.duty || s.dutyCycle || ''}</td>
+                    <td data-label="이송속도">${s.travelSpeed || '-'}</td>
                     <td data-label="비고">${s.notes}</td>
                   </tr>
                 `).join('')}
