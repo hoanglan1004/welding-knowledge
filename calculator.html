@@ -326,7 +326,53 @@
           </div>
         </details>
       </section>
-      <!-- 8. 용접 파라미터 (펄스 TIG) -->
+      <!-- 8. 파이프 용접 레시피 (자동) -->
+      <section class="calc-panel" id="panel-recipe">
+        <h2 class="calc-panel__title">파이프 용접 레시피</h2>
+        <p class="calc-panel__desc">파이프 번호와 벽두께만 선택하면 1A/mil 기준 펄스 TIG 세팅을 자동 생성합니다.</p>
+
+        <div class="calc-form">
+          <div class="calc-field">
+            <label class="calc-label">파이프 사이즈</label>
+            <select class="calc-select" id="autoSize" onchange="Calculator._updateAutoWall()"></select>
+          </div>
+          <div class="calc-field">
+            <label class="calc-label">벽두께</label>
+            <select class="calc-select" id="autoWall"></select>
+          </div>
+          <div class="calc-field">
+            <label class="calc-label">소재</label>
+            <select class="calc-select" id="autoMaterial">
+              <option value="304">304 BA</option>
+              <option value="316l">316L BA</option>
+            </select>
+          </div>
+          <div class="calc-field">
+            <label class="calc-label">용접 타입</label>
+            <div style="display:flex; gap:0.5rem;">
+              <button type="button" class="calc-tab calc-tab--active" id="autoTypeButt" onclick="Calculator._setAutoType('butt')" style="flex:1; padding:0.5rem; font-size:0.9rem;">맞대기 (Butt)</button>
+              <button type="button" class="calc-tab" id="autoTypeFlange" onclick="Calculator._setAutoType('flange')" style="flex:1; padding:0.5rem; font-size:0.9rem;">플랜지 (Fillet)</button>
+            </div>
+          </div>
+          <button class="calc-btn" onclick="Calculator.calcAutoParam()">레시피 생성</button>
+        </div>
+
+        <div class="calc-result" id="result-autoparam"></div>
+
+        <details class="calc-formula">
+          <summary>공식 보기</summary>
+          <div class="calc-formula__content">
+            <p><strong>전류 기준</strong>: 1A/mil (0.001"당 1A) — Pro-Fusion 업계 표준</p>
+            <p><strong>이송속도</strong>: 맞대기 4~7 IPM (평균 5), 플랜지 6~12 IPM</p>
+            <p><strong>펄스</strong>: 맞대기 D35% / BG33%, 플랜지 D70% / BG50%</p>
+            <p><strong>OD 보정</strong> = (현재 단면적 / 기준 단면적)^0.15</p>
+            <p><strong>Peak</strong> = 목표RMS / √(Duty + BG²×(1-Duty))</p>
+            <p class="calc-formula__tip">기준 파이프: 3" OD × 0.065" wall (보정 계수 1.0)</p>
+          </div>
+        </details>
+      </section>
+
+      <!-- 9. 용접 파라미터 (펄스 TIG) -->
       <section class="calc-panel" id="panel-weldparam">
         <h2 class="calc-panel__title">용접 파라미터 (펄스 TIG)</h2>
         <p class="calc-panel__desc">펄스 TIG 설정값으로 열입력을 계산하고, STS 열변형을 최소화하는 턴테이블 RPM을 추천합니다.</p>
