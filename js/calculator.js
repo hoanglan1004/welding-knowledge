@@ -17,6 +17,7 @@ const Calculator = {
 
     this._setupTabs();
     this._populateSizeSelects();
+    this._updateAutoWall();
     this._buildFractionGrid();
   },
 
