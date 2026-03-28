@@ -525,24 +525,41 @@
         <p class="calc-panel__desc">삼각함수·제곱근 + RMS전류·열입력 등 용접 전용 공식이 내장된 현장용 계산기</p>
 
         <style>
-          #sciGrid button { padding:0.7rem 0; border:none; border-radius:8px; font-size:0.95rem; font-weight:600; cursor:pointer; transition:opacity 0.15s; }
-          #sciGrid button:active { opacity:0.7; }
-          .sci-fn { background:#1e3a5f; color:#93c5fd; }
-          .sci-num { background:#374151; color:#f1f5f9; font-size:1.1rem; }
-          .sci-op { background:#78350f; color:#fcd34d; font-size:1.1rem; }
-          .sci-eq { background:#16a34a; color:#fff; font-size:1.3rem; }
-          .sci-ac { background:#991b1b; color:#fecaca; }
-          .sci-del { background:#4a4a4a; color:#e2e8f0; }
+          #sciGrid button {
+            min-height: 52px;
+            padding: 0.6rem 0;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.15s;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+          }
+          #sciGrid button:active { opacity: 0.65; transform: scale(0.96); }
+          .sci-fn { background: #1e3a5f; color: #93c5fd; }
+          .sci-num { background: #374151; color: #f1f5f9; font-size: 1.35rem; }
+          .sci-op { background: #78350f; color: #fcd34d; font-size: 1.3rem; }
+          .sci-eq { background: #16a34a; color: #fff; font-size: 1.5rem; }
+          .sci-ac { background: #991b1b; color: #fecaca; }
+          .sci-del { background: #4a4a4a; color: #e2e8f0; }
+          @media (max-width: 480px) {
+            #sciGrid button { min-height: 56px; font-size: 1.1rem; border-radius: 12px; }
+            .sci-num { font-size: 1.45rem; }
+            .sci-op { font-size: 1.4rem; }
+            .sci-eq { font-size: 1.6rem; }
+          }
         </style>
 
         <!-- 디스플레이 -->
-        <div style="background:#1e293b; border-radius:12px; padding:0.75rem 1rem; margin-bottom:0.5rem; font-family:'SF Mono','Menlo','Consolas',monospace;">
-          <div id="sciExprLine" style="color:#94a3b8; font-size:0.85rem; min-height:1.2rem; text-align:right; word-break:break-all;"></div>
-          <div id="sciResultLine" style="color:#f1f5f9; font-size:2rem; font-weight:bold; text-align:right; min-height:2.2rem; overflow:hidden;">0</div>
+        <div style="background:#1e293b; border-radius:14px; padding:1rem 1.2rem; margin-bottom:0.6rem; font-family:'SF Mono','Menlo','Consolas',monospace;">
+          <div id="sciExprLine" style="color:#94a3b8; font-size:0.9rem; min-height:1.4rem; text-align:right; word-break:break-all;"></div>
+          <div id="sciResultLine" style="color:#f1f5f9; font-size:2.5rem; font-weight:bold; text-align:right; min-height:2.8rem; overflow:hidden;">0</div>
         </div>
 
         <!-- 버튼 그리드 (4열) -->
-        <div id="sciGrid" style="display:grid; grid-template-columns:repeat(4,1fr); gap:3px; margin-bottom:1rem;">
+        <div id="sciGrid" style="display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:1rem;">
           <button class="sci-fn" onclick="Calculator._sci('sin(')">sin</button>
           <button class="sci-fn" onclick="Calculator._sci('cos(')">cos</button>
           <button class="sci-fn" onclick="Calculator._sci('tan(')">tan</button>
