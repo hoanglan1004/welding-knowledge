@@ -55,11 +55,12 @@
         "settings": [
           {
             "scenario": "304 BA 박판 1.65mm (LOD)",
-            "peak": "55~70A",
-            "base": "15~25A",
+            "peak": "90~110A",
+            "base": "30~36A",
             "frequency": "2~4 Hz",
             "duty": "30~40%",
-            "notes": "박판 번스루 방지. 높은 주파수+낮은 듀티. 용가재 1.0mm"
+            "travelSpeed": "4~7 IPM (평균 5)",
+            "notes": "1A/mil → RMS 65A → Peak ~100A. 번스루 방지는 낮은 듀티로 제어. 용가재 1.0mm"
           },
           {
             "scenario": "316L BA 박판 1.65mm (LOD)",
