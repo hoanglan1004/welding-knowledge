@@ -64,11 +64,12 @@
           },
           {
             "scenario": "316L BA 박판 1.65mm (LOD)",
-            "peak": "60~75A",
-            "base": "18~28A",
+            "peak": "95~115A",
+            "base": "31~38A",
             "frequency": "2~4 Hz",
             "duty": "30~40%",
-            "notes": "로우셀파 시 피크 +10A. 듀티 30%로 입열 억제"
+            "travelSpeed": "4~7 IPM (평균 5)",
+            "notes": "1A/mil → RMS 65A → Peak ~100A. 로우셀파 시 Peak +10~15%"
           },
           {
             "scenario": "304 BA 3mm (Sch.10 소구경)",
