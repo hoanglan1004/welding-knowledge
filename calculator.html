@@ -519,6 +519,105 @@
           </div>
         </details>
       </section>
+      <!-- 11. 공학 계산기 (용접 특화) -->
+      <section class="calc-panel" id="panel-engcalc">
+        <h2 class="calc-panel__title">공학 계산기</h2>
+        <p class="calc-panel__desc">삼각함수·제곱근 + RMS전류·열입력 등 용접 전용 공식이 내장된 현장용 계산기</p>
+
+        <style>
+          #sciGrid button { padding:0.7rem 0; border:none; border-radius:8px; font-size:0.95rem; font-weight:600; cursor:pointer; transition:opacity 0.15s; }
+          #sciGrid button:active { opacity:0.7; }
+          .sci-fn { background:#1e3a5f; color:#93c5fd; }
+          .sci-num { background:#374151; color:#f1f5f9; font-size:1.1rem; }
+          .sci-op { background:#78350f; color:#fcd34d; font-size:1.1rem; }
+          .sci-eq { background:#16a34a; color:#fff; font-size:1.3rem; }
+          .sci-ac { background:#991b1b; color:#fecaca; }
+          .sci-del { background:#4a4a4a; color:#e2e8f0; }
+        </style>
+
+        <!-- 디스플레이 -->
+        <div style="background:#1e293b; border-radius:12px; padding:0.75rem 1rem; margin-bottom:0.5rem; font-family:'SF Mono','Menlo','Consolas',monospace;">
+          <div id="sciExprLine" style="color:#94a3b8; font-size:0.85rem; min-height:1.2rem; text-align:right; word-break:break-all;"></div>
+          <div id="sciResultLine" style="color:#f1f5f9; font-size:2rem; font-weight:bold; text-align:right; min-height:2.2rem; overflow:hidden;">0</div>
+        </div>
+
+        <!-- 버튼 그리드 (4열) -->
+        <div id="sciGrid" style="display:grid; grid-template-columns:repeat(4,1fr); gap:3px; margin-bottom:1rem;">
+          <button class="sci-fn" onclick="Calculator._sci('sin(')">sin</button>
+          <button class="sci-fn" onclick="Calculator._sci('cos(')">cos</button>
+          <button class="sci-fn" onclick="Calculator._sci('tan(')">tan</button>
+          <button class="sci-fn" onclick="Calculator._sci('angle')" id="sciAngleBtn">DEG</button>
+
+          <button class="sci-fn" onclick="Calculator._sci('√(')">√</button>
+          <button class="sci-fn" onclick="Calculator._sci('^2')">x²</button>
+          <button class="sci-fn" onclick="Calculator._sci('π')">π</button>
+          <button class="sci-fn" onclick="Calculator._sci('paren')">( )</button>
+
+          <button class="sci-ac" onclick="Calculator._sci('clear')">AC</button>
+          <button class="sci-del" onclick="Calculator._sci('del')">DEL</button>
+          <button class="sci-op" onclick="Calculator._sci('^')">^</button>
+          <button class="sci-op" onclick="Calculator._sci('÷')">÷</button>
+
+          <button class="sci-num" onclick="Calculator._sci('7')">7</button>
+          <button class="sci-num" onclick="Calculator._sci('8')">8</button>
+          <button class="sci-num" onclick="Calculator._sci('9')">9</button>
+          <button class="sci-op" onclick="Calculator._sci('×')">×</button>
+
+          <button class="sci-num" onclick="Calculator._sci('4')">4</button>
+          <button class="sci-num" onclick="Calculator._sci('5')">5</button>
+          <button class="sci-num" onclick="Calculator._sci('6')">6</button>
+          <button class="sci-op" onclick="Calculator._sci('-')">−</button>
+
+          <button class="sci-num" onclick="Calculator._sci('1')">1</button>
+          <button class="sci-num" onclick="Calculator._sci('2')">2</button>
+          <button class="sci-num" onclick="Calculator._sci('3')">3</button>
+          <button class="sci-op" onclick="Calculator._sci('+')">+</button>
+
+          <button class="sci-num" onclick="Calculator._sci('negate')">±</button>
+          <button class="sci-num" onclick="Calculator._sci('0')">0</button>
+          <button class="sci-num" onclick="Calculator._sci('.')">.</button>
+          <button class="sci-eq" onclick="Calculator._sci('eval')">=</button>
+        </div>
+
+        <!-- 용접 전용 공식 -->
+        <h3 class="calc-panel__subtitle" style="margin-top:1.5rem;">용접 공식</h3>
+
+        <!-- 펄스 전류 (RMS + 평균) -->
+        <div class="calc-form" style="margin-bottom:1rem; padding:0.75rem; background:var(--color-bg-alt, #f8fafc); border-radius:8px;">
+          <p style="font-weight:bold; margin-bottom:0.5rem;">펄스 전류 (RMS + 산술 평균)</p>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.5rem;">
+            <div class="calc-field"><label class="calc-label">Peak (A)</label><input type="number" class="calc-input" id="sciPeak" inputmode="decimal" placeholder="100"></div>
+            <div class="calc-field"><label class="calc-label">BG (%)</label><input type="number" class="calc-input" id="sciBG" inputmode="decimal" placeholder="33"></div>
+            <div class="calc-field"><label class="calc-label">Duty (%)</label><input type="number" class="calc-input" id="sciDuty" inputmode="decimal" placeholder="35"></div>
+          </div>
+          <button class="calc-btn" onclick="Calculator.calcSciCurrent()" style="margin-top:0.5rem;">전류 계산</button>
+          <div id="result-scicurrent"></div>
+        </div>
+
+        <!-- 열입력 -->
+        <div class="calc-form" style="margin-bottom:1rem; padding:0.75rem; background:var(--color-bg-alt, #f8fafc); border-radius:8px;">
+          <p style="font-weight:bold; margin-bottom:0.5rem;">열입력 (Heat Input)</p>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.5rem;">
+            <div class="calc-field"><label class="calc-label">전압 (V)</label><input type="number" class="calc-input" id="sciHIVolt" inputmode="decimal" placeholder="10"></div>
+            <div class="calc-field"><label class="calc-label">평균전류 (A)</label><input type="number" class="calc-input" id="sciHIAmp" inputmode="decimal" placeholder="65"></div>
+            <div class="calc-field"><label class="calc-label">속도 (mm/min)</label><input type="number" class="calc-input" id="sciHISpeed" inputmode="decimal" placeholder="127"></div>
+          </div>
+          <button class="calc-btn" onclick="Calculator.calcSciHeatInput()" style="margin-top:0.5rem;">열입력 계산</button>
+          <div id="result-sciheat"></div>
+        </div>
+
+        <!-- 속도 변환 -->
+        <div class="calc-form" style="padding:0.75rem; background:var(--color-bg-alt, #f8fafc); border-radius:8px;">
+          <p style="font-weight:bold; margin-bottom:0.5rem;">속도 변환 (IPM ↔ RPM)</p>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.5rem;">
+            <div class="calc-field"><label class="calc-label">IPM</label><input type="number" class="calc-input" id="sciIPM" inputmode="decimal" placeholder="5.0"></div>
+            <div class="calc-field"><label class="calc-label">또는 RPM</label><input type="number" class="calc-input" id="sciRPM2" inputmode="decimal" placeholder="0.8"></div>
+            <div class="calc-field"><label class="calc-label">OD (inch)</label><input type="number" class="calc-input" id="sciOD" inputmode="decimal" placeholder="2.0"></div>
+          </div>
+          <button class="calc-btn" onclick="Calculator.calcSciSpeed()" style="margin-top:0.5rem;">속도 계산</button>
+          <div id="result-scispeed"></div>
+        </div>
+      </section>
     </div>
   </main>
 
