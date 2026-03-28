@@ -1281,7 +1281,7 @@ const Calculator = {
         </div>
       </div>
     `);
-  }
+  },
   // ===== 11. 공학 계산기 (용접 특화) =====
   _sciExpr: '',
   _sciAngleMode: 'deg',
