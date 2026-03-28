@@ -802,7 +802,7 @@ const Calculator = {
         html += `
         <div class="calc-result__breakdown" style="margin-top:0.75rem; background:var(--color-bg-alt, #f0f9ff); padding:0.75rem; border-radius:8px;">
           <p style="color:#ea580c; font-weight:bold;">벽 두께를 입력하면 업계 표준 기반 추천을 받을 수 있습니다</p>
-          <p style="color:var(--text-muted); font-size:0.85rem;">STS: 벽 두께(mil)당 1A 용접기 RMS 전류 + 4-10 IPM 이동속도 연립 계산</p>
+          <p style="color:var(--text-muted); font-size:0.85rem;">STS: 벽 두께(mil)당 1A 용접기 RMS 전류 + 맞대기 4~7 IPM (평균 5) 이동속도 연립 계산</p>
         </div>`;
       }
     }
