@@ -35,13 +35,14 @@
         },
         {
           "material": "STS 304",
-          "thickness": "3mm",
-          "current": "90~110A",
+          "thickness": "3mm (0.118\")",
+          "current": "110~130A",
           "voltage": "10~14V",
           "gasFlow": "8~12 L/min",
           "electrode": "WT20 (2% 토리움) 2.4mm",
           "fillerWire": "ER308L 2.0mm",
-          "notes": "백실드(Back Purge) 필수. 입열량 최소화."
+          "travelSpeed": "4~7 IPM (평균 5)",
+          "notes": "1A/mil 기준 118A. 백실드(Back Purge) 필수. 입열량 최소화."
         },
         {
           "material": "STS 316L",
