@@ -57,13 +57,14 @@
         },
         {
           "material": "304 BA 파이프 (LOD)",
-          "thickness": "3mm (Sch.10)",
-          "current": "85~100A",
+          "thickness": "3mm (Sch.10, 0.118\")",
+          "current": "110~130A",
           "voltage": "10~13V",
           "gasFlow": "10~12 L/min",
           "electrode": "WCe20 2.4mm",
           "fillerWire": "ER308L 2.0mm",
-          "notes": "BA 표면 — 변색 최소화. 백퍼지 필수. 연금색까지 허용."
+          "travelSpeed": "4~7 IPM (평균 5)",
+          "notes": "1A/mil 기준 118A. BA 표면 — 변색 최소화. 백퍼지 필수. 연금색까지 허용."
         },
         {
           "material": "316L BA 파이프 (LOD)",
