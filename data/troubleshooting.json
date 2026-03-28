@@ -23,7 +23,7 @@
       "detailedSolutions": [
         {
           "action": "전류 조정",
-          "detail": "현재 전류에서 5~10A 감소. 두께 1mm당 약 30~40A가 기준 (304/316L TIG)"
+          "detail": "현재 전류에서 5~10A 감소. 1A/mil 기준 (~40A/mm, 0.001\"당 1A). 이송속도 4~7 IPM 평균 5 (304/316L TIG)"
         },
         {
           "action": "속도 증가",
