@@ -118,11 +118,12 @@
         },
         {
           "scenario": "316L BA 6mm 필패스",
-          "peakCurrent": "150~180A",
-          "baseCurrent": "50~70A",
+          "peakCurrent": "290~330A",
+          "baseCurrent": "96~109A",
           "frequency": "1~2 Hz",
           "dutyCycle": "45~55%",
-          "notes": "로우셀파 의심 시 피크 20% 증가."
+          "travelSpeed": "4~7 IPM (평균 5)",
+          "notes": "1A/mil → RMS 236A → Peak ~317A. 350A+ 장비 필요. 로우셀파 시 Peak +15~20%."
         },
         {
           "scenario": "대구경(8\"+) 316L BA 루트",
