@@ -25,12 +25,13 @@
         {
           "material": "316L BA 박판 (LOD)",
           "thickness": "1.65mm (0.065\")",
-          "current": "40~60A",
+          "current": "60~70A",
           "voltage": "8~10V",
           "gasFlow": "8~10 L/min",
           "electrode": "WCe20 1.6mm",
           "fillerWire": "ER316L 1.0~1.6mm",
-          "notes": "박판 316L — 로우셀파 시 전류 소폭 증가(+5A). 펄스 듀티 30~40%로 열 제어. 변색 관리 중요."
+          "travelSpeed": "4~7 IPM (평균 5)",
+          "notes": "1A/mil 기준 65A. 로우셀파 시 +10~15%. 펄스 듀티 30~40%로 열 제어. 변색 관리 중요."
         },
         {
           "material": "STS 304",
