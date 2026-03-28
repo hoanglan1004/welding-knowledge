@@ -82,11 +82,12 @@
           },
           {
             "scenario": "316L BA 6mm (Sch.40 중구경)",
-            "peak": "150~180A",
-            "base": "50~70A",
+            "peak": "290~330A",
+            "base": "96~109A",
             "frequency": "1~2 Hz",
             "duty": "45~55%",
-            "notes": "로우셀파 의심 시 피크 20% 증가"
+            "travelSpeed": "4~7 IPM (평균 5)",
+            "notes": "1A/mil → RMS 236A → Peak ~317A. 350A+ 장비 필요. 로우셀파 시 +15~20%"
           },
           {
             "scenario": "316L BA 대구경 (8\"+) 루트패스",
