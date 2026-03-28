@@ -127,11 +127,12 @@
         },
         {
           "scenario": "대구경(8\"+) 316L BA 루트",
-          "peakCurrent": "110~140A",
-          "baseCurrent": "35~50A",
+          "peakCurrent": "215~240A",
+          "baseCurrent": "71~79A",
           "frequency": "1~1.5 Hz",
           "dutyCycle": "40~50%",
-          "notes": "대구경은 열 분산 빠름. 백퍼지 체적 계산 필수."
+          "travelSpeed": "4~7 IPM (평균 5)",
+          "notes": "1A/mil 기준 (Sch.10 벽두께 0.148\" = 148mil). OD 보정 포함. 백퍼지 체적 계산 필수."
         },
         {
           "scenario": "로우셀파 316L 대응",
