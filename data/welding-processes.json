@@ -109,11 +109,12 @@
         },
         {
           "scenario": "304 BA 3mm 루트패스",
-          "peakCurrent": "100~120A",
-          "baseCurrent": "30~40A",
+          "peakCurrent": "160~185A",
+          "baseCurrent": "53~61A",
           "frequency": "1~2 Hz",
           "dutyCycle": "40~50%",
-          "notes": "동전 쌓기 비드. 깨끗한 외관. 키홀 유지하며 진행."
+          "travelSpeed": "4~7 IPM (평균 5)",
+          "notes": "1A/mil → RMS 118A → Peak ~173A (D40%/BG33% 기준). 키홀 유지하며 진행."
         },
         {
           "scenario": "316L BA 6mm 필패스",
