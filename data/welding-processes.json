@@ -46,13 +46,14 @@
         },
         {
           "material": "STS 316L",
-          "thickness": "6mm",
-          "current": "130~160A",
+          "thickness": "6mm (0.236\")",
+          "current": "210~260A",
           "voltage": "11~15V",
           "gasFlow": "10~15 L/min",
           "electrode": "WT20 2.4mm",
           "fillerWire": "ER316L 2.4mm",
-          "notes": "층간온도 150℃ 이하 유지. 다층 용접 시 슬래그 제거 철저."
+          "travelSpeed": "4~7 IPM (평균 5)",
+          "notes": "1A/mil 기준 236A. 단층 오비탈 기준. 수동 다층 시 패스당 분배. 층간온도 150℃ 이하."
         },
         {
           "material": "304 BA 파이프 (LOD)",
