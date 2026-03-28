@@ -462,6 +462,213 @@ const Calculator = {
     flangeBtn.classList.toggle('calc-tab--active', type === 'flange');
   },
 
+  // ===== 10. 파이프 용접 레시피 (자동) =====
+  // 파이프 번호 + 벽두께만 선택 → 1A/mil 기준 완전 자동 세팅
+  _autoWeldType: 'butt',
+
+  _setAutoType(type) {
+    this._autoWeldType = type;
+    document.getElementById('autoTypeButt').classList.toggle('calc-tab--active', type === 'butt');
+    document.getElementById('autoTypeFlange').classList.toggle('calc-tab--active', type === 'flange');
+  },
+
+  _updateAutoWall() {
+    const sel = document.getElementById('autoSize');
+    if (!sel || !this.data) return;
+    const walls = (this.data.pipeWalls || {})[sel.value] || [];
+    const wallSel = document.getElementById('autoWall');
+    if (!wallSel) return;
+    wallSel.innerHTML = '';
+    walls.forEach(w => {
+      const opt = document.createElement('option');
+      opt.value = w.inch;
+      opt.textContent = w.label;
+      wallSel.appendChild(opt);
+    });
+  },
+
+  calcAutoParam() {
+    const od = parseFloat(document.getElementById('autoSize').value);
+    const wallInch = parseFloat(document.getElementById('autoWall').value);
+    const material = document.getElementById('autoMaterial').value;
+    const isFlange = this._autoWeldType === 'flange';
+    const r = (v, d) => this._round(v, d != null ? d : 2);
+
+    if (!wallInch || isNaN(wallInch)) {
+      this._showResult('result-autoparam', '<p class="calc-result__error">벽두께를 선택하세요</p>');
+      return;
+    }
+
+    // 기본 치수
+    const wallMm = wallInch * 25.4;
+    const wallMils = wallInch * 1000;
+    const odMm = od * 25.4;
+    const circumMm = Math.PI * odMm;
+    const sizeInfo = this.data.pipeSizes.find(s => s.od_inch === od);
+    const matName = material === '316l' ? '316L BA' : '304 BA';
+
+    // OD 열용량 보정 (기준: 3" × 0.065")
+    const refArea = Math.PI * (3.0 - 0.065) * 0.065;
+    const curArea = Math.PI * (od - wallInch) * wallInch;
+    const odFactor = Math.max(0.70, Math.min(1.10, Math.pow(curArea / refArea, 0.15)));
+
+    // 1A/mil + 모드별 펄스 기본값
+    const p = {};
+    if (isFlange) {
+      p.targetRMS = wallMils * odFactor * 1.18;
+      p.bgPct = 50; p.duty = 70;
+      p.optIPM = Math.max(6, Math.min(12, 12 - (wallMils - 30) * 6 / 79));
+    } else {
+      p.targetRMS = wallMils * odFactor;
+      p.bgPct = 33; p.duty = 35;
+      p.optIPM = Math.max(4, Math.min(7, 7 - (wallMils - 30) * 3 / 79));
+    }
+
+    // Peak 역산 (RMS → Peak)
+    const rmsFactor = Math.sqrt(p.duty / 100 + Math.pow(p.bgPct / 100, 2) * (1 - p.duty / 100));
+    p.peak = Math.max(30, Math.min(350, Math.round(p.targetRMS / rmsFactor)));
+    p.bgAmps = p.peak * p.bgPct / 100;
+    p.iAvg = p.peak * p.duty / 100 + p.bgAmps * (1 - p.duty / 100);
+    p.iRMS = Math.sqrt(p.peak * p.peak * p.duty / 100 + p.bgAmps * p.bgAmps * (1 - p.duty / 100));
+
+    // 이송속도
+    p.optSpeed = p.optIPM * 25.4;
+    p.optRPM = p.optIPM / (Math.PI * od);
+    p.minIPM = Math.max(isFlange ? 5 : 3.5, p.optIPM * 0.85);
+    p.maxIPM = Math.min(isFlange ? 13 : 7.5, p.optIPM * 1.15);
+    p.minRPM = p.minIPM / (Math.PI * od);
+    p.maxRPM = p.maxIPM / (Math.PI * od);
+    p.weldTime = p.optRPM > 0 ? 60 / p.optRPM : 0;
+
+    // PPS (75% 오버랩)
+    const spotDia = 2.5 * wallInch;
+    p.pps = spotDia > 0 ? Math.max(1, Math.round((p.optIPM / 60) / (spotDia * 0.25))) : 3;
+
+    // 전압 / 열입력 / 아크갭 / 리플
+    p.volt = wallMils < 80 ? 9 : wallMils < 150 ? 10 : 12;
+    p.heatKJ = (p.volt * p.iAvg * 60) / (p.optSpeed * 1000);
+    p.arcGap = isFlange ? 0.010 + wallInch / 4 : 0.010 + wallInch / 2;
+    p.ripple = p.pps > 0 ? (p.optSpeed / 60) / p.pps : 0;
+
+    // 전극 / 용가재 / 가스
+    p.elec = wallMils <= 65 ? 'WCe20 1.6mm' : 'WCe20 2.4mm';
+    const fSize = wallMils <= 65 ? '1.0~1.6mm' : wallMils <= 120 ? '1.6~2.0mm' : '2.0~2.4mm';
+    p.filler = (material === '316l' ? 'ER316L ' : 'ER308L ') + fSize;
+    p.gas = odMm < 30 ? '8~10' : odMm < 80 ? '10~12' : '12~15';
+    p.purge = odMm < 30 ? '3~5' : odMm < 80 ? '5~8' : '8~12';
+
+    // 열입력 판정
+    const hiColor = p.heatKJ <= 0.5 ? '#16a34a' : p.heatKJ <= 1.0 ? '#ea580c' : '#dc2626';
+    const hiLabel = p.heatKJ <= 0.3 ? '최적' : p.heatKJ <= 0.5 ? '양호' : p.heatKJ <= 1.0 ? '주의' : '위험';
+
+    // 주의사항
+    const cautions = [];
+    if (material === '316l') cautions.push('로우셀파 의심 시 Peak +10~15%');
+    cautions.push('백퍼지 필수 (변색 방지)');
+    cautions.push('층간온도 150℃ 이하');
+    if (wallMils <= 65) cautions.push('박판 — 번스루 주의, 낮은 듀티 유지');
+    if (p.peak > 250) cautions.push('350A급 장비 필요 (Peak ' + p.peak + 'A)');
+
+    // ── 결과 렌더링 ──
+    const html = `
+      <div style="background:var(--color-bg-alt, #f0f9ff); padding:1rem; border-radius:12px;">
+        <p style="font-weight:bold; font-size:1.15rem;">${isFlange ? '🔩' : '⚡'} ${sizeInfo.nominal} × ${r(wallInch, 3)}" (${r(wallMm)}mm) ${matName}</p>
+        <p style="font-size:0.9rem; color:var(--text-muted);">${isFlange ? '플랜지 필렛' : '맞대기 완전용입'} · ${Math.round(wallMils)}mil · 1A/mil → RMS ${r(p.targetRMS)}A · OD보정 ${r(odFactor)}</p>
+      </div>
+
+      <div class="calc-result__grid" style="margin-top:0.75rem;">
+        <div class="calc-result__item calc-result__item--primary">
+          <span class="calc-result__label">Peak</span>
+          <span class="calc-result__value">${p.peak} A</span>
+        </div>
+        <div class="calc-result__item">
+          <span class="calc-result__label">BG</span>
+          <span class="calc-result__value">${r(p.bgAmps)} A (${p.bgPct}%)</span>
+        </div>
+        <div class="calc-result__item">
+          <span class="calc-result__label">용접기 표시</span>
+          <span class="calc-result__value">${r(p.iRMS)} A</span>
+          <span class="calc-result__sub">Dynasty RMS</span>
+        </div>
+      </div>
+
+      <div class="calc-result__breakdown" style="margin-top:0.75rem;">
+        <p><strong>Dynasty 세팅값</strong></p>
+        <table style="width:100%; font-size:0.95rem; border-collapse:collapse;">
+          <tr>
+            <td style="padding:0.3rem 0;">Peak</td><td style="text-align:right; font-weight:bold; font-size:1.1rem;">${p.peak} A</td>
+            <td style="padding-left:1.5rem;">Duty</td><td style="text-align:right; font-weight:bold; font-size:1.1rem;">${p.duty}%</td>
+          </tr>
+          <tr>
+            <td>BG</td><td style="text-align:right;">${p.bgPct}% → ${r(p.bgAmps)}A</td>
+            <td style="padding-left:1.5rem;">PPS</td><td style="text-align:right;">${p.pps} Hz</td>
+          </tr>
+          <tr>
+            <td>전압</td><td style="text-align:right;">~${p.volt} V</td>
+            <td style="padding-left:1.5rem;">이론 평균</td><td style="text-align:right;">${r(p.iAvg)} A</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="calc-result__breakdown" style="margin-top:0.75rem;">
+        <p><strong>이송속도 (턴테이블)</strong></p>
+        <table style="width:100%; font-size:0.95rem; border-collapse:collapse;">
+          <tr style="border-bottom:1px solid var(--border);">
+            <th style="text-align:left; padding:0.25rem 0;"></th><th style="text-align:right;">IPM</th><th style="text-align:right;">RPM</th><th style="text-align:right;">mm/min</th>
+          </tr>
+          <tr style="color:#16a34a; font-weight:bold;">
+            <td style="padding:0.25rem 0;">최적</td>
+            <td style="text-align:right;">${r(p.optIPM)}</td>
+            <td style="text-align:right;">${r(p.optRPM)}</td>
+            <td style="text-align:right;">${r(p.optSpeed)}</td>
+          </tr>
+          <tr style="color:var(--text-muted);">
+            <td>범위</td>
+            <td style="text-align:right;">${r(p.minIPM)}~${r(p.maxIPM)}</td>
+            <td style="text-align:right;">${r(p.minRPM)}~${r(p.maxRPM)}</td>
+            <td></td>
+          </tr>
+        </table>
+        <p style="color:var(--text-muted); font-size:0.85rem; margin-top:0.25rem;">1회전: ${r(p.weldTime)}초 · 원주: ${r(circumMm)}mm</p>
+      </div>
+
+      <div class="calc-result__breakdown" style="margin-top:0.75rem;">
+        <table style="width:100%; font-size:0.95rem; border-collapse:collapse;">
+          <tr>
+            <td style="padding:0.3rem 0;"><strong>열입력</strong></td>
+            <td style="text-align:right; color:${hiColor}; font-weight:bold;">${r(p.heatKJ, 3)} kJ/mm — ${hiLabel}</td>
+          </tr>
+          <tr>
+            <td>리플 간격</td>
+            <td style="text-align:right;">${r(p.ripple)} mm</td>
+          </tr>
+          <tr>
+            <td>아크 갭</td>
+            <td style="text-align:right;">${r(p.arcGap * 25.4)} mm (${r(p.arcGap, 3)}")</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="calc-result__breakdown" style="margin-top:0.75rem;">
+        <p><strong>세팅</strong></p>
+        <table style="width:100%; font-size:0.95rem; border-collapse:collapse;">
+          <tr><td style="padding:0.3rem 0;">전극</td><td style="text-align:right;">${p.elec}</td></tr>
+          <tr><td>용가재</td><td style="text-align:right;">${p.filler}</td></tr>
+          <tr><td>실드가스 (Ar)</td><td style="text-align:right;">${p.gas} L/min</td></tr>
+          <tr><td>백퍼지 (Ar)</td><td style="text-align:right;">${p.purge} L/min</td></tr>
+        </table>
+      </div>
+
+      <div style="margin-top:0.75rem; background:#fef3c7; padding:0.75rem; border-radius:8px;">
+        <p><strong>⚠️ ${matName} 주의</strong></p>
+        ${cautions.map(c => '<p style="margin:0.15rem 0;">• ' + c + '</p>').join('')}
+      </div>
+
+      <p class="calc-result__note">${sizeInfo.nominal} (OD ${odMm}mm) · 1A/mil · Pro-Fusion 표준 기반 펄스 TIG</p>`;
+
+    this._showResult('result-autoparam', html);
+  },
+
   calcWeldParam() {
     const od = parseFloat(document.getElementById('weldSize').value);
     const isFlange = this._weldType === 'flange';
