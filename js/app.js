@@ -538,6 +538,7 @@ const App = {
                 <th>두께</th>
                 <th>전류</th>
                 <th>전압</th>
+                <th>이송속도</th>
                 <th>가스유량</th>
                 <th>전극</th>
                 <th>용접봉</th>
@@ -551,6 +552,7 @@ const App = {
                   <td data-label="두께">${s.thickness}</td>
                   <td data-label="전류">${s.current}</td>
                   <td data-label="전압">${s.voltage}</td>
+                  <td data-label="이송속도">${s.travelSpeed || '-'}</td>
                   <td data-label="가스유량">${s.gasFlow}</td>
                   <td data-label="전극">${s.electrode}</td>
                   <td data-label="용접봉">${s.fillerWire}</td>
