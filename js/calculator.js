@@ -562,7 +562,7 @@ const Calculator = {
       // RMS = Peak × √(Duty + BG%² × (1-Duty)) → Peak = targetRMS / rmsFactor
       const rmsFactor = Math.sqrt(rec.duty / 100 + Math.pow(rec.bgPct / 100, 2) * (1 - rec.duty / 100));
       rec.peak = Math.round(rec.targetIRMS / rmsFactor);
-      if (rec.peak > 250) rec.peak = 250;
+      if (rec.peak > 350) rec.peak = 350;
       if (rec.peak < 30) rec.peak = 30;
       rec.bgAmps = rec.peak * rec.bgPct / 100;
       rec.iAvg = rec.peak * (rec.duty / 100) + rec.bgAmps * (1 - rec.duty / 100);
