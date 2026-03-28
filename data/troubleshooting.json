@@ -38,8 +38,13 @@
           "detail": "하향(1G)에서 더 잘 밀림. 가능하면 수평(2G)이나 상향(3G)으로 변경"
         }
       ],
-      "relatedDefects": ["undercut", "oxidation"],
-      "relatedProcesses": ["tig"]
+      "relatedDefects": [
+        "undercut",
+        "oxidation"
+      ],
+      "relatedProcesses": [
+        "tig"
+      ]
     },
     {
       "id": "no-penetration",
@@ -81,8 +86,12 @@
           "detail": "2.4mm 텅스텐을 15~30° 각도로 날카롭게 연마. 무딘 전극은 아크가 퍼짐"
         }
       ],
-      "relatedDefects": ["lack-of-penetration"],
-      "relatedProcesses": ["tig"]
+      "relatedDefects": [
+        "lack-of-penetration"
+      ],
+      "relatedProcesses": [
+        "tig"
+      ]
     },
     {
       "id": "undercut-issue",
@@ -118,8 +127,13 @@
           "detail": "언더컷 부위에 용가재를 충분히 공급. 다음 패스에서 커버"
         }
       ],
-      "relatedDefects": ["undercut"],
-      "relatedProcesses": ["tig", "mig"]
+      "relatedDefects": [
+        "undercut"
+      ],
+      "relatedProcesses": [
+        "tig",
+        "mig"
+      ]
     },
     {
       "id": "porosity-issue",
@@ -161,8 +175,13 @@
           "detail": "배관 내부 산소 농도 0.1% 미만 확보. 퍼지 시간: 배관 체적의 5~7배 가스 흘린 후 시작"
         }
       ],
-      "relatedDefects": ["porosity"],
-      "relatedProcesses": ["tig", "mig"]
+      "relatedDefects": [
+        "porosity"
+      ],
+      "relatedProcesses": [
+        "tig",
+        "mig"
+      ]
     },
     {
       "id": "oxidation-issue",
@@ -198,8 +217,13 @@
           "detail": "전류(A) × 0.5초 = 포스트플로우 시간. 예: 100A → 5초. 최소 5초, 두꺼운 소재는 8~10초"
         }
       ],
-      "relatedDefects": ["porosity", "oxidation"],
-      "relatedProcesses": ["tig"]
+      "relatedDefects": [
+        "porosity",
+        "oxidation"
+      ],
+      "relatedProcesses": [
+        "tig"
+      ]
     },
     {
       "id": "tungsten-contamination",
@@ -234,8 +258,12 @@
           "detail": "텅스텐 끝이 볼형으로 뭉치거나 변색되면 해당 부분을 절단 후 재연마. 오염된 상태로 용접하면 텅스텐 혼입 결함"
         }
       ],
-      "relatedDefects": ["tungsten-inclusion"],
-      "relatedProcesses": ["tig"]
+      "relatedDefects": [
+        "tungsten-inclusion"
+      ],
+      "relatedProcesses": [
+        "tig"
+      ]
     },
     {
       "id": "cracking-issue",
@@ -271,8 +299,14 @@
           "detail": "지그 구속을 필요 최소한으로. 용접 순서 계획 — 중앙에서 바깥으로 대칭 용접"
         }
       ],
-      "relatedDefects": ["crack"],
-      "relatedProcesses": ["tig", "mig", "smaw"]
+      "relatedDefects": [
+        "crack"
+      ],
+      "relatedProcesses": [
+        "tig",
+        "mig",
+        "smaw"
+      ]
     },
     {
       "id": "pool-spreading",
@@ -308,8 +342,12 @@
           "detail": "뾰족할수록 아크가 집중되어 풀이 좁아짐. 15° 이하 각도로 날카롭게"
         }
       ],
-      "relatedDefects": ["lack-of-penetration"],
-      "relatedProcesses": ["tig"]
+      "relatedDefects": [
+        "lack-of-penetration"
+      ],
+      "relatedProcesses": [
+        "tig"
+      ]
     },
     {
       "id": "no-back-bead",
@@ -346,8 +384,12 @@
           "detail": "루트 패스에서 작은 키홀(구멍)이 보이면 용입 충분. 키홀이 안 보이면 전류 부족. 키홀이 너무 크면 전류 과다 → 번스루 위험"
         }
       ],
-      "relatedDefects": ["lack-of-penetration"],
-      "relatedProcesses": ["tig"]
+      "relatedDefects": [
+        "lack-of-penetration"
+      ],
+      "relatedProcesses": [
+        "tig"
+      ]
     },
     {
       "id": "excessive-back-bead",
@@ -383,8 +425,12 @@
           "detail": "키홀이 보이면 즉시 용가재 투입 → 키홀을 메움. 늦으면 번스루. 용가재를 8시~10시 방향에서 풀 앞부분에 공급"
         }
       ],
-      "relatedDefects": ["lack-of-fusion"],
-      "relatedProcesses": ["tig"]
+      "relatedDefects": [
+        "lack-of-fusion"
+      ],
+      "relatedProcesses": [
+        "tig"
+      ]
     },
     {
       "id": "bead-convex",
@@ -415,8 +461,12 @@
           "detail": "일정한 리듬으로 용가재 투입. 한 번에 많이 넣지 말고 소량씩 자주"
         }
       ],
-      "relatedDefects": ["lack-of-fusion"],
-      "relatedProcesses": ["tig"]
+      "relatedDefects": [
+        "lack-of-fusion"
+      ],
+      "relatedProcesses": [
+        "tig"
+      ]
     },
     {
       "id": "bead-concave",
@@ -446,8 +496,12 @@
           "detail": "오버헤드(4G): 중력으로 처짐 → 전류 줄이고 속도 높여서 빠르게. 수직 하향(3G): 용융금속 흘러내림 → 펄스 사용"
         }
       ],
-      "relatedDefects": ["undercut"],
-      "relatedProcesses": ["tig"]
+      "relatedDefects": [
+        "undercut"
+      ],
+      "relatedProcesses": [
+        "tig"
+      ]
     },
     {
       "id": "arc-unstable",
@@ -483,8 +537,13 @@
           "detail": "유량계 확인 + 가스렌즈(Gas Lens) 사용 시 균일한 가스 흐름. 노즐 내부 스패터/오물 청소"
         }
       ],
-      "relatedDefects": ["tungsten-inclusion", "porosity"],
-      "relatedProcesses": ["tig"]
+      "relatedDefects": [
+        "tungsten-inclusion",
+        "porosity"
+      ],
+      "relatedProcesses": [
+        "tig"
+      ]
     },
     {
       "id": "distortion-issue",
@@ -519,8 +578,14 @@
           "detail": "304/316L은 탄소강보다 열팽창이 크고 열전도율이 낮아 변형이 2~3배. 펄스 사용으로 입열 감소가 가장 효과적"
         }
       ],
-      "relatedDefects": ["crack"],
-      "relatedProcesses": ["tig", "mig", "smaw"]
+      "relatedDefects": [
+        "crack"
+      ],
+      "relatedProcesses": [
+        "tig",
+        "mig",
+        "smaw"
+      ]
     },
     {
       "id": "filler-sticking",
@@ -552,7 +617,9 @@
         }
       ],
       "relatedDefects": [],
-      "relatedProcesses": ["tig"]
+      "relatedProcesses": [
+        "tig"
+      ]
     },
     {
       "id": "low-sulfur-effect",
@@ -587,8 +654,12 @@
           "detail": "자재 성적서(Mill Certificate)에서 S 함량 확인. 0.005% 미만이면 로우셀파 주의. 용접 전 WPS에 반영할 것"
         }
       ],
-      "relatedDefects": ["lack-of-penetration"],
-      "relatedProcesses": ["tig"]
+      "relatedDefects": [
+        "lack-of-penetration"
+      ],
+      "relatedProcesses": [
+        "tig"
+      ]
     },
     {
       "id": "sensitization-issue",
@@ -623,8 +694,56 @@
           "detail": "BA 제품은 이미 고용화 처리된 상태. 용접으로 예민화되면 BA 효과 상실. 입열 최소화 + 펄스 + 빠른 속도가 핵심"
         }
       ],
-      "relatedDefects": ["crack"],
-      "relatedProcesses": ["tig", "mig"]
+      "relatedDefects": [
+        "crack"
+      ],
+      "relatedProcesses": [
+        "tig",
+        "mig"
+      ]
+    },
+    {
+      "symptom": "엘보와 튜브 양측 측정 시 높이 불일치 및 플랜지 평행도 불량",
+      "product": "4인치 SST(316L) 엘보-튜브-플랜지 어셈블리",
+      "drawingInfo": "0051-31305_03_D",
+      "category": "치수",
+      "urgency": "medium",
+      "description": "도면 0051-31305_03_D에 따라 제작된 11개 제품 중 3개에서 측정 위치에 따른 높이 편차가 발생하였으며, 이는 플랜지 평행도 및 취부 각도 오차에 기인함.",
+      "quickFixes": [
+        "용접 전 양방향 높이 동시 측정 및 교정",
+        "정밀 지그를 사용한 플랜지 평행도 고정",
+        "취부 시 튜브 컷팅면 각도 재확인"
+      ],
+      "causes": [
+        "재료의 잔류 응력에 의한 용접 변형",
+        "취부 시 튜브와 플랜지 간의 미세 각도 어긋남",
+        "플랜지 자체의 평행도 공차 누적"
+      ],
+      "detailedSolutions": [
+        {
+          "action": "치수 검사 표준화",
+          "detail": "한쪽 측면이 아닌 엘보와 튜브 양측 전체 높이를 모두 측정하여 공차(10.16~10.22) 내에 들어오는지 전수 검사 실시."
+        },
+        {
+          "action": "취부 공정 개선",
+          "detail": "튜브 컷팅 후 직각도를 정밀하게 체크하고, 가용접(Tack weld) 단계에서 대칭 방향으로 구속력을 확보하여 각도 틀어짐 방지."
+        },
+        {
+          "action": "응력 완화 조치",
+          "detail": "용접 입열량을 최소화하고 대칭 용접법을 적용하여 잔류 응력에 의한 최종 치수 변형을 제어."
+        }
+      ],
+      "relatedDefects": [
+        "distortion-issue"
+      ],
+      "relatedProcesses": [
+        "tig"
+      ],
+      "id": "field-exp-0328",
+      "icon": "📏",
+      "source": "현장",
+      "date": "2026-03-28",
+      "image": "images/field/field-exp-0328.jpg"
     }
   ]
 }
