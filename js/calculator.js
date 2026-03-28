@@ -1282,6 +1282,175 @@ const Calculator = {
       </div>
     `);
   }
+  // ===== 11. 공학 계산기 (용접 특화) =====
+  _sciExpr: '',
+  _sciAngleMode: 'deg',
+
+  _sci(cmd) {
+    switch (cmd) {
+      case 'clear':
+        this._sciExpr = '';
+        document.getElementById('sciExprLine').textContent = '';
+        break;
+      case 'del': {
+        const fns = ['sin(', 'cos(', 'tan(', '√('];
+        const match = fns.find(f => this._sciExpr.endsWith(f));
+        this._sciExpr = this._sciExpr.slice(0, -(match ? match.length : 1));
+        break;
+      }
+      case 'eval': {
+        const result = this._sciEvalExpr();
+        if (result !== 'Error') {
+          document.getElementById('sciExprLine').textContent = this._sciExpr + ' =';
+          this._sciExpr = String(result);
+        }
+        break;
+      }
+      case 'negate':
+        if (this._sciExpr === '' || this._sciExpr === '0') { this._sciExpr = '-'; }
+        else if (this._sciExpr.startsWith('-')) { this._sciExpr = this._sciExpr.slice(1); }
+        else { this._sciExpr = '-' + this._sciExpr; }
+        break;
+      case 'angle':
+        this._sciAngleMode = this._sciAngleMode === 'deg' ? 'rad' : 'deg';
+        document.getElementById('sciAngleBtn').textContent = this._sciAngleMode.toUpperCase();
+        break;
+      case 'paren': {
+        const o = (this._sciExpr.match(/\(/g) || []).length;
+        const c = (this._sciExpr.match(/\)/g) || []).length;
+        this._sciExpr += o > c ? ')' : '(';
+        break;
+      }
+      default:
+        this._sciExpr += cmd;
+    }
+    this._sciUpdateDisplay();
+  },
+
+  _sciUpdateDisplay() {
+    const el = document.getElementById('sciResultLine');
+    if (!el) return;
+    if (!this._sciExpr) { el.textContent = '0'; return; }
+    const live = this._sciEvalExpr();
+    el.textContent = live !== 'Error' ? this._sciFormatNum(live) : this._sciExpr;
+  },
+
+  _sciEvalExpr() {
+    let e = this._sciExpr;
+    if (!e) return 0;
+    e = e.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-').replace(/\^/g, '**');
+    e = e.replace(/π/g, '(Math.PI)');
+    e = e.replace(/√\(/g, '_sq(');
+    e = e.replace(/sin\(/g, '_si(');
+    e = e.replace(/cos\(/g, '_co(');
+    e = e.replace(/tan\(/g, '_ta(');
+    const d = this._sciAngleMode === 'deg';
+    const k = Math.PI / 180;
+    try {
+      return new Function('_si', '_co', '_ta', '_sq',
+        'return ' + e
+      )(
+        d ? x => Math.sin(x * k) : Math.sin,
+        d ? x => Math.cos(x * k) : Math.cos,
+        d ? x => Math.tan(x * k) : Math.tan,
+        Math.sqrt
+      );
+    } catch { return 'Error'; }
+  },
+
+  _sciFormatNum(n) {
+    if (typeof n !== 'number' || !isFinite(n)) return 'Error';
+    if (Number.isInteger(n) && Math.abs(n) < 1e12) return n.toLocaleString();
+    if (Math.abs(n) < 0.0001 || Math.abs(n) >= 1e10) return n.toExponential(6);
+    return parseFloat(n.toPrecision(10)).toString();
+  },
+
+  // --- 용접 공식: 펄스 전류 ---
+  calcSciCurrent() {
+    const peak = parseFloat(document.getElementById('sciPeak').value);
+    const bgPct = parseFloat(document.getElementById('sciBG').value) / 100;
+    const duty = parseFloat(document.getElementById('sciDuty').value) / 100;
+    if (isNaN(peak) || isNaN(bgPct) || isNaN(duty)) {
+      this._showResult('result-scicurrent', '<p class="calc-result__error">모든 값을 입력하세요</p>');
+      return;
+    }
+    const bg = peak * bgPct;
+    const iAvg = peak * duty + bg * (1 - duty);
+    const iRMS = Math.sqrt(peak * peak * duty + bg * bg * (1 - duty));
+    const ratio = bgPct > 0 ? this._round(1 / bgPct, 1) : '∞';
+    this._showResult('result-scicurrent', `
+      <div class="calc-result__grid" style="margin-top:0.5rem;">
+        <div class="calc-result__item calc-result__item--primary">
+          <span class="calc-result__label">RMS 전류</span>
+          <span class="calc-result__value">${this._round(iRMS, 1)} A</span>
+          <span class="calc-result__sub">용접기 디스플레이</span>
+        </div>
+        <div class="calc-result__item">
+          <span class="calc-result__label">산술 평균</span>
+          <span class="calc-result__value">${this._round(iAvg, 1)} A</span>
+          <span class="calc-result__sub">열입력 계산용</span>
+        </div>
+        <div class="calc-result__item">
+          <span class="calc-result__label">BG 전류</span>
+          <span class="calc-result__value">${this._round(bg, 1)} A</span>
+          <span class="calc-result__sub">Peak:BG = ${ratio}:1</span>
+        </div>
+      </div>
+      <p class="calc-result__note">RMS = √(Peak²×D + BG²×(1-D)) · 평균 = Peak×D + BG×(1-D)</p>`);
+  },
+
+  // --- 용접 공식: 열입력 ---
+  calcSciHeatInput() {
+    const v = parseFloat(document.getElementById('sciHIVolt').value);
+    const i = parseFloat(document.getElementById('sciHIAmp').value);
+    const spd = parseFloat(document.getElementById('sciHISpeed').value);
+    if (isNaN(v) || isNaN(i) || isNaN(spd) || spd <= 0) {
+      this._showResult('result-sciheat', '<p class="calc-result__error">모든 값을 입력하세요</p>');
+      return;
+    }
+    const hJ = (v * i * 60) / spd;
+    const hKJ = hJ / 1000;
+    const color = hKJ <= 0.5 ? '#16a34a' : hKJ <= 1.0 ? '#ea580c' : '#dc2626';
+    const label = hKJ <= 0.3 ? '최적' : hKJ <= 0.5 ? '양호' : hKJ <= 1.0 ? '주의 (변형 가능)' : '위험 (열변형)';
+    this._showResult('result-sciheat', `
+      <div class="calc-result__grid" style="margin-top:0.5rem;">
+        <div class="calc-result__item calc-result__item--primary">
+          <span class="calc-result__label">열입력</span>
+          <span class="calc-result__value" style="color:${color}">${this._round(hKJ, 3)} kJ/mm</span>
+          <span class="calc-result__sub">${label}</span>
+        </div>
+        <div class="calc-result__item">
+          <span class="calc-result__label">J/mm</span>
+          <span class="calc-result__value">${this._round(hJ, 1)}</span>
+        </div>
+      </div>
+      <p class="calc-result__note">HI = (V × I × 60) / Speed(mm/min) / 1000 · STS ≤0.5 kJ/mm 권장</p>`);
+  },
+
+  // --- 용접 공식: 속도 변환 ---
+  calcSciSpeed() {
+    const ipm = parseFloat(document.getElementById('sciIPM').value) || 0;
+    const rpm = parseFloat(document.getElementById('sciRPM2').value) || 0;
+    const od = parseFloat(document.getElementById('sciOD').value);
+    if (isNaN(od) || od <= 0) {
+      this._showResult('result-scispeed', '<p class="calc-result__error">OD를 입력하세요</p>');
+      return;
+    }
+    const circ = Math.PI * od;
+    let rIPM, rRPM, rMM;
+    if (ipm > 0) { rIPM = ipm; rRPM = ipm / circ; }
+    else if (rpm > 0) { rRPM = rpm; rIPM = rpm * circ; }
+    else { this._showResult('result-scispeed', '<p class="calc-result__error">IPM 또는 RPM을 입력하세요</p>'); return; }
+    rMM = rIPM * 25.4;
+    const wt = rRPM > 0 ? 60 / rRPM : 0;
+    this._showResult('result-scispeed', `
+      <div class="calc-result__grid" style="margin-top:0.5rem;">
+        <div class="calc-result__item"><span class="calc-result__label">IPM</span><span class="calc-result__value">${this._round(rIPM, 2)}</span></div>
+        <div class="calc-result__item"><span class="calc-result__label">RPM</span><span class="calc-result__value">${this._round(rRPM, 3)}</span></div>
+        <div class="calc-result__item"><span class="calc-result__label">mm/min</span><span class="calc-result__value">${this._round(rMM, 1)}</span></div>
+      </div>
+      <p class="calc-result__note">1회전: ${this._round(wt, 1)}초 · 원주: ${this._round(circ * 25.4, 1)}mm · IPM = RPM × π × OD</p>`);
+  }
 };
 
 document.addEventListener('DOMContentLoaded', () => Calculator.init());
