@@ -68,13 +68,14 @@
         },
         {
           "material": "316L BA 파이프 (LOD)",
-          "thickness": "6mm (Sch.40)",
-          "current": "130~160A",
+          "thickness": "6mm (Sch.40, 0.236\")",
+          "current": "210~260A",
           "voltage": "11~15V",
           "gasFlow": "10~15 L/min",
           "electrode": "WCe20 2.4mm",
           "fillerWire": "ER316L 2.4mm",
-          "notes": "로우셀파 주의. BA 변색 관리. 백퍼지 10~15 L/min. 층간온도 150℃ 이하."
+          "travelSpeed": "4~7 IPM (평균 5)",
+          "notes": "1A/mil 기준 236A. 로우셀파 시 +10~15%. BA 변색 관리. 백퍼지 10~15 L/min. 층간온도 150℃ 이하."
         },
         {
           "material": "알루미늄 6061",
