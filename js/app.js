@@ -84,12 +84,18 @@ const App = {
 
     // 트러블슈팅 카드는 특별 처리
     if (item._type === 'troubleshooting') {
+      const fieldBadge = item.source === '현장' ? '<span class="card__field-badge">🏭 현장</span>' : '';
+      const dateBadge = item.date ? `<span class="card__date">${item.date}</span>` : '';
+      const thumbImg = item.image ? `<div class="card__thumb"><img src="${item.image}" alt="" loading="lazy"></div>` : '';
+
       return `
-        <div class="card card--trouble" data-type="${item._type}" data-id="${item.id}">
+        <div class="card card--trouble ${item.source === '현장' ? 'card--field' : ''}" data-type="${item._type}" data-id="${item.id}">
           <div class="card__header">
             <span class="card__title">${item.icon} ${item.symptom}</span>
             <span class="card__tag card__tag--trouble card__tag--${item.urgency}">${item.urgency === 'critical' ? '긴급' : item.urgency === 'high' ? '중요' : item.urgency === 'medium' ? '보통' : '참고'}</span>
           </div>
+          ${fieldBadge || dateBadge ? `<div class="card__field-info">${fieldBadge}${dateBadge}</div>` : ''}
+          ${thumbImg}
           <div class="card__summary">${item.description}</div>
           <div class="card__quickfix">
             <strong>즉시 조치:</strong> ${item.quickFixes[0]}
