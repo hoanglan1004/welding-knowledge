@@ -1344,6 +1344,10 @@ const Calculator = {
   _sciEvalExpr() {
     let e = this._sciExpr;
     if (!e) return 0;
+    // 열린 괄호 자동 닫기 (실시간 미리보기용)
+    const opens = (e.match(/\(/g) || []).length;
+    const closes = (e.match(/\)/g) || []).length;
+    e += ')'.repeat(opens - closes);
     e = e.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-').replace(/\^/g, '**');
     e = e.replace(/π/g, '(Math.PI)');
     e = e.replace(/√\(/g, '_sq(');
