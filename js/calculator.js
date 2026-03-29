@@ -1299,10 +1299,16 @@ const Calculator = {
         break;
       }
       case 'eval': {
+        // 열린 괄호 자동 닫기
+        const opens = (this._sciExpr.match(/\(/g) || []).length;
+        const closes = (this._sciExpr.match(/\)/g) || []).length;
+        this._sciExpr += ')'.repeat(opens - closes);
         const result = this._sciEvalExpr();
         if (result !== 'Error') {
           document.getElementById('sciExprLine').textContent = this._sciExpr + ' =';
           this._sciExpr = String(result);
+        } else {
+          document.getElementById('sciResultLine').textContent = 'Error';
         }
         break;
       }
