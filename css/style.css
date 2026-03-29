@@ -1371,3 +1371,94 @@ a:hover {
   color: var(--color-text-light);
   margin-top: 0.5rem;
 }
+
+/* ============================================
+   현장 기록 전용 카드 (타임라인 뷰)
+   분류 필터 "내 현장 기록" 선택 시 표시
+   ============================================ */
+
+.card--field-log {
+  background: #fff;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.15s;
+  border-left: 4px solid #e67e22;
+}
+
+.card--field-log:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+
+.field-log__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 1rem;
+  background: #fef9f3;
+  border-bottom: 1px solid #f0dcc4;
+}
+
+.field-log__date {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--color-primary);
+}
+
+.field-log__urgency {
+  font-size: 0.8rem;
+  color: var(--color-text-light);
+}
+
+.field-log__image {
+  width: 100%;
+  max-height: 220px;
+  overflow: hidden;
+  background: #f0f0f0;
+}
+
+.field-log__image img {
+  width: 100%;
+  height: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  display: block;
+}
+
+.field-log__body {
+  padding: 0.75rem 1rem 1rem;
+}
+
+.field-log__symptom {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 0.4rem;
+}
+
+.field-log__product,
+.field-log__drawing {
+  font-size: 0.8rem;
+  color: var(--color-accent);
+  margin-bottom: 0.2rem;
+  font-weight: 600;
+}
+
+.field-log__desc {
+  font-size: 0.85rem;
+  color: var(--color-text-light);
+  line-height: 1.5;
+  margin: 0.4rem 0;
+}
+
+.field-log__fix {
+  font-size: 0.8rem;
+  color: var(--color-text);
+  background: #f8f9fa;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  margin-top: 0.5rem;
+  border-left: 3px solid var(--color-success);
+}
