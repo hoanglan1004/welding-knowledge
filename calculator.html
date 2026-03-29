@@ -519,6 +519,144 @@
             <p class="calc-formula__tip">유속이 너무 빠르면 난류 → 공기 재유입. 너무 느리면 시간 낭비. 층류(0.1~0.3 m/s)를 유지하는 게 핵심.</p>
           </div>
         </details>
+
+        <!-- ═══ 퍼지 참조 데이터 (산업 표준 기반) ═══ -->
+        <div class="purge-ref" style="margin-top:1.5rem;">
+
+          <!-- 1. 유량 설정표 -->
+          <details class="calc-formula" open>
+            <summary>📊 사이즈별 퍼징 유량표 (L/min)</summary>
+            <div class="calc-formula__content">
+              <p class="calc-formula__tip" style="margin-bottom:0.75rem;">난기류(Turbulence) 방지를 위해 사전 퍼징 유량은 <strong>20~25 L/min을 넘기지 않는 것</strong>이 기술 표준 권장. 유량을 그 이상 높이면 가스만 낭비되고 퍼징 시간은 오히려 늘어남.</p>
+              <div style="overflow-x:auto;">
+                <table class="settings-table" style="font-size:0.82rem;">
+                  <thead>
+                    <tr>
+                      <th>파이프 규격</th>
+                      <th>외경</th>
+                      <th>1단계: 사전 퍼징<br>(Pre-Purge)</th>
+                      <th>2단계: 용접 중 유지<br>(Welding Flow)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>0.5"</td><td>약 15mm</td><td>3 ~ 5</td><td>1 ~ 2</td></tr>
+                    <tr><td><strong>1.0"</strong></td><td>약 25mm</td><td>5 ~ 10</td><td>2 ~ 3</td></tr>
+                    <tr><td>1.5"</td><td>약 40mm</td><td>8 ~ 12</td><td>2.5 ~ 4</td></tr>
+                    <tr><td><strong>2.0"</strong></td><td>약 50mm</td><td>10 ~ 15</td><td>3 ~ 5</td></tr>
+                    <tr><td>2.5"</td><td>약 65mm</td><td>12 ~ 16</td><td>3.5 ~ 5.5</td></tr>
+                    <tr><td>3.0"</td><td>약 80mm</td><td>13 ~ 18</td><td>4 ~ 6</td></tr>
+                    <tr><td><strong>4.0"</strong></td><td>약 100mm</td><td>15 ~ 20</td><td>5 ~ 7</td></tr>
+                    <tr><td>5.0"</td><td>약 125mm</td><td>17 ~ 22</td><td>6 ~ 8.5</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p style="font-size:0.75rem; color:#7f8c8d; margin-top:0.4rem;">※ 굵은 글씨(1", 2", 4")는 기준 데이터, 나머지는 비례 보간 산출 안전 범위</p>
+              <div style="background:#eef7ff; border-left:3px solid #3498db; padding:0.6rem 0.8rem; border-radius:4px; margin-top:0.6rem;">
+                <strong>💡 10% 유량 공식</strong> (현장 즉석 계산)<br>
+                <code style="font-size:0.9rem; background:#d6eaf8; padding:2px 6px; border-radius:3px;">유량(L/min) = 파이프 내경(mm) × 10%</code><br>
+                <span style="font-size:0.8rem; color:#555;">예: 2"(50mm) → 5 L/min / 4"(100mm) → 10 L/min<br>
+                → 용접 중 최대 유량 한계치 또는 난기류 방지 안전 유량의 기준점</span>
+              </div>
+            </div>
+          </details>
+
+          <!-- 2. 배출구 사이즈표 -->
+          <details class="calc-formula">
+            <summary>📊 배출구(Vent/Restrictor) 사이즈표</summary>
+            <div class="calc-formula__content">
+              <p class="calc-formula__tip" style="margin-bottom:0.75rem;">SEMI F78 규격 + Swagelok 기술 가이드라인 종합. 배출구가 너무 작으면 배압 발생, 너무 크면 차폐 효과 감소.</p>
+              <div style="overflow-x:auto;">
+                <table class="settings-table" style="font-size:0.82rem;">
+                  <thead>
+                    <tr>
+                      <th>파이프 OD (인치)</th>
+                      <th>파이프 OD (mm)</th>
+                      <th>배출구 (인치)</th>
+                      <th>배출구 (mm)</th>
+                      <th>출처</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>1/4"</td><td>6.35</td><td>1/8"</td><td>3</td><td>공통</td></tr>
+                    <tr><td>3/8"</td><td>9.53</td><td>1/8"</td><td>3</td><td>공통</td></tr>
+                    <tr><td>1/2"</td><td>12.7</td><td>1/4"</td><td>6</td><td>공통</td></tr>
+                    <tr><td>3/4"</td><td>19.05</td><td>1/4"</td><td>6</td><td>공통</td></tr>
+                    <tr><td>1"</td><td>25.4</td><td>1/4"~3/8"</td><td>6~10</td><td>Swagelok / SEMI</td></tr>
+                    <tr><td>1.5"</td><td>38.1</td><td>1/4"~3/8"</td><td>6~10</td><td>Swagelok / SEMI</td></tr>
+                    <tr><td>2"</td><td>50.8</td><td>3/8"~1/2"</td><td>10~12</td><td>Swagelok / SEMI</td></tr>
+                    <tr><td>2.5"</td><td>63.5</td><td>1/2"</td><td>12</td><td>보간</td></tr>
+                    <tr><td>3"</td><td>76.2</td><td>1/2"</td><td>12</td><td>공통</td></tr>
+                    <tr><td>4"</td><td>101.6</td><td>3/4"</td><td>20</td><td>공통</td></tr>
+                    <tr><td>5"</td><td>127.0</td><td>3/4"</td><td>20</td><td>보간</td></tr>
+                    <tr><td>6"</td><td>152.4</td><td>3/4"</td><td>20</td><td>SEMI F78</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </details>
+
+          <!-- 3. 퍼징 시간표 -->
+          <details class="calc-formula">
+            <summary>📊 사전 퍼징 시간표 (5체적 교환 기준)</summary>
+            <div class="calc-formula__content">
+              <p class="calc-formula__tip" style="margin-bottom:0.75rem;">산업 표준: 파이프 내부 부피의 <strong>최소 5~6배</strong> 가스를 교환해야 완벽한 공기 치환. 기준 유량 25 CFH (약 12 L/min).</p>
+
+              <p style="font-weight:700; margin-bottom:0.3rem;">길이 500mm 기준 퍼징 시간</p>
+              <div style="overflow-x:auto;">
+                <table class="settings-table" style="font-size:0.82rem;">
+                  <thead>
+                    <tr>
+                      <th>파이프 OD</th>
+                      <th>1ft당 소요</th>
+                      <th>500mm 기준 총 시간</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>0.5"</td><td>1초</td><td>약 2초</td></tr>
+                    <tr><td>1.0"</td><td>4초</td><td>약 7초</td></tr>
+                    <tr><td>1.5"</td><td>9초</td><td>약 15초</td></tr>
+                    <tr><td>2.0"</td><td>16초</td><td>약 26초</td></tr>
+                    <tr><td>2.5"</td><td>25초</td><td>약 41초</td></tr>
+                    <tr><td>3.0"</td><td>35초</td><td>약 57초</td></tr>
+                    <tr><td>4.0"</td><td>63초</td><td>1분 43초</td></tr>
+                    <tr><td>5.0"</td><td>98초</td><td>2분 40초</td></tr>
+                    <tr><td>6.0"</td><td>141초</td><td>3분 51초</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <p style="font-weight:700; margin-top:1rem; margin-bottom:0.3rem;">일반 스풀/국소 퍼징 최소 시간 (안전 기준)</p>
+              <div style="overflow-x:auto;">
+                <table class="settings-table" style="font-size:0.82rem;">
+                  <thead>
+                    <tr><th>파이프 NPS</th><th>최소 사전 퍼징 시간</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>2" 이하</td><td>30초</td></tr>
+                    <tr><td>4"</td><td>2분</td></tr>
+                    <tr><td>6"</td><td>4분</td></tr>
+                    <tr><td>8"</td><td>7분</td></tr>
+                    <tr><td>10"</td><td>10분</td></tr>
+                    <tr><td>12"</td><td>15분</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div style="background:#eef7ff; border-left:3px solid #3498db; padding:0.6rem 0.8rem; border-radius:4px; margin-top:0.8rem;">
+                <strong>🧮 퍼징 시간 현장 공식</strong> (MCAA 배관접합협회)<br>
+                <code style="font-size:0.9rem; background:#d6eaf8; padding:2px 6px; border-radius:3px;">퍼징 시간(분) = [4 × OD(inch) × 길이(ft)] ÷ 유량(CFH)</code><br>
+                <span style="font-size:0.8rem; color:#555;">※ CFH = L/min × 2.1<br>
+                예: 4"×1.64ft, 25CFH → (4×4×1.64)÷25 = 약 1분 3초</span>
+              </div>
+
+              <div style="background:#fef3f3; border-left:3px solid #e74c3c; padding:0.6rem 0.8rem; border-radius:4px; margin-top:0.6rem;">
+                <strong>🚨 주의</strong>: 시간표는 공기 유입 없는 이상적 조건 기준의 추정치.<br>
+                <span style="font-size:0.85rem;">루트 갭 틈새, 테이프 마감 불량 시 훨씬 오래 걸림. 첫 작업 시 <strong>산소 농도 측정기</strong>로 70ppm 이하 확인 후 시간 확립할 것.</span>
+              </div>
+            </div>
+          </details>
+
+        </div>
       </section>
       <!-- 11. 공학 계산기 (용접 특화) -->
       <section class="calc-panel calc-panel--active" id="panel-engcalc">
