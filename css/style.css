@@ -1238,3 +1238,136 @@ a:hover {
     font-size: 0.7rem;
   }
 }
+
+/* ============================================
+   현장 경험 (Field Experience)
+   텔레그램 /현장 명령으로 추가된 항목 스타일
+   ============================================ */
+
+/* 카드 - 현장 경험 뱃지 */
+.card--field {
+  border-left-color: #e67e22;
+}
+
+.card__field-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 1rem;
+  margin-top: -0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.card__field-badge {
+  font-size: 0.7rem;
+  background: #e67e22;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.card__date {
+  font-size: 0.7rem;
+  color: var(--color-text-light);
+}
+
+/* 카드 - 이미지 썸네일 */
+.card__thumb {
+  padding: 0 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.card__thumb img {
+  width: 100%;
+  max-height: 160px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  border: 1px solid #e0e0e0;
+}
+
+/* 상세 페이지 - 뱃지 영역 */
+.ts-detail__badges {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.detail__category--field {
+  background: #e67e22 !important;
+}
+
+.detail__category--date {
+  background: #7f8c8d !important;
+  font-size: 0.75rem;
+}
+
+/* 상세 페이지 - 현장 메타 정보 (제품, 도면번호) */
+.field-meta {
+  background: #fef9f3;
+  border: 1px solid #f0dcc4;
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.field-meta__item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+}
+
+.field-meta__label {
+  font-weight: 700;
+  font-size: 0.85rem;
+  min-width: 60px;
+}
+
+.field-meta__value {
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+/* 상세 페이지 - 도면/사진 이미지 */
+.field-image-wrapper {
+  text-align: center;
+}
+
+.field-image {
+  max-width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+  border-radius: var(--radius);
+  border: 2px solid #e0e0e0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.field-image:hover {
+  border-color: var(--color-primary-light);
+  box-shadow: var(--shadow-hover);
+}
+
+.field-image--expanded {
+  max-height: none;
+  position: fixed;
+  top: 5vh;
+  left: 5vw;
+  width: 90vw;
+  max-width: 90vw;
+  max-height: 90vh;
+  z-index: 1000;
+  background: #fff;
+  padding: 8px;
+  border: 3px solid var(--color-primary);
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7);
+}
+
+.field-image__hint {
+  font-size: 0.75rem;
+  color: var(--color-text-light);
+  margin-top: 0.5rem;
+}
