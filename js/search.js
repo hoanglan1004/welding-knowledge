@@ -25,9 +25,14 @@ const Search = {
     const typeFilter = document.getElementById('typeFilter').value;
     const processFilter = document.getElementById('processFilter').value;
 
-    const filtered = DataLoader.allItems.filter(item => {
+    let filtered = DataLoader.allItems.filter(item => {
       // 1. 분류 필터
-      if (typeFilter !== 'all' && item._type !== typeFilter) return false;
+      if (typeFilter === 'field') {
+        // 현장 경험만 표시
+        if (item.source !== '현장') return false;
+      } else if (typeFilter !== 'all' && item._type !== typeFilter) {
+        return false;
+      }
 
       // 2. 용접 종류 필터
       if (processFilter !== 'all' && !this._matchesProcess(item, processFilter)) return false;
@@ -41,7 +46,12 @@ const Search = {
       return true;
     });
 
-    App.renderCards(filtered);
+    // 현장 기록은 최신순 정렬
+    if (typeFilter === 'field') {
+      filtered.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    }
+
+    App.renderCards(filtered, typeFilter === 'field');
   },
 
   _matchesProcess(item, processId) {
