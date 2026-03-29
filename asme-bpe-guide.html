@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASME BPE 쉬운 학습 - 반도체 배관의 비밀</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0e17;
+    --card: #131926;
+    --border: #1e2a3a;
+    --text: #e8edf5;
+    --dim: #6b7b95;
+    --orange: #ff6b35;
+    --orange-glow: rgba(255, 107, 53, 0.15);
+    --cyan: #00d4ff;
+    --cyan-glow: rgba(0, 212, 255, 0.12);
+    --green: #34d399;
+    --red: #f87171;
+    --yellow: #fbbf24;
+  }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    user-select: none;
+  }
+
+  /* ── Slide Container ── */
+  .slide-container {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 80px;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .slide.active {
+    display: flex;
+    opacity: 1;
+  }
+
+  /* ── Navigation ── */
+  .nav-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    background: rgba(10, 14, 23, 0.95);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+
+  .nav-bar .progress-track {
+    flex: 1;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 0 24px;
+    overflow: hidden;
+  }
+
+  .nav-bar .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--orange), var(--cyan));
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  .nav-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--dim);
+    font-size: 14px;
+    padding: 8px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: all 0.2s;
+  }
+
+  .nav-btn:hover {
+    border-color: var(--orange);
+    color: var(--orange);
+  }
+
+  .page-num {
+    color: var(--dim);
+    font-size: 13px;
+    min-width: 70px;
+    text-align: center;
+    font-weight: 300;
+  }
+
+  /* ── Typography ── */
+  .slide-title {
+    font-size: 42px;
+    font-weight: 900;
+    margin-bottom: 40px;
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  .slide-title .accent { color: var(--orange); }
+  .slide-title .cyan { color: var(--cyan); }
+
+  .slide-subtitle {
+    font-size: 20px;
+    color: var(--dim);
+    margin-top: -28px;
+    margin-bottom: 40px;
+    text-align: center;
+    font-weight: 300;
+  }
+
+  .big-text {
+    font-size: 28px;
+    line-height: 1.8;
+    text-align: center;
+    max-width: 800px;
+    font-weight: 300;
+  }
+
+  .big-text strong { color: var(--orange); font-weight: 700; }
+  .big-text .cyan { color: var(--cyan); }
+
+  .analogy {
+    background: var(--orange-glow);
+    border: 1px solid rgba(255, 107, 53, 0.3);
+    border-radius: 16px;
+    padding: 24px 36px;
+    margin-top: 32px;
+    font-size: 22px;
+    max-width: 700px;
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  .analogy::before {
+    content: '💡 쉽게 말하면';
+    display: block;
+    font-size: 14px;
+    color: var(--orange);
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: 2px;
+  }
+
+  /* ── Cards Grid ── */
+  .cards {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 1100px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    flex: 1;
+    min-width: 240px;
+    max-width: 320px;
+  }
+
+  .card-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+  }
+
+  .card h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--orange);
+  }
+
+  .card p {
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--dim);
+  }
+
+  .card.cyan-card { border-color: rgba(0, 212, 255, 0.3); }
+  .card.cyan-card h3 { color: var(--cyan); }
+
+  .card.green-card { border-color: rgba(52, 211, 153, 0.3); }
+  .card.green-card h3 { color: var(--green); }
+
+  .card.red-card { border-color: rgba(248, 113, 113, 0.3); }
+  .card.red-card h3 { color: var(--red); }
+
+  /* ── SVG Diagrams ── */
+  .diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 48px;
+    flex-wrap: wrap;
+  }
+
+  .diagram svg { flex-shrink: 0; }
+
+  .diagram-label {
+    font-size: 18px;
+    max-width: 420px;
+    line-height: 1.8;
+  }
+
+  .diagram-label h3 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  /* ── Comparison Table ── */
+  .compare-table {
+    border-collapse: collapse;
+    font-size: 16px;
+    margin-top: 24px;
+  }
+
+  .compare-table th {
+    background: var(--card);
+    padding: 14px 28px;
+    text-align: center;
+    font-weight: 700;
+    border: 1px solid var(--border);
+    color: var(--orange);
+    font-size: 17px;
+  }
+
+  .compare-table td {
+    padding: 12px 28px;
+    text-align: center;
+    border: 1px solid var(--border);
+    color: var(--dim);
+  }
+
+  .compare-table tr:hover td { background: rgba(255,255,255,0.03); }
+
+  .compare-table .highlight { color: var(--cyan); font-weight: 700; }
+  .compare-table .warn { color: var(--red); font-weight: 700; }
+
+  /* ── Steps (vertical) ── */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 700px;
+    width: 100%;
+  }
+
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 24px;
+  }
+
+  .step-num {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--orange);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .step-num.cyan-num { background: var(--cyan); color: var(--bg); }
+  .step-num.green-num { background: var(--green); color: var(--bg); }
+
+  .step-content h4 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .step-content p {
+    font-size: 15px;
+    color: var(--dim);
+    line-height: 1.6;
+  }
+
+  /* ── Visual Bars (roughness) ── */
+  .roughness-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    max-width: 600px;
+    width: 100%;
+  }
+
+  .rough-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .rough-label {
+    width: 100px;
+    font-weight: 700;
+    font-size: 15px;
+    text-align: right;
+  }
+
+  .rough-bar-track {
+    flex: 1;
+    height: 36px;
+    background: var(--card);
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid var(--border);
+  }
+
+  .rough-bar {
+    height: 100%;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    padding-left: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    color: rgba(0,0,0,0.7);
+    transition: width 1s ease;
+  }
+
+  .rough-value {
+    width: 120px;
+    font-size: 14px;
+    color: var(--dim);
+  }
+
+  /* ── Flow diagram ── */
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .flow-box {
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 22px;
+    text-align: center;
+    min-width: 130px;
+  }
+
+  .flow-box.active-box { border-color: var(--orange); }
+
+  .flow-box h4 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .flow-box p { font-size: 13px; color: var(--dim); }
+
+  .flow-arrow {
+    font-size: 24px;
+    color: var(--dim);
+  }
+
+  /* ── Checklist ── */
+  .checklist {
+    max-width: 600px;
+    width: 100%;
+  }
+
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 17px;
+    cursor: pointer;
+  }
+
+  .check-box {
+    width: 28px;
+    height: 28px;
+    border: 2px solid var(--dim);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .check-item.checked .check-box {
+    background: var(--green);
+    border-color: var(--green);
+  }
+
+  .check-item.checked .check-box::after {
+    content: '✓';
+    color: #fff;
+    font-weight: 900;
+    font-size: 16px;
+  }
+
+  /* ── Title slide special ── */
+  .title-slide {
+    background: radial-gradient(ellipse at center, rgba(255,107,53,0.08) 0%, transparent 70%);
+  }
+
+  .title-slide .main-title {
+    font-size: 56px;
+    font-weight: 900;
+    text-align: center;
+    line-height: 1.3;
+    margin-bottom: 20px;
+  }
+
+  .title-slide .main-sub {
+    font-size: 22px;
+    color: var(--dim);
+    text-align: center;
+    font-weight: 300;
+    margin-bottom: 48px;
+  }
+
+  .title-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 10px 24px;
+    font-size: 14px;
+    color: var(--dim);
+  }
+
+  /* ── Quiz ── */
+  .quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 600px;
+    width: 100%;
+    margin-top: 20px;
+  }
+
+  .quiz-opt {
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 24px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .quiz-opt:hover { border-color: var(--cyan); }
+  .quiz-opt.correct { border-color: var(--green); background: rgba(52,211,153,0.1); }
+  .quiz-opt.wrong { border-color: var(--red); background: rgba(248,113,113,0.1); }
+
+  .quiz-result {
+    margin-top: 16px;
+    font-size: 18px;
+    min-height: 28px;
+    text-align: center;
+  }
+
+  /* ── Pipe SVG Animation ── */
+  @keyframes flowParticle {
+    0% { transform: translateX(-20px); opacity: 0; }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { transform: translateX(320px); opacity: 0; }
+  }
+
+  .particle {
+    animation: flowParticle 3s linear infinite;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+
+  .pulse { animation: pulse-glow 2s ease infinite; }
+
+  /* ── Keyboard hint ── */
+  .key-hint {
+    position: fixed;
+    top: 16px;
+    right: 24px;
+    font-size: 12px;
+    color: var(--dim);
+    opacity: 0.5;
+    z-index: 100;
+  }
+
+  .key-hint kbd {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-family: monospace;
+    font-size: 11px;
+  }
+
+  /* ── Section indicator ── */
+  .section-tag {
+    position: absolute;
+    top: 24px;
+    left: 32px;
+    font-size: 12px;
+    color: var(--dim);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  /* ── Summary grid ── */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    max-width: 800px;
+    width: 100%;
+  }
+
+  .summary-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    text-align: center;
+  }
+
+  .summary-item .num {
+    font-size: 36px;
+    font-weight: 900;
+    color: var(--orange);
+    margin-bottom: 8px;
+  }
+
+  .summary-item .label {
+    font-size: 15px;
+    color: var(--dim);
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .slide { padding: 40px 24px; }
+    .slide-title { font-size: 28px; }
+    .title-slide .main-title { font-size: 36px; }
+    .big-text { font-size: 20px; }
+    .cards { flex-direction: column; align-items: center; }
+    .diagram { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<a href="index.html" style="position:fixed;top:16px;left:24px;z-index:100;color:var(--dim);text-decoration:none;font-size:14px;padding:6px 16px;border:1px solid var(--border);border-radius:8px;background:rgba(10,14,23,0.9);backdrop-filter:blur(8px);transition:all 0.2s;" onmouseover="this.style.borderColor='var(--orange)';this.style.color='var(--orange)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--dim)'">&larr; 용접 지식 백과</a>
+
+<div class="key-hint">
+  <kbd>&larr;</kbd> <kbd>&rarr;</kbd> 또는 클릭으로 이동
+</div>
+
+<div class="slide-container" id="slideContainer">
+
+<!-- ═══════════ SLIDE 1: 타이틀 ═══════════ -->
+<div class="slide title-slide active" data-section="">
+  <svg width="120" height="120" viewBox="0 0 120 120" style="margin-bottom: 24px;">
+    <circle cx="60" cy="60" r="55" fill="none" stroke="var(--orange)" stroke-width="2" opacity="0.3"/>
+    <circle cx="60" cy="60" r="40" fill="none" stroke="var(--orange)" stroke-width="1.5" opacity="0.5"/>
+    <!-- pipe cross section -->
+    <circle cx="60" cy="60" r="28" fill="none" stroke="var(--cyan)" stroke-width="3"/>
+    <circle cx="60" cy="60" r="22" fill="none" stroke="var(--cyan)" stroke-width="1" stroke-dasharray="3 3"/>
+    <text x="60" y="65" text-anchor="middle" fill="var(--orange)" font-size="16" font-weight="900">BPE</text>
+  </svg>
+  <div class="main-title">
+    반도체 배관의 <span style="color:var(--orange)">비밀</span>
+  </div>
+  <div class="main-sub">
+    ASME BPE 규격 — 세상에서 가장 깨끗한 파이프 만들기
+  </div>
+  <div class="title-badge">
+    <span style="color:var(--orange)">●</span> 초등학생도 이해할 수 있는 쉬운 학습 슬라이드
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 2: 왜 깨끗해야 할까? ═══════════ -->
+<div class="slide" data-section="왜 깨끗해야 할까?">
+  <span class="section-tag">Chapter 1 &mdash; 시작</span>
+  <div class="slide-title">먼지 하나가 <span class="accent">수십억 원</span>을 날린다</div>
+
+  <div class="diagram">
+    <svg width="300" height="240" viewBox="0 0 300 240">
+      <!-- chip -->
+      <rect x="50" y="40" width="200" height="160" rx="12" fill="var(--card)" stroke="var(--border)" stroke-width="2"/>
+      <rect x="90" y="70" width="120" height="100" rx="4" fill="none" stroke="var(--cyan)" stroke-width="1.5"/>
+      <!-- circuit lines -->
+      <line x1="100" y1="90" x2="200" y2="90" stroke="var(--cyan)" stroke-width="0.8" opacity="0.5"/>
+      <line x1="100" y1="110" x2="200" y2="110" stroke="var(--cyan)" stroke-width="0.8" opacity="0.5"/>
+      <line x1="100" y1="130" x2="200" y2="130" stroke="var(--cyan)" stroke-width="0.8" opacity="0.5"/>
+      <line x1="100" y1="150" x2="200" y2="150" stroke="var(--cyan)" stroke-width="0.8" opacity="0.5"/>
+      <line x1="130" y1="75" x2="130" y2="165" stroke="var(--cyan)" stroke-width="0.8" opacity="0.5"/>
+      <line x1="170" y1="75" x2="170" y2="165" stroke="var(--cyan)" stroke-width="0.8" opacity="0.5"/>
+      <!-- dust particle -->
+      <circle cx="155" cy="120" r="8" fill="var(--red)" opacity="0.8" class="pulse"/>
+      <text x="155" y="124" text-anchor="middle" fill="#fff" font-size="8" font-weight="900">먼지</text>
+      <!-- label -->
+      <text x="150" y="225" text-anchor="middle" fill="var(--dim)" font-size="14">반도체 칩 (5nm 회로)</text>
+    </svg>
+
+    <div class="diagram-label">
+      <h3>반도체 회로는 <span style="color:var(--orange)">머리카락의 1만분의 1</span></h3>
+      <p style="color:var(--dim); line-height:1.8; font-size:17px;">
+        반도체 칩 안의 회로는 <strong style="color:var(--cyan)">5나노미터</strong>.<br>
+        머리카락(50,000nm)의 <strong style="color:var(--orange)">1만분의 1</strong> 굵기야.<br><br>
+        이렇게 작으니까 <strong style="color:var(--red)">먼지 한 알</strong>만 붙어도<br>
+        칩이 망가져. 수십억 원이 날아가!
+      </p>
+    </div>
+  </div>
+
+  <div class="analogy">
+    수술실에 흙묻은 신발 신고 들어가면 안 되는 것처럼,<br>
+    반도체 공장의 배관도 <strong style="color:var(--orange)">극도로 깨끗</strong>해야 해!
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 3: ASME BPE가 뭐야? ═══════════ -->
+<div class="slide" data-section="ASME BPE란?">
+  <span class="section-tag">Chapter 1 &mdash; 시작</span>
+  <div class="slide-title">ASME BPE = <span class="accent">깨끗한 배관 규칙서</span></div>
+  <div class="slide-subtitle">BioProcessing Equipment Standard</div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">📏</div>
+      <h3>설계 규칙 (SD)</h3>
+      <p>어떤 재료를 쓰고, 배관을 어떻게 설계해야 하는지 정해놓은 규칙</p>
+    </div>
+    <div class="card cyan-card">
+      <div class="card-icon">✨</div>
+      <h3>표면 등급 (SF)</h3>
+      <p>배관 안쪽이 얼마나 매끄러워야 하는지 숫자로 정한 기준</p>
+    </div>
+    <div class="card green-card">
+      <div class="card-icon">🔧</div>
+      <h3>용접 규칙 (WS)</h3>
+      <p>용접을 어떻게 해야 하고, 어떻게 검사해야 하는지의 규칙</p>
+    </div>
+  </div>
+
+  <div class="analogy">
+    요리에 '레시피'가 있는 것처럼,<br>
+    깨끗한 배관을 만드는 <strong style="color:var(--orange)">'레시피(규격서)'</strong>가 ASME BPE야!
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 4: 배관 재료 - 316L ═══════════ -->
+<div class="slide" data-section="재료">
+  <span class="section-tag">Chapter 2 &mdash; 재료</span>
+  <div class="slide-title">왜 <span class="accent">316L</span>만 쓸까?</div>
+
+  <div class="diagram">
+    <svg width="280" height="220" viewBox="0 0 280 220">
+      <!-- pipe cross section -->
+      <ellipse cx="140" cy="110" rx="100" ry="80" fill="none" stroke="var(--dim)" stroke-width="2"/>
+      <ellipse cx="140" cy="110" rx="75" ry="60" fill="var(--card)" stroke="var(--cyan)" stroke-width="2"/>
+      <!-- shield layer -->
+      <ellipse cx="140" cy="110" rx="82" ry="65" fill="none" stroke="var(--green)" stroke-width="1.5" stroke-dasharray="6 3" opacity="0.6"/>
+      <!-- labels -->
+      <text x="140" y="105" text-anchor="middle" fill="var(--text)" font-size="18" font-weight="700">316L</text>
+      <text x="140" y="125" text-anchor="middle" fill="var(--dim)" font-size="12">스테인리스강</text>
+      <!-- arrows pointing to shield -->
+      <text x="250" y="60" fill="var(--green)" font-size="11" font-weight="700">크롬 보호막</text>
+      <line x1="220" y1="65" x2="200" y2="75" stroke="var(--green)" stroke-width="1" opacity="0.5"/>
+    </svg>
+
+    <div style="max-width:400px">
+      <div class="step" style="margin-bottom:14px">
+        <div class="step-num">Cr</div>
+        <div class="step-content">
+          <h4>크롬 16~18%</h4>
+          <p>녹 방지 보호막을 만드는 핵심 성분</p>
+        </div>
+      </div>
+      <div class="step" style="margin-bottom:14px">
+        <div class="step-num cyan-num">Mo</div>
+        <div class="step-content">
+          <h4>몰리브덴 2~3%</h4>
+          <p>구멍 부식(공식)을 막아주는 성분</p>
+        </div>
+      </div>
+      <div class="step" style="margin-bottom:14px">
+        <div class="step-num green-num">L</div>
+        <div class="step-content">
+          <h4>탄소 ≤ 0.03%</h4>
+          <p>L = Low Carbon. 용접해도 부식에 안 약해짐</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="analogy">
+    316L은 용접사에게 <strong style="color:var(--orange)">"최고급 방탄유리"</strong> 같은 거야.<br>
+    녹도 안 슬고, 용접해도 약해지지 않거든!
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 5: 표면 거칠기란? ═══════════ -->
+<div class="slide" data-section="표면 거칠기">
+  <span class="section-tag">Chapter 3 &mdash; 표면</span>
+  <div class="slide-title">표면 거칠기 <span class="accent">Ra</span>가 뭐야?</div>
+
+  <div class="diagram">
+    <svg width="500" height="200" viewBox="0 0 500 200">
+      <!-- rough surface -->
+      <text x="10" y="20" fill="var(--red)" font-size="14" font-weight="700">거친 표면 (Ra 높음)</text>
+      <path d="M10,70 l15,-25 l15,30 l20,-35 l15,40 l18,-28 l12,20 l20,-32 l15,25 l18,-20 l15,30 l20,-38 l15,33 l15,-25 l18,28 l15,-22 l20,30 l15,-35 l15,28"
+            fill="none" stroke="var(--red)" stroke-width="2.5"/>
+      <line x1="10" y1="70" x2="300" y2="70" stroke="var(--dim)" stroke-width="0.5" stroke-dasharray="4 4"/>
+      <text x="310" y="74" fill="var(--dim)" font-size="11">← 중심선</text>
+      <!-- bacteria -->
+      <circle cx="65" cy="55" r="4" fill="var(--red)" opacity="0.6"/>
+      <text x="65" y="44" text-anchor="middle" fill="var(--red)" font-size="9">세균</text>
+      <circle cx="150" cy="48" r="3" fill="var(--red)" opacity="0.6"/>
+      <circle cx="220" cy="52" r="5" fill="var(--red)" opacity="0.6"/>
+
+      <!-- smooth surface -->
+      <text x="10" y="130" fill="var(--green)" font-size="14" font-weight="700">매끄러운 표면 (Ra 낮음)</text>
+      <path d="M10,170 l15,-2 l15,3 l20,-2 l15,1 l18,-2 l12,3 l20,-1 l15,2 l18,-3 l15,1 l20,-2 l15,3 l15,-1 l18,2 l15,-2 l20,1 l15,-2 l15,3"
+            fill="none" stroke="var(--green)" stroke-width="2.5"/>
+      <line x1="10" y1="170" x2="300" y2="170" stroke="var(--dim)" stroke-width="0.5" stroke-dasharray="4 4"/>
+      <text x="310" y="174" fill="var(--dim)" font-size="11">← 중심선</text>
+      <!-- sparkle -->
+      <text x="100" y="158" fill="var(--green)" font-size="12">✦</text>
+      <text x="200" y="155" fill="var(--green)" font-size="10">✦</text>
+    </svg>
+
+    <div style="max-width:320px">
+      <p style="font-size:18px; line-height:1.8; color:var(--dim)">
+        <strong style="color:var(--text)">Ra</strong> = 표면의 <strong style="color:var(--orange)">울퉁불퉁한 정도</strong>를 숫자로 나타낸 것<br><br>
+        <strong style="color:var(--red)">Ra가 크면</strong> → 울퉁불퉁 → 더럽기 쉬움<br>
+        <strong style="color:var(--green)">Ra가 작으면</strong> → 매끈매끈 → 깨끗 유지
+      </p>
+    </div>
+  </div>
+
+  <div class="analogy">
+    빨대 안쪽이 울퉁불퉁하면 음료 찌꺼기가 끼지?<br>
+    배관도 똑같아! <strong style="color:var(--orange)">매끄러울수록 깨끗</strong>해!
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 6: SF 등급 ═══════════ -->
+<div class="slide" data-section="SF 등급">
+  <span class="section-tag">Chapter 3 &mdash; 표면</span>
+  <div class="slide-title">표면 등급 <span class="accent">SF1 ~ SF4</span></div>
+  <div class="slide-subtitle">숫자가 작을수록 더 매끈해!</div>
+
+  <div class="roughness-bars">
+    <div class="rough-row">
+      <div class="rough-label" style="color:var(--cyan)">SF1</div>
+      <div class="rough-bar-track">
+        <div class="rough-bar" style="width:12%; background: linear-gradient(90deg, var(--cyan), #0090aa);">거울</div>
+      </div>
+      <div class="rough-value"><strong style="color:var(--cyan)">≤ 0.2 μm</strong> 반도체</div>
+    </div>
+    <div class="rough-row">
+      <div class="rough-label" style="color:var(--green)">SF2</div>
+      <div class="rough-bar-track">
+        <div class="rough-bar" style="width:25%; background: linear-gradient(90deg, var(--green), #1a9a6a);">매끈</div>
+      </div>
+      <div class="rough-value"><strong style="color:var(--green)">≤ 0.4 μm</strong> 제약</div>
+    </div>
+    <div class="rough-row">
+      <div class="rough-label" style="color:var(--yellow)">SF3</div>
+      <div class="rough-bar-track">
+        <div class="rough-bar" style="width:50%; background: linear-gradient(90deg, var(--yellow), #d4990a);">보통</div>
+      </div>
+      <div class="rough-value"><strong style="color:var(--yellow)">≤ 0.8 μm</strong> 일반</div>
+    </div>
+    <div class="rough-row">
+      <div class="rough-label" style="color:var(--red)">SF4</div>
+      <div class="rough-bar-track">
+        <div class="rough-bar" style="width:100%; background: linear-gradient(90deg, var(--red), #c44);">거침</div>
+      </div>
+      <div class="rough-value"><strong style="color:var(--red)">≤ 1.6 μm</strong> 저가</div>
+    </div>
+  </div>
+
+  <div class="analogy" style="margin-top:28px;">
+    반도체 배관은 <strong style="color:var(--cyan)">SF1 (≤ 0.2 μm)</strong> 필수!<br>
+    거울보다 더 매끈한 수준이야
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 7: 전해연마 EP ═══════════ -->
+<div class="slide" data-section="전해연마">
+  <span class="section-tag">Chapter 3 &mdash; 표면</span>
+  <div class="slide-title"><span class="accent">전해연마(EP)</span> — 배관을 거울로!</div>
+
+  <div class="diagram">
+    <svg width="380" height="240" viewBox="0 0 380 240">
+      <!-- tank -->
+      <rect x="40" y="60" width="300" height="140" rx="8" fill="none" stroke="var(--border)" stroke-width="2"/>
+      <text x="190" y="50" text-anchor="middle" fill="var(--dim)" font-size="12">전해액 (인산 + 황산)</text>
+
+      <!-- liquid fill -->
+      <rect x="42" y="100" width="296" height="98" rx="6" fill="rgba(255,107,53,0.08)"/>
+
+      <!-- anode pipe -->
+      <rect x="100" y="80" width="20" height="110" rx="4" fill="var(--card)" stroke="var(--orange)" stroke-width="2"/>
+      <text x="110" y="210" text-anchor="middle" fill="var(--orange)" font-size="12" font-weight="700">배관 (+)</text>
+      <text x="110" y="225" text-anchor="middle" fill="var(--dim)" font-size="10">양극</text>
+
+      <!-- cathode -->
+      <rect x="260" y="80" width="20" height="110" rx="4" fill="var(--card)" stroke="var(--cyan)" stroke-width="2"/>
+      <text x="270" y="210" text-anchor="middle" fill="var(--cyan)" font-size="12" font-weight="700">전극 (-)</text>
+      <text x="270" y="225" text-anchor="middle" fill="var(--dim)" font-size="10">음극</text>
+
+      <!-- DC power -->
+      <line x1="110" y1="75" x2="110" y2="35" stroke="var(--orange)" stroke-width="1.5"/>
+      <line x1="110" y1="35" x2="270" y2="35" stroke="var(--dim)" stroke-width="1.5"/>
+      <line x1="270" y1="35" x2="270" y2="75" stroke="var(--cyan)" stroke-width="1.5"/>
+      <rect x="165" y="22" width="50" height="26" rx="6" fill="var(--card)" stroke="var(--border)" stroke-width="1"/>
+      <text x="190" y="40" text-anchor="middle" fill="var(--text)" font-size="11" font-weight="700">DC 전원</text>
+
+      <!-- bubbles -->
+      <circle cx="115" cy="140" r="3" fill="var(--orange)" opacity="0.3" class="pulse"/>
+      <circle cx="105" cy="120" r="2" fill="var(--orange)" opacity="0.4" class="pulse"/>
+      <circle cx="118" cy="155" r="4" fill="var(--orange)" opacity="0.2" class="pulse"/>
+
+      <!-- arrow: rough becomes smooth -->
+      <text x="175" y="115" text-anchor="middle" fill="var(--dim)" font-size="28">→</text>
+      <text x="175" y="145" text-anchor="middle" fill="var(--dim)" font-size="11">울퉁불퉁이</text>
+      <text x="175" y="160" text-anchor="middle" fill="var(--dim)" font-size="11">녹아 없어짐!</text>
+    </svg>
+
+    <div style="max-width:340px">
+      <div class="steps" style="gap:14px">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h4>전기를 건다</h4>
+            <p>배관에 (+)전기, 전극에 (-)전기</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h4>튀어나온 부분이 먼저 녹는다</h4>
+            <p>울퉁불퉁한 곳에 전류가 집중!</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h4>거울처럼 매끈해진다</h4>
+            <p>5~10분이면 Ra ≤ 0.15μm 달성</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="analogy">
+    사포로 문지르는 게 아니라, <strong style="color:var(--orange)">전기로 울퉁불퉁을 녹여버리는</strong> 거야!<br>
+    마치 얼음 표면이 서서히 녹아서 매끈해지는 것처럼
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 8: EP 후 크롬 보호막 ═══════════ -->
+<div class="slide" data-section="크롬 보호막">
+  <span class="section-tag">Chapter 3 &mdash; 표면</span>
+  <div class="slide-title">EP 후 생기는 <span class="cyan">크롬 보호막</span></div>
+
+  <div class="diagram">
+    <svg width="400" height="180" viewBox="0 0 400 180">
+      <!-- base metal -->
+      <rect x="20" y="80" width="360" height="80" rx="4" fill="var(--card)" stroke="var(--border)" stroke-width="1.5"/>
+      <text x="200" y="130" text-anchor="middle" fill="var(--dim)" font-size="16">316L 스테인리스강 (모재)</text>
+
+      <!-- chrome oxide layer -->
+      <rect x="20" y="68" width="360" height="14" rx="3" fill="rgba(0,212,255,0.15)" stroke="var(--cyan)" stroke-width="1.5"/>
+      <text x="200" y="63" text-anchor="middle" fill="var(--cyan)" font-size="13" font-weight="700">Cr₂O₃ 크롬 산화막 (2~5nm)</text>
+
+      <!-- arrows and labels -->
+      <text x="60" y="40" fill="var(--green)" font-size="12">녹 방지 ✓</text>
+      <text x="200" y="40" fill="var(--green)" font-size="12">세균 방지 ✓</text>
+      <text x="310" y="40" fill="var(--green)" font-size="12">자가 치유 ✓</text>
+
+      <!-- Cr/Fe ratio -->
+      <text x="200" y="18" text-anchor="middle" fill="var(--orange)" font-size="14" font-weight="700">Cr/Fe 비율 > 1.5 (정상은 1.0 미만)</text>
+    </svg>
+
+    <div style="max-width:400px; margin-top:16px">
+      <div class="cards" style="gap:14px">
+        <div class="card green-card" style="min-width:180px; padding:18px">
+          <h3 style="font-size:16px">자가 치유</h3>
+          <p style="font-size:14px">긁혀도 크롬이 알아서 다시 막을 만듦!</p>
+        </div>
+        <div class="card cyan-card" style="min-width:180px; padding:18px">
+          <h3 style="font-size:16px">수명 20년+</h3>
+          <p style="font-size:14px">Ra ≤ 0.2μm이면 부식 없이 20년 이상</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="analogy">
+    EP 후 배관 표면에는 눈에 안 보이는 <strong style="color:var(--cyan)">"투명 갑옷"</strong>이 생겨!<br>
+    긁혀도 스스로 회복하는 마법 갑옷이야
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 9: 위생설계 3원칙 ═══════════ -->
+<div class="slide" data-section="위생 설계">
+  <span class="section-tag">Chapter 4 &mdash; 위생 설계</span>
+  <div class="slide-title">위생 설계 <span class="accent">3가지 원칙</span></div>
+  <div class="slide-subtitle">오염을 막는 배관 설계의 핵심!</div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">🚫</div>
+      <h3>① 고인 물 금지</h3>
+      <p><strong>Dead Leg 규칙</strong><br>
+      막힌 배관 길이 ≤ 지름 × 2<br><br>
+      물이 고이면 세균이 자라니까<br>고인 곳이 없어야 해!</p>
+    </div>
+    <div class="card cyan-card">
+      <div class="card-icon">⬇️</div>
+      <h3>② 자연 배수</h3>
+      <p><strong>경사 규칙</strong><br>
+      최소 1/8인치 per foot (1%)<br><br>
+      배관을 살짝 기울여서<br>물이 자연스럽게 빠지게!</p>
+    </div>
+    <div class="card green-card">
+      <div class="card-icon">🔒</div>
+      <h3>③ 틈새 없음</h3>
+      <p><strong>Crevice-Free</strong><br>
+      나사 연결 금지, 용접만 사용<br><br>
+      미세한 틈에 세균이 숨으니까<br>틈이 아예 없어야 해!</p>
+    </div>
+  </div>
+
+  <div class="analogy">
+    수영장에 고인 물웅덩이가 있으면 이끼가 끼지?<br>
+    배관도 <strong style="color:var(--orange)">물이 안 고이고, 자연히 빠지고, 틈이 없어야</strong> 깨끗해!
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 10: Dead Leg 설명 ═══════════ -->
+<div class="slide" data-section="Dead Leg">
+  <span class="section-tag">Chapter 4 &mdash; 위생 설계</span>
+  <div class="slide-title"><span class="accent">Dead Leg</span> — 물이 고이면 안 돼!</div>
+
+  <div class="diagram">
+    <svg width="500" height="260" viewBox="0 0 500 260">
+      <!-- BAD example -->
+      <text x="130" y="20" text-anchor="middle" fill="var(--red)" font-size="16" font-weight="700">나쁜 설계 ✗</text>
+      <!-- main pipe -->
+      <rect x="20" y="60" width="220" height="30" rx="6" fill="var(--card)" stroke="var(--red)" stroke-width="2"/>
+      <!-- branch (too long) -->
+      <rect x="130" y="30" width="30" height="35" rx="6" fill="var(--card)" stroke="var(--red)" stroke-width="2"/>
+      <rect x="130" y="88" width="30" height="80" rx="6" fill="var(--card)" stroke="var(--red)" stroke-width="2"/>
+      <!-- stagnant water -->
+      <rect x="133" y="120" width="24" height="45" rx="3" fill="rgba(248,113,113,0.2)"/>
+      <text x="145" y="148" text-anchor="middle" fill="var(--red)" font-size="9" font-weight="700">고인 물!</text>
+      <text x="145" y="160" text-anchor="middle" fill="var(--red)" font-size="8">세균 번식</text>
+      <!-- dimension -->
+      <line x1="170" y1="95" x2="170" y2="165" stroke="var(--red)" stroke-width="1" stroke-dasharray="3 3"/>
+      <text x="185" y="135" fill="var(--red)" font-size="11">L > 2D</text>
+
+      <!-- flow arrow -->
+      <text x="55" y="80" fill="var(--dim)" font-size="14">→ 흐름</text>
+
+      <!-- GOOD example -->
+      <text x="380" y="20" text-anchor="middle" fill="var(--green)" font-size="16" font-weight="700">좋은 설계 ✓</text>
+      <!-- main pipe -->
+      <rect x="270" y="60" width="220" height="30" rx="6" fill="var(--card)" stroke="var(--green)" stroke-width="2"/>
+      <!-- branch (short) -->
+      <rect x="380" y="88" width="30" height="25" rx="6" fill="var(--card)" stroke="var(--green)" stroke-width="2"/>
+      <!-- dimension -->
+      <line x1="420" y1="93" x2="420" y2="110" stroke="var(--green)" stroke-width="1" stroke-dasharray="3 3"/>
+      <text x="435" y="105" fill="var(--green)" font-size="11">L ≤ 2D</text>
+      <text x="395" y="128" text-anchor="middle" fill="var(--green)" font-size="10">깨끗 유지!</text>
+
+      <!-- flow arrow -->
+      <text x="305" y="80" fill="var(--dim)" font-size="14">→ 흐름</text>
+
+      <!-- calculation example -->
+      <rect x="100" y="190" width="300" height="55" rx="10" fill="var(--card)" stroke="var(--border)" stroke-width="1"/>
+      <text x="250" y="210" text-anchor="middle" fill="var(--text)" font-size="14" font-weight="700">계산 예시</text>
+      <text x="250" y="232" text-anchor="middle" fill="var(--dim)" font-size="13">배관 내경 22mm → 가지 최대 길이 = 22 × 2 = 44mm</text>
+    </svg>
+  </div>
+
+  <div class="analogy">
+    배관 속 막다른 골목은 <strong style="color:var(--red)">지름의 2배</strong>보다 길면 안 돼!<br>
+    골목이 길면 물이 고여서 세균이 파티를 열거든 🦠
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 11: 용접 규칙 ═══════════ -->
+<div class="slide" data-section="용접 규칙">
+  <span class="section-tag">Chapter 5 &mdash; 용접</span>
+  <div class="slide-title">BPE 용접 = <span class="accent">완벽만 허용</span></div>
+
+  <div class="diagram" style="gap:36px">
+    <div>
+      <svg width="300" height="200" viewBox="0 0 300 200">
+        <!-- pipe -->
+        <rect x="20" y="70" width="110" height="60" rx="4" fill="var(--card)" stroke="var(--dim)" stroke-width="1.5"/>
+        <rect x="170" y="70" width="110" height="60" rx="4" fill="var(--card)" stroke="var(--dim)" stroke-width="1.5"/>
+        <!-- weld zone -->
+        <rect x="128" y="65" width="44" height="70" rx="4" fill="rgba(255,107,53,0.1)" stroke="var(--orange)" stroke-width="2"/>
+        <!-- weld bead -->
+        <path d="M130,100 Q150,85 170,100" fill="none" stroke="var(--orange)" stroke-width="3"/>
+        <!-- inner bead -->
+        <path d="M130,100 Q150,108 170,100" fill="none" stroke="var(--cyan)" stroke-width="2"/>
+        <!-- labels -->
+        <text x="75" y="55" text-anchor="middle" fill="var(--dim)" font-size="12">모재 316L</text>
+        <text x="225" y="55" text-anchor="middle" fill="var(--dim)" font-size="12">모재 316L</text>
+        <text x="150" y="50" text-anchor="middle" fill="var(--orange)" font-size="12" font-weight="700">용접부</text>
+        <!-- shield gas -->
+        <text x="150" y="175" text-anchor="middle" fill="var(--dim)" font-size="11">100% 아르곤 가스 보호</text>
+        <text x="150" y="192" text-anchor="middle" fill="var(--cyan)" font-size="11">안팎 모두 차폐!</text>
+      </svg>
+    </div>
+
+    <div style="max-width:380px">
+      <table class="compare-table">
+        <tr>
+          <th>항목</th>
+          <th>BPE 기준</th>
+        </tr>
+        <tr>
+          <td>균열</td>
+          <td class="warn">절대 불가 (0개)</td>
+        </tr>
+        <tr>
+          <td>기공</td>
+          <td class="warn">최대 3개, 1mm 이하</td>
+        </tr>
+        <tr>
+          <td>용입 불량</td>
+          <td class="warn">0.5mm 초과 불가</td>
+        </tr>
+        <tr>
+          <td>표면 거칠기</td>
+          <td class="highlight">Ra ≤ 0.4μm</td>
+        </tr>
+        <tr>
+          <td>UT 검사</td>
+          <td class="highlight">100% 전수 검사</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="analogy">
+    일반 배관은 "좀 괜찮으면 OK"지만,<br>
+    BPE 용접은 <strong style="color:var(--orange)">"완벽하지 않으면 전부 불합격!"</strong>
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 12: 오비탈 vs 수동 ═══════════ -->
+<div class="slide" data-section="오비탈 용접">
+  <span class="section-tag">Chapter 5 &mdash; 용접</span>
+  <div class="slide-title"><span class="cyan">오비탈 용접</span> vs <span class="accent">수동 용접</span></div>
+
+  <div class="cards" style="max-width:800px">
+    <div class="card cyan-card" style="max-width:360px">
+      <div class="card-icon">🤖</div>
+      <h3>오비탈 TIG (자동)</h3>
+      <p style="font-size:15px; line-height:1.8">
+        <strong style="color:var(--text)">기계가 자동으로 용접</strong><br>
+        파이프 주위를 빙글빙글 돌면서<br>
+        일정한 속도와 전류로 용접<br><br>
+        <span style="color:var(--green)">장점:</span> 품질 균일, 실수 거의 없음<br>
+        <span style="color:var(--red)">단점:</span> 장비 비쌈 (수천만 원)
+      </p>
+      <div style="margin-top:12px; padding:10px; background:rgba(0,212,255,0.08); border-radius:8px; text-align:center">
+        <strong style="color:var(--cyan)">BPE 현장의 90% 이상 사용</strong>
+      </div>
+    </div>
+
+    <div class="card" style="max-width:360px">
+      <div class="card-icon">👨‍🔧</div>
+      <h3>수동 TIG (사람)</h3>
+      <p style="font-size:15px; line-height:1.8">
+        <strong style="color:var(--text)">용접사가 직접 용접</strong><br>
+        경험과 기술로 한 땀 한 땀<br>
+        좁은 곳이나 특수 상황에 사용<br><br>
+        <span style="color:var(--green)">장점:</span> 유연성, 장비 저렴<br>
+        <span style="color:var(--red)">단점:</span> 사람마다 차이 큼
+      </p>
+      <div style="margin-top:12px; padding:10px; background:rgba(255,107,53,0.08); border-radius:8px; text-align:center">
+        <strong style="color:var(--orange)">극숙련 용접사만 가능</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="analogy">
+    오비탈은 <strong style="color:var(--cyan)">"자동 세차기"</strong>,
+    수동은 <strong style="color:var(--orange)">"달인의 손세차"</strong>야.<br>
+    BPE에선 자동이 기본이고, 수동은 달인만 허용!
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 13: 밸리데이션 IQ/OQ/PQ ═══════════ -->
+<div class="slide" data-section="밸리데이션">
+  <span class="section-tag">Chapter 6 &mdash; 검증</span>
+  <div class="slide-title"><span class="accent">IQ → OQ → PQ</span> 3단계 검증</div>
+  <div class="slide-subtitle">설치 → 작동 → 성능, 단계별로 합격해야 다음으로!</div>
+
+  <div class="flow" style="margin-bottom:32px">
+    <div class="flow-box active-box">
+      <h4 style="color:var(--orange)">IQ</h4>
+      <p>설치 검증</p>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box active-box">
+      <h4 style="color:var(--cyan)">OQ</h4>
+      <p>작동 검증</p>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box active-box">
+      <h4 style="color:var(--green)">PQ</h4>
+      <p>성능 검증</p>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box" style="border-color:var(--yellow)">
+      <h4 style="color:var(--yellow)">합격!</h4>
+      <p>시스템 인수</p>
+    </div>
+  </div>
+
+  <div class="steps" style="max-width:800px">
+    <div class="step">
+      <div class="step-num">IQ</div>
+      <div class="step-content">
+        <h4>설치 적격성 <span style="color:var(--dim);font-weight:300">(Installation Qualification)</span></h4>
+        <p>설계도대로 제대로 설치됐어? 재료 맞아? 용접 기록 있어? MTR 확인!</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num cyan-num">OQ</div>
+      <div class="step-content">
+        <h4>운전 적격성 <span style="color:var(--dim);font-weight:300">(Operational Qualification)</span></h4>
+        <p>새면 안 돼! 압력 테스트 + 헬륨 누수 테스트. 1시간 동안 0방울!</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num green-num">PQ</div>
+      <div class="step-content">
+        <h4>성능 적격성 <span style="color:var(--dim);font-weight:300">(Performance Qualification)</span></h4>
+        <p>진짜 쓸 때도 깨끗해? 입자 수, 금속 이온, TOC 전부 측정! 2~4주 관찰</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="analogy">
+    새 차를 살 때: <strong style="color:var(--orange)">외관 검사(IQ)</strong> →
+    <strong style="color:var(--cyan)">시운전(OQ)</strong> →
+    <strong style="color:var(--green)">실제 도로 주행(PQ)</strong> 하는 것과 같아!
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 14: 용접 기록의 중요성 ═══════════ -->
+<div class="slide" data-section="용접 기록">
+  <span class="section-tag">Chapter 6 &mdash; 검증</span>
+  <div class="slide-title">용접 기록이 <span class="accent">없으면 불합격!</span></div>
+
+  <div class="diagram" style="gap:40px">
+    <svg width="280" height="280" viewBox="0 0 280 280">
+      <!-- document stack -->
+      <rect x="40" y="30" width="200" height="240" rx="8" fill="var(--card)" stroke="var(--border)" stroke-width="1.5"/>
+      <!-- lines -->
+      <line x1="65" y1="70" x2="215" y2="70" stroke="var(--border)" stroke-width="1"/>
+      <text x="140" y="60" text-anchor="middle" fill="var(--orange)" font-size="16" font-weight="700">Weld Log</text>
+
+      <!-- content lines -->
+      <text x="70" y="95" fill="var(--dim)" font-size="12">위치: WDS-001</text>
+      <text x="70" y="115" fill="var(--dim)" font-size="12">날짜: 2026-03-28</text>
+      <text x="70" y="135" fill="var(--dim)" font-size="12">용접사: 윤민호</text>
+      <text x="70" y="155" fill="var(--dim)" font-size="12">WPS: BPE-316L-Rev02</text>
+      <text x="70" y="175" fill="var(--dim)" font-size="12">Heat #: 6543210</text>
+      <text x="70" y="195" fill="var(--dim)" font-size="12">전류: 130A / 12V</text>
+      <text x="70" y="215" fill="var(--dim)" font-size="12">가스: 100% Ar, 18 CFH</text>
+      <text x="70" y="240" fill="var(--green)" font-size="14" font-weight="700">VT: PASS | UT: PASS</text>
+    </svg>
+
+    <div style="max-width:380px">
+      <p style="font-size:18px; margin-bottom:20px; line-height:1.7">
+        BPE에서 용접 기록은 <strong style="color:var(--orange)">생명</strong>이야.<br>
+        기록이 없으면 아무리 잘 용접해도 <strong style="color:var(--red)">무효</strong>!
+      </p>
+
+      <div class="steps" style="gap:12px">
+        <div class="step">
+          <div class="step-num">📋</div>
+          <div class="step-content">
+            <h4>WPS (용접 절차서)</h4>
+            <p>"이렇게 용접하겠습니다" 계획서</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">📋</div>
+          <div class="step-content">
+            <h4>Weld Log (용접 기록)</h4>
+            <p>누가, 언제, 어떤 조건으로 용접했는지</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">📋</div>
+          <div class="step-content">
+            <h4>Coupon (쿠폰 시편)</h4>
+            <p>같은 조건으로 만든 샘플, 3~5년 보관</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 15: 핵심 숫자 요약 ═══════════ -->
+<div class="slide" data-section="핵심 숫자">
+  <span class="section-tag">Chapter 7 &mdash; 정리</span>
+  <div class="slide-title">기억할 <span class="accent">핵심 숫자</span></div>
+
+  <div class="summary-grid">
+    <div class="summary-item">
+      <div class="num" style="color:var(--cyan)">≤ 0.2 μm</div>
+      <div class="label">표면 거칠기 (Ra) — SF1<br>반도체 배관 기준</div>
+    </div>
+    <div class="summary-item">
+      <div class="num">L/D ≤ 2</div>
+      <div class="label">Dead Leg 최대 허용<br>가지 배관 길이 제한</div>
+    </div>
+    <div class="summary-item">
+      <div class="num" style="color:var(--green)">100%</div>
+      <div class="label">초음파 검사 (UT)<br>모든 용접부 전수 검사</div>
+    </div>
+    <div class="summary-item">
+      <div class="num" style="color:var(--yellow)">1%</div>
+      <div class="label">자연 배수 최소 경사<br>1/8" per foot</div>
+    </div>
+    <div class="summary-item">
+      <div class="num" style="color:var(--red)">0개</div>
+      <div class="label">허용 균열 수<br>균열은 무조건 불합격</div>
+    </div>
+    <div class="summary-item">
+      <div class="num" style="color:var(--cyan)">Cr/Fe > 1.5</div>
+      <div class="label">EP 후 크롬 비율<br>내식성 보장 기준</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 16: 퀴즈 ═══════════ -->
+<div class="slide" data-section="퀴즈">
+  <span class="section-tag">Quiz Time</span>
+  <div class="slide-title">배운 거 확인! <span class="accent">퀴즈</span></div>
+
+  <p style="font-size:22px; margin-bottom:8px; text-align:center">
+    반도체 배관 표면 거칠기(Ra) 기준은?
+  </p>
+
+  <div class="quiz-options" id="quiz1">
+    <div class="quiz-opt" onclick="checkQuiz(this, false)">① Ra ≤ 1.6 μm</div>
+    <div class="quiz-opt" onclick="checkQuiz(this, false)">② Ra ≤ 0.8 μm</div>
+    <div class="quiz-opt" onclick="checkQuiz(this, true)">③ Ra ≤ 0.2 μm</div>
+    <div class="quiz-opt" onclick="checkQuiz(this, false)">④ Ra ≤ 0.05 μm</div>
+  </div>
+
+  <div class="quiz-result" id="quizResult1"></div>
+
+  <p style="font-size:22px; margin-top:32px; margin-bottom:8px; text-align:center">
+    Dead Leg 최대 허용 길이는?
+  </p>
+
+  <div class="quiz-options" id="quiz2">
+    <div class="quiz-opt" onclick="checkQuiz(this, false)">① 배관 지름 × 1</div>
+    <div class="quiz-opt" onclick="checkQuiz(this, true)">② 배관 지름 × 2</div>
+    <div class="quiz-opt" onclick="checkQuiz(this, false)">③ 배관 지름 × 5</div>
+    <div class="quiz-opt" onclick="checkQuiz(this, false)">④ 제한 없음</div>
+  </div>
+
+  <div class="quiz-result" id="quizResult2"></div>
+</div>
+
+<!-- ═══════════ SLIDE 17: 전체 요약 ═══════════ -->
+<div class="slide title-slide" data-section="">
+  <div class="slide-title" style="font-size:36px; margin-bottom:32px">
+    ASME BPE <span class="accent">한 장 정리</span>
+  </div>
+
+  <div class="steps" style="max-width:700px">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h4>재료는 316L</h4>
+        <p>크롬 + 몰리브덴 + 저탄소 = 녹 안 슬고 용접해도 안전</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num cyan-num">2</div>
+      <div class="step-content">
+        <h4>표면은 거울처럼 (Ra ≤ 0.2μm)</h4>
+        <p>전해연마(EP)로 울퉁불퉁을 녹여서 극도로 매끈하게</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num green-num">3</div>
+      <div class="step-content">
+        <h4>설계는 위생적으로</h4>
+        <p>Dead Leg 없이, 경사 주고, 틈새 없이 — 오염 원천 차단</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num" style="background:var(--yellow); color:var(--bg)">4</div>
+      <div class="step-content">
+        <h4>용접은 완벽하게, 기록은 반드시</h4>
+        <p>100% UT 검사 + WPS + Weld Log + 쿠폰 보관</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num" style="background:var(--red)">5</div>
+      <div class="step-content">
+        <h4>검증은 3단계 (IQ → OQ → PQ)</h4>
+        <p>설치 → 작동 → 성능, 단계마다 합격해야 다음으로</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="title-badge" style="margin-top:32px">
+    <span style="color:var(--green)">●</span> ASME BPE = "세상에서 가장 깨끗한 배관을 만드는 법"
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 18: 끝 ═══════════ -->
+<div class="slide title-slide" data-section="">
+  <svg width="100" height="100" viewBox="0 0 100 100" style="margin-bottom:24px; opacity:0.6">
+    <circle cx="50" cy="50" r="45" fill="none" stroke="var(--orange)" stroke-width="2"/>
+    <circle cx="50" cy="50" r="32" fill="none" stroke="var(--cyan)" stroke-width="1.5"/>
+    <text x="50" y="55" text-anchor="middle" fill="var(--text)" font-size="14" font-weight="900">BPE</text>
+  </svg>
+  <div class="main-title" style="font-size:42px">
+    학습 완료!
+  </div>
+  <div class="main-sub">
+    이제 ASME BPE 배관이 왜 특별한지 알게 됐어!<br>
+    다음엔 실제 현장에서 이 기준을 확인해 보자
+  </div>
+  <div style="display:flex; gap:16px; margin-top:24px">
+    <div class="title-badge">
+      <span style="color:var(--dim)">제작</span> Claude by Anthropic
+    </div>
+    <div class="title-badge">
+      <span style="color:var(--dim)">소스</span> ASME BPE NotebookLM
+    </div>
+  </div>
+</div>
+
+</div><!-- /slide-container -->
+
+<!-- ── Navigation Bar ── -->
+<div class="nav-bar">
+  <button class="nav-btn" onclick="prevSlide()">← 이전</button>
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+  <span class="page-num" id="pageNum">1 / 18</span>
+  <button class="nav-btn" onclick="nextSlide()">다음 →</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  let current = 0;
+  const total = slides.length;
+
+  function showSlide(n) {
+    slides[current].classList.remove('active');
+    current = Math.max(0, Math.min(n, total - 1));
+    slides[current].classList.add('active');
+    document.getElementById('pageNum').textContent = `${current + 1} / ${total}`;
+    document.getElementById('progressFill').style.width = `${((current + 1) / total) * 100}%`;
+  }
+
+  function nextSlide() { showSlide(current + 1); }
+  function prevSlide() { showSlide(current - 1); }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+    if (e.key === 'Home') { e.preventDefault(); showSlide(0); }
+    if (e.key === 'End') { e.preventDefault(); showSlide(total - 1); }
+  });
+
+  // Touch swipe support
+  let touchStartX = 0;
+  document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+  document.addEventListener('touchend', (e) => {
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+  });
+
+  // Quiz logic
+  function checkQuiz(el, correct) {
+    const parent = el.parentElement;
+    if (parent.dataset.answered) return;
+    parent.dataset.answered = 'true';
+
+    const opts = parent.querySelectorAll('.quiz-opt');
+    opts.forEach(opt => {
+      const isCorrect = opt.getAttribute('onclick').includes('true');
+      if (isCorrect) opt.classList.add('correct');
+      if (opt === el && !correct) opt.classList.add('wrong');
+    });
+
+    const resultId = parent.id === 'quiz1' ? 'quizResult1' : 'quizResult2';
+    document.getElementById(resultId).innerHTML = correct
+      ? '<span style="color:var(--green)">정답! 반도체 UHP는 SF1 (≤ 0.2 μm) 필수!</span>'
+      : '<span style="color:var(--red)">아쉽! 정답은 ③번이야. 다시 슬라이드를 확인해 보자!</span>';
+
+    if (parent.id === 'quiz2') {
+      document.getElementById(resultId).innerHTML = correct
+        ? '<span style="color:var(--green)">정답! Dead Leg는 배관 지름의 2배까지만 허용!</span>'
+        : '<span style="color:var(--red)">아쉽! 정답은 ②번 (L/D ≤ 2)이야!</span>';
+    }
+  }
+
+  // Checklist interaction
+  document.querySelectorAll('.check-item').forEach(item => {
+    item.addEventListener('click', () => item.classList.toggle('checked'));
+  });
+
+  // Init
+  showSlide(0);
+</script>
+</body>
+</html>
