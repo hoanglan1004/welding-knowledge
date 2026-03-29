@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>계산기 사용법 - 용접 지식 백과</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .guide { max-width: 800px; margin: 0 auto; padding-bottom: 3rem; }
+    .guide h1 { font-size: 1.6rem; margin-bottom: 0.5rem; }
+    .guide-intro { color: var(--text-muted); margin-bottom: 2rem; line-height: 1.7; }
+    .guide-section {
+      margin-bottom: 2rem;
+      background: var(--color-bg-card, #fff);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .guide-section__header {
+      background: var(--color-bg-alt, #f0f9ff);
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .guide-section__header:hover { background: var(--color-bg-hover, #e0f2fe); }
+    .guide-section__header h2 {
+      font-size: 1.1rem;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .guide-section__header .tag {
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+    .tag--essential { background: #fef3c7; color: #92400e; }
+    .tag--advanced { background: #dbeafe; color: #1e40af; }
+    .tag--new { background: #dcfce7; color: #166534; }
+    .guide-section__body {
+      padding: 1.25rem;
+      display: none;
+    }
+    .guide-section.open .guide-section__body { display: block; }
+    .guide-section__body p { margin-bottom: 0.5rem; line-height: 1.7; }
+    .guide-step {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      align-items: flex-start;
+    }
+    .guide-step__num {
+      min-width: 28px; height: 28px;
+      background: var(--color-primary, #2563eb);
+      color: #fff;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; font-weight: 700;
+      flex-shrink: 0;
+    }
+    .guide-step__text { flex: 1; }
+    .guide-step__text strong { color: var(--color-primary, #2563eb); }
+    .guide-example {
+      background: #1e293b; color: #e2e8f0;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      font-family: 'SF Mono', 'Menlo', monospace;
+      font-size: 0.9rem;
+      margin: 0.5rem 0;
+      line-height: 1.6;
+    }
+    .guide-tip {
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      padding: 0.75rem 1rem;
+      border-radius: 0 8px 8px 0;
+      margin: 0.75rem 0;
+      font-size: 0.9rem;
+    }
+    .guide-warn {
+      background: #fee2e2;
+      border-left: 4px solid #ef4444;
+      padding: 0.75rem 1rem;
+      border-radius: 0 8px 8px 0;
+      margin: 0.75rem 0;
+      font-size: 0.9rem;
+    }
+    .guide-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0.75rem 0; }
+    .guide-table th { text-align: left; padding: 0.5rem; border-bottom: 2px solid var(--border); font-weight: 700; }
+    .guide-table td { padding: 0.5rem; border-bottom: 1px solid var(--border); }
+    .guide-table tr:hover td { background: var(--color-bg-alt, #f0f9ff); }
+    .guide-btn-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.5rem 0; }
+    .guide-btn {
+      padding: 0.4rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: inline-block;
+    }
+    .btn-fn { background: #1e3a5f; color: #93c5fd; }
+    .btn-num { background: #374151; color: #f1f5f9; }
+    .btn-op { background: #78350f; color: #fcd34d; }
+    .btn-eq { background: #16a34a; color: #fff; }
+    .btn-ac { background: #991b1b; color: #fecaca; }
+    @media (max-width: 480px) {
+      .guide { padding: 0 0.5rem 3rem; }
+    }
+  </style>
+</head>
+<body>
+  <header class="header header--detail">
+    <div class="container header__nav">
+      <a href="calculator.html" class="header__back">&larr; 계산기로</a>
+      <span class="header__title-small">계산기 사용법</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="guide">
+      <h1>파이프 계산기 사용법</h1>
+      <p class="guide-intro">
+        총 11개 계산기가 탭으로 구성되어 있습니다. 상단 탭을 눌러 필요한 계산기를 선택하세요.<br>
+        아래 각 항목을 눌러 사용법을 확인하세요.
+      </p>
+
+      <!-- ── 1. 공학 계산기 ── -->
+      <div class="guide-section open" id="guide-engcalc">
+        <div class="guide-section__header" onclick="this.parentElement.classList.toggle('open')">
+          <h2>1. 공학 계산 <span class="tag tag--essential">기본</span></h2>
+          <span>&#9660;</span>
+        </div>
+        <div class="guide-section__body">
+          <p>삼각함수, 제곱근 등이 내장된 <strong>현장용 공학 계산기</strong>입니다.</p>
+
+          <h3 style="margin: 1rem 0 0.5rem;">버튼 설명</h3>
+          <div class="guide-btn-row">
+            <span class="guide-btn btn-fn">sin</span>
+            <span class="guide-btn btn-fn">cos</span>
+            <span class="guide-btn btn-fn">tan</span>
+            <span>삼각함수 (기본: DEG 모드)</span>
+          </div>
+          <div class="guide-btn-row">
+            <span class="guide-btn btn-fn">&radic;</span>
+            <span class="guide-btn btn-fn">x&sup2;</span>
+            <span class="guide-btn btn-fn">&pi;</span>
+            <span class="guide-btn btn-fn">( )</span>
+            <span>루트, 제곱, 파이, 괄호</span>
+          </div>
+          <div class="guide-btn-row">
+            <span class="guide-btn btn-fn">DEG</span>
+            <span>누를 때마다 DEG &harr; RAD 전환</span>
+          </div>
+
+          <h3 style="margin: 1rem 0 0.5rem;">사용 예시</h3>
+
+          <div class="guide-step">
+            <div class="guide-step__num">1</div>
+            <div class="guide-step__text">
+              <strong>sin(45)</strong> 계산하기
+              <div class="guide-example">
+                sin &rarr; 4 &rarr; 5 &rarr; =<br>
+                결과: 0.7071
+              </div>
+              <p><strong>괄호는 = 누르면 자동으로 닫힙니다!</strong> 직접 닫을 필요 없어요.</p>
+            </div>
+          </div>
+
+          <div class="guide-step">
+            <div class="guide-step__num">2</div>
+            <div class="guide-step__text">
+              <strong>&radic;(144)</strong> 계산하기
+              <div class="guide-example">
+                &radic; &rarr; 1 &rarr; 4 &rarr; 4 &rarr; =<br>
+                결과: 12
+              </div>
+            </div>
+          </div>
+
+          <div class="guide-step">
+            <div class="guide-step__num">3</div>
+            <div class="guide-step__text">
+              <strong>원주 계산</strong>: &pi; &times; 2 (OD 2인치 파이프 원주)
+              <div class="guide-example">
+                &pi; &rarr; &times; &rarr; 2 &rarr; =<br>
+                결과: 6.2832 (inch)
+              </div>
+            </div>
+          </div>
+
+          <div class="guide-tip">
+            <strong>팁:</strong> <span class="guide-btn btn-ac" style="font-size:0.75rem">AC</span>는 전체 초기화, <span class="guide-btn" style="background:#4a4a4a;color:#e2e8f0;font-size:0.75rem">DEL</span>은 마지막 글자만 삭제.
+          </div>
+
+          <h3 style="margin: 1rem 0 0.5rem;">용접 공식 (아래쪽 섹션)</h3>
+          <table class="guide-table">
+            <tr>
+              <th>공식</th>
+              <th>입력</th>
+              <th>결과</th>
+            </tr>
+            <tr>
+              <td><strong>펄스 전류</strong></td>
+              <td>Peak(A), BG(%), Duty(%)</td>
+              <td>RMS 전류, 산술평균, BG 전류</td>
+            </tr>
+            <tr>
+              <td><strong>열입력</strong></td>
+              <td>전압(V), 평균전류(A), 속도(mm/min)</td>
+              <td>kJ/mm + 판정 (최적/주의/위험)</td>
+            </tr>
+            <tr>
+              <td><strong>속도 변환</strong></td>
+              <td>IPM 또는 RPM + OD(inch)</td>
+              <td>IPM &harr; RPM &harr; mm/min</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── 2. 용접 레시피 ── -->
+      <div class="guide-section" id="guide-recipe">
+        <div class="guide-section__header" onclick="this.parentElement.classList.toggle('open')">
+          <h2>2. 용접 레시피 <span class="tag tag--essential">핵심</span></h2>
+          <span>&#9660;</span>
+        </div>
+        <div class="guide-section__body">
+          <p><strong>파이프 사이즈와 벽두께만 선택</strong>하면 펄스 TIG 세팅을 자동 생성합니다.</p>
+
+          <div class="guide-step">
+            <div class="guide-step__num">1</div>
+            <div class="guide-step__text">파이프 사이즈 선택 (예: 2" OD)</div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step__num">2</div>
+            <div class="guide-step__text">벽두께 선택 (자동으로 해당 사이즈 벽두께 목록 표시)</div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step__num">3</div>
+            <div class="guide-step__text">소재 선택 (304 BA / 316L BA)</div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step__num">4</div>
+            <div class="guide-step__text">용접 타입: <strong>맞대기(Butt)</strong> 또는 <strong>플랜지(Fillet)</strong></div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step__num">5</div>
+            <div class="guide-step__text"><strong>레시피 생성</strong> 버튼 클릭</div>
+          </div>
+
+          <p><strong>결과로 나오는 것:</strong></p>
+          <table class="guide-table">
+            <tr><td>Peak / BG / Duty / PPS</td><td>Dynasty 300에 바로 입력할 값</td></tr>
+            <tr><td>RPM (최적 / 범위)</td><td>턴테이블 속도</td></tr>
+            <tr><td>열입력</td><td>kJ/mm + 판정</td></tr>
+            <tr><td>전극 / 용가재 / 가스</td><td>준비물 한눈에</td></tr>
+          </table>
+
+          <div class="guide-tip">
+            <strong>원리:</strong> 1A/mil(0.001") 업계 표준 기반. OD 열용량 보정 자동 적용. 플랜지는 히트싱크 보상(x1.18) + 높은 Duty(70%).
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 3. 퍼지 ── -->
+      <div class="guide-section" id="guide-purge">
+        <div class="guide-section__header" onclick="this.parentElement.classList.toggle('open')">
+          <h2>3. 백퍼지 <span class="tag tag--essential">핵심</span></h2>
+          <span>&#9660;</span>
+        </div>
+        <div class="guide-section__body">
+          <p>파이프 사이즈 + 벽두께 + 길이만 넣으면 <strong>유량, 시간, 필요 가스량</strong>을 자동 계산.</p>
+
+          <div class="guide-step">
+            <div class="guide-step__num">1</div>
+            <div class="guide-step__text">파이프 사이즈 선택</div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step__num">2</div>
+            <div class="guide-step__text">벽 두께 입력 (mm 또는 inch)</div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step__num">3</div>
+            <div class="guide-step__text">퍼지 구간 길이 입력 (끝~끝 거리)</div>
+          </div>
+
+          <p><strong>결과로 나오는 것:</strong></p>
+          <table class="guide-table">
+            <tr><td>퍼지 시간</td><td>산소 10ppm 도달까지 필요한 시간</td></tr>
+            <tr><td>Dwyer 플로미터 설정</td><td>초기 퍼지 SCFH + 용접 중 SCFH</td></tr>
+            <tr><td>입/출 벤트 추천</td><td>벤트 사이즈 + 위치 (하부 입구, 상부 출구)</td></tr>
+            <tr><td>산소 농도 변화표</td><td>시간별 예상 O₂ ppm</td></tr>
+          </table>
+
+          <div class="guide-warn">
+            <strong>중요:</strong> 계산값은 이론치입니다. 반드시 산소 분석기로 <strong>10ppm 이하</strong> 확인 후 용접 시작하세요.
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 4. 용접설정 ── -->
+      <div class="guide-section" id="guide-weldparam">
+        <div class="guide-section__header" onclick="this.parentElement.classList.toggle('open')">
+          <h2>4. 용접설정 (분석) <span class="tag tag--advanced">심화</span></h2>
+          <span>&#9660;</span>
+        </div>
+        <div class="guide-section__body">
+          <p><strong>현재 쓰고 있는 설정값</strong>을 입력하면 업계 표준과 비교 분석해줍니다.</p>
+          <p>레시피가 "자동 추천"이라면, 용접설정은 "<strong>내 설정 진단</strong>"입니다.</p>
+
+          <div class="guide-step">
+            <div class="guide-step__num">1</div>
+            <div class="guide-step__text">용접 타입 선택 (맞대기 / 플랜지)</div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step__num">2</div>
+            <div class="guide-step__text">파이프 사이즈 + 벽 두께 입력</div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step__num">3</div>
+            <div class="guide-step__text">현재 사용 중인 Peak, BG%, PPS, Duty, 전압 입력</div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step__num">4</div>
+            <div class="guide-step__text">턴테이블 RPM 입력 (선택 - 넣으면 열입력도 분석)</div>
+          </div>
+
+          <p><strong>결과:</strong> 내 설정 vs 추천 비교표 + OK/높음/낮음 판정 + 조정 가이드</p>
+        </div>
+      </div>
+
+      <!-- ── 5. 오프셋 ── -->
+      <div class="guide-section" id="guide-offset">
+        <div class="guide-section__header" onclick="this.parentElement.classList.toggle('open')">
+          <h2>5. 파이프 오프셋</h2>
+          <span>&#9660;</span>
+        </div>
+        <div class="guide-section__body">
+          <p>파이프 높이를 변경할 때 <strong>Travel</strong>(사선 길이)과 <strong>Run</strong>(수평 거리)을 계산.</p>
+
+          <div class="guide-step">
+            <div class="guide-step__num">1</div>
+            <div class="guide-step__text">각도 선택 (45도가 가장 일반적)</div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step__num">2</div>
+            <div class="guide-step__text">Set (높이차) 입력</div>
+          </div>
+
+          <div class="guide-example">
+            45도, Set 6" &rarr; Travel = 8.485", Run = 6"
+          </div>
+
+          <div class="guide-tip">
+            <strong>공식:</strong> Travel = Set / sin(&theta;), Run = Set / tan(&theta;)<br>
+            45도 오프셋이면 Travel = Set &times; 1.414, Run = Set (같음)
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 6. 엘보 ── -->
+      <div class="guide-section" id="guide-elbow">
+        <div class="guide-section__header" onclick="this.parentElement.classList.toggle('open')">
+          <h2>6. 엘보</h2>
+          <span>&#9660;</span>
+        </div>
+        <div class="guide-section__body">
+          <p>두 가지 기능이 있습니다:</p>
+
+          <h3 style="margin: 0.5rem 0;">A. 기성품 엘보 테이크아웃</h3>
+          <p>파이프 사이즈 + 엘보 타입(90LR/90SR/45LR) 선택 &rarr; <strong>테이크아웃(중심~끝 거리)</strong> 표시</p>
+
+          <div class="guide-tip">
+            도면의 C-C 치수에서 양쪽 테이크아웃을 빼면 = 파이프 절단 길이
+          </div>
+
+          <h3 style="margin: 0.75rem 0;">B. 탄젠트 엘보 (직관 제작)</h3>
+          <p>직관 파이프로 엘보를 만들 때 <strong>절단 각도</strong>와 <strong>마킹 치수</strong>를 계산.</p>
+          <p>파이프 사이즈 + 회전 각도 + 피스 수 선택 &rarr; 절단 각도 + 마킹 거리</p>
+        </div>
+      </div>
+
+      <!-- ── 7. 절단길이 ── -->
+      <div class="guide-section" id="guide-cutlength">
+        <div class="guide-section__header" onclick="this.parentElement.classList.toggle('open')">
+          <h2>7. 절단길이</h2>
+          <span>&#9660;</span>
+        </div>
+        <div class="guide-section__body">
+          <p>도면 치수에서 피팅 허용량과 용접 수축을 빼서 <strong>실제 절단 길이</strong>를 계산.</p>
+
+          <div class="guide-example">
+            도면 전체 = 24" - 피팅 허용량 3" - 수축(2mm &times; 2개소) = 20.843"
+          </div>
+
+          <div class="guide-tip">
+            수축량은 mm로 입력합니다. 전체 길이가 inch면 자동 변환됩니다.
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 8. 수축량 ── -->
+      <div class="guide-section" id="guide-shrinkage">
+        <div class="guide-section__header" onclick="this.parentElement.classList.toggle('open')">
+          <h2>8. 수축량</h2>
+          <span>&#9660;</span>
+        </div>
+        <div class="guide-section__body">
+          <p>파이프 사이즈 + 용접 개소 수 &rarr; <strong>총 수축량</strong> (mm / inch)</p>
+          <p>고순도 SST TIG 기준 데이터 사용. 실제 값은 전류/패스 수에 따라 달라질 수 있습니다.</p>
+        </div>
+      </div>
+
+      <!-- ── 9. 원주 ── -->
+      <div class="guide-section" id="guide-circumference">
+        <div class="guide-section__header" onclick="this.parentElement.classList.toggle('open')">
+          <h2>9. 원주</h2>
+          <span>&#9660;</span>
+        </div>
+        <div class="guide-section__body">
+          <p>외경(OD) 입력 &rarr; <strong>원주</strong>(&pi; &times; OD)와 <strong>반원주</strong> 계산. 마킹/래핑 템플릿에 활용.</p>
+        </div>
+      </div>
+
+      <!-- ── 10. 단위변환 ── -->
+      <div class="guide-section" id="guide-convert">
+        <div class="guide-section__header" onclick="this.parentElement.classList.toggle('open')">
+          <h2>10. 단위변환</h2>
+          <span>&#9660;</span>
+        </div>
+        <div class="guide-section__body">
+          <p><strong>inch &harr; mm</strong> 실시간 변환. 숫자를 입력하면 즉시 반대쪽이 변환됩니다.</p>
+          <p>하단에 <strong>자주 쓰는 분수 inch</strong> 버튼이 있어요. 클릭하면 바로 변환됩니다.</p>
+          <p>예: <span class="guide-btn btn-num" style="font-size:0.8rem">1/8</span> 클릭 &rarr; 0.125" = 3.175mm</p>
+        </div>
+      </div>
+
+      <!-- ── 11. 각도/투영 ── -->
+      <div class="guide-section" id="guide-tolerance">
+        <div class="guide-section__header" onclick="this.parentElement.classList.toggle('open')">
+          <h2>11. 각도/투영 보정 <span class="tag tag--advanced">심화</span></h2>
+          <span>&#9660;</span>
+        </div>
+        <div class="guide-section__body">
+          <p>도면 치수가 투영(수평/수직)인 경우, <strong>실제 파이프 길이</strong>를 계산합니다.</p>
+          <p>각도 편차를 추가 입력하면 <strong>허용 오차 범위</strong>도 분석합니다.</p>
+
+          <div class="guide-step">
+            <div class="guide-step__num">1</div>
+            <div class="guide-step__text">도면 치수(길이)와 각도 입력</div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step__num">2</div>
+            <div class="guide-step__text">(선택) 각도 편차 입력 &rarr; 오차 분석 추가</div>
+          </div>
+
+          <div class="guide-example">
+            45도, 2.30" &rarr; 높이: 1.626", 수평: 1.626"<br>
+            편차 &plusmn;1도 입력 &rarr; 높이 차이 0.028" (0.03" 이내 OK)
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 빠른 참조 ── -->
+      <div style="margin-top: 2rem; background: var(--color-bg-alt, #f0f9ff); padding: 1.25rem; border-radius: 12px;">
+        <h3 style="margin-bottom: 0.75rem;">빠른 참조: 언제 뭘 쓰나?</h3>
+        <table class="guide-table">
+          <tr><th>상황</th><th>사용할 탭</th></tr>
+          <tr><td>새 파이프 용접 시작할 때</td><td><strong>용접 레시피</strong> (자동 세팅)</td></tr>
+          <tr><td>퍼지 준비할 때</td><td><strong>퍼지</strong> (유량 + 시간)</td></tr>
+          <tr><td>현재 세팅 맞는지 확인할 때</td><td><strong>용접설정</strong> (분석)</td></tr>
+          <tr><td>파이프 자를 때</td><td><strong>절단길이</strong> + <strong>수축량</strong></td></tr>
+          <tr><td>배관 경로 설계할 때</td><td><strong>오프셋</strong> + <strong>엘보</strong></td></tr>
+          <tr><td>도면 치수 변환할 때</td><td><strong>단위변환</strong> + <strong>원주</strong></td></tr>
+          <tr><td>기울어진 배관 길이 계산</td><td><strong>각도/투영</strong></td></tr>
+          <tr><td>현장에서 빠른 계산</td><td><strong>공학 계산</strong></td></tr>
+        </table>
+      </div>
+
+      <p style="text-align: center; margin-top: 2rem; color: var(--text-muted); font-size: 0.85rem;">
+        &copy; 2026 용접 지식 백과 &middot; Made by Claude
+      </p>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">&copy; 2026 용접 지식 백과</div>
+  </footer>
+</body>
+</html>
