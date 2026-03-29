@@ -45,22 +45,32 @@ const App = {
   /**
    * 카드 목록을 화면에 렌더링한다.
    */
-  renderCards(items) {
+  renderCards(items, fieldMode) {
     const grid = document.getElementById('cardGrid');
     const noResults = document.getElementById('noResults');
     const countEl = document.getElementById('resultCount');
 
     if (items.length === 0) {
       grid.innerHTML = '';
-      noResults.style.display = 'block';
+      if (fieldMode) {
+        noResults.style.display = 'block';
+        noResults.querySelector('p').textContent = '아직 현장 기록이 없습니다.';
+        noResults.querySelector('.no-results__hint').textContent = '텔레그램에서 /현장 명령어로 기록을 추가해 보세요.';
+      } else {
+        noResults.style.display = 'block';
+      }
       countEl.textContent = '';
       return;
     }
 
     noResults.style.display = 'none';
-    countEl.textContent = `${items.length}건`;
+    countEl.textContent = fieldMode ? `현장 기록 ${items.length}건` : `${items.length}건`;
 
-    grid.innerHTML = items.map(item => this._createCardHTML(item)).join('');
+    if (fieldMode) {
+      grid.innerHTML = items.map(item => this._createFieldCardHTML(item)).join('');
+    } else {
+      grid.innerHTML = items.map(item => this._createCardHTML(item)).join('');
+    }
 
     // 카드 클릭 이벤트
     grid.querySelectorAll('.card').forEach(card => {
@@ -70,6 +80,36 @@ const App = {
         window.location.href = `detail.html?type=${type}&id=${id}`;
       });
     });
+  },
+
+  /**
+   * 현장 기록 전용 카드 — 날짜, 도면 사진, 제품정보가 바로 보이는 레이아웃
+   */
+  _createFieldCardHTML(item) {
+    const urgencyIcon = item.urgency === 'high' ? '🔴' : item.urgency === 'medium' ? '🟡' : '🟢';
+
+    return `
+      <div class="card card--field-log" data-type="troubleshooting" data-id="${item.id}">
+        <div class="field-log__header">
+          <span class="field-log__date">${item.date || '날짜 없음'}</span>
+          <span class="field-log__urgency">${urgencyIcon} ${item.urgency === 'high' ? '중요' : item.urgency === 'medium' ? '보통' : '참고'}</span>
+        </div>
+        ${item.image ? `
+          <div class="field-log__image">
+            <img src="${item.image}" alt="현장 도면" loading="lazy">
+          </div>
+        ` : ''}
+        <div class="field-log__body">
+          <h3 class="field-log__symptom">${item.icon} ${item.symptom}</h3>
+          ${item.product ? `<div class="field-log__product">🔩 ${item.product}</div>` : ''}
+          ${item.drawingInfo ? `<div class="field-log__drawing">📐 ${item.drawingInfo}</div>` : ''}
+          <p class="field-log__desc">${item.description}</p>
+          <div class="field-log__fix">
+            <strong>즉시 조치:</strong> ${item.quickFixes[0]}
+          </div>
+        </div>
+      </div>
+    `;
   },
 
   /**
