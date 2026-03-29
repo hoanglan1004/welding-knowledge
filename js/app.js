@@ -239,14 +239,26 @@ const App = {
     const urgencyLabel = { critical: '긴급', high: '중요', medium: '보통', low: '참고' };
     const urgencyColor = { critical: '#c0392b', high: '#e74c3c', medium: '#e67e22', low: '#3498db' };
 
+    // 현장 경험 메타 (도면, 제품정보, 날짜)
+    const fieldMeta = this._renderFieldMeta(item);
+    // 도면/사진 이미지
+    const fieldImage = this._renderFieldImage(item);
+
     return `
       <div class="ts-detail">
         <div class="ts-detail__header">
           <span class="ts-detail__icon">${item.icon}</span>
           <h1 class="ts-detail__title">${item.symptom}</h1>
         </div>
-        <span class="detail__category" style="background: ${urgencyColor[item.urgency]}">${urgencyLabel[item.urgency]} · ${item.category}</span>
+        <div class="ts-detail__badges">
+          <span class="detail__category" style="background: ${urgencyColor[item.urgency]}">${urgencyLabel[item.urgency]} · ${item.category}</span>
+          ${item.source === '현장' ? '<span class="detail__category detail__category--field">🏭 현장 경험</span>' : ''}
+          ${item.date ? `<span class="detail__category detail__category--date">${item.date}</span>` : ''}
+        </div>
         <div class="detail__summary">${item.description}</div>
+
+        ${fieldMeta}
+        ${fieldImage}
 
         <div class="ts-quickfix-section">
           <h2 class="ts-quickfix-section__title">즉시 조치</h2>
@@ -277,6 +289,32 @@ const App = {
 
         <div class="ts-nav">
           <a href="index.html#troubleshoot-section" class="ts-nav__back">다른 문제 보기</a>
+        </div>
+      </div>
+    `;
+  },
+
+  // --- 현장 경험 메타 정보 (제품, 도면번호) ---
+  _renderFieldMeta(item) {
+    if (!item.product && !item.drawingInfo) return '';
+    return `
+      <div class="field-meta">
+        ${item.product ? `<div class="field-meta__item"><span class="field-meta__label">🔩 제품</span><span class="field-meta__value">${item.product}</span></div>` : ''}
+        ${item.drawingInfo ? `<div class="field-meta__item"><span class="field-meta__label">📐 도면</span><span class="field-meta__value">${item.drawingInfo}</span></div>` : ''}
+      </div>
+    `;
+  },
+
+  // --- 현장 도면/사진 이미지 ---
+  _renderFieldImage(item) {
+    if (!item.image) return '';
+    return `
+      <div class="detail-section field-image-section">
+        <h2 class="detail-section__title">📷 현장 도면 / 사진</h2>
+        <div class="field-image-wrapper">
+          <img src="${item.image}" alt="현장 도면" class="field-image" loading="lazy"
+               onclick="this.classList.toggle('field-image--expanded')">
+          <p class="field-image__hint">이미지를 탭하면 확대됩니다</p>
         </div>
       </div>
     `;
