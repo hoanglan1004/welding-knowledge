@@ -828,6 +828,44 @@
       "relatedProcesses": [
         "tig"
       ]
+    },
+    {
+      "symptom": "엘보의 타원화(Ovality)로 인한 튜브 접합부 단차 발생 및 조립 불가",
+      "product": "1.5인치 Stainless Steel (0.065T) 튜브-엘보 맞대기 용접",
+      "drawingInfo": "E17607130_A_B",
+      "category": "치수",
+      "urgency": "high",
+      "description": "도면 E17607130에 명시된 1.5인치 튜브와 벤딩 엘보 조립 시, 엘보 끝단이 정원이 아닌 타원형으로 변형되어 있어 튜브와 면이 맞지 않는 구조적 결함 발생.",
+      "quickFixes": [
+        "정원 복원용 클램프(Re-rounding tool)를 사용하여 엘보 끝단 형상 교정",
+        "가접(Tack weld) 시 단차를 최소화할 수 있는 지점을 우선 확보 후 분산 가접"
+      ],
+      "causes": [
+        "벤딩 가공 공정 중 발생하는 파이프의 구조적 타원화(Ovality)",
+        "박판 소재(0.065T)의 가공 시 형상 유지력 부족",
+        "입고 자재의 치수 허용 오차 초과"
+      ],
+      "detailedSolutions": [
+        {
+          "action": "기계적 정원 교정",
+          "detail": "용접 전 전용 확관기나 정원 복원 지그를 엘보 내경에 삽입하여 튜브의 외경과 일치하도록 물리적으로 교정합니다."
+        },
+        {
+          "action": "단차 보정 용접 검토",
+          "detail": "단차가 미세한 경우 용융풀의 표면 장력을 이용해 '살 채우기' 식으로 육성 용접 후 면을 잡을 수 있으나, BA 파이프의 특성상 내부 비드 품질을 위해 선 교정 후 자동/수동 용접을 진행하는 것이 원칙입니다."
+        }
+      ],
+      "relatedDefects": [
+        "distortion-issue"
+      ],
+      "relatedProcesses": [
+        "tig"
+      ],
+      "id": "field-exp-0401",
+      "icon": "📏",
+      "source": "현장",
+      "date": "2026-04-01",
+      "image": "images/field/field-exp-0401.jpg"
     }
   ]
 }
